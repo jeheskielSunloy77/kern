@@ -19,6 +19,7 @@ type Container struct {
 	Paths   storage.Paths
 	DB      *sql.DB
 	Library *LibraryService
+	Reader  *ReaderService
 }
 
 func NewContainer(ctx context.Context) (*Container, error) {
@@ -46,16 +47,18 @@ func NewContainer(ctx context.Context) (*Container, error) {
 	stateRepo := repository.NewReadingStateRepository(db)
 
 	processorRegistry := preprocessing.NewRegistry()
-	processorRegistry.Register(domain.BookFormatEPUB, preprocess.NoopProcessor{})
-	processorRegistry.Register(domain.BookFormatPDF, preprocess.NoopProcessor{})
+	processorRegistry.Register(domain.BookFormatEPUB, preprocess.EPUBProcessor{})
+	processorRegistry.Register(domain.BookFormatPDF, preprocess.PDFProcessor{})
 
 	library := NewLibraryService(bookRepo, stateRepo, processorRegistry, paths)
+	readerService := NewReaderService(bookRepo, stateRepo, paths)
 
 	return &Container{
 		Config:  loadedConfig.Config,
 		Paths:   paths,
 		DB:      db,
 		Library: library,
+		Reader:  readerService,
 	}, nil
 }
 
