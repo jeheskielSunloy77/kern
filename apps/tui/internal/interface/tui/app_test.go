@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -101,35 +102,132 @@ func TestDeleteFromDiskRequiresExactDELETEConfirmation(t *testing.T) {
 		t.Fatalf("expected 1 library book, got %d", len(m.libraryBooks))
 	}
 
-	m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("D")})
-	if m.prompt == nil || m.prompt.kind != promptDeleteDiskConfirm {
-		t.Fatalf("expected delete confirmation prompt")
+	m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("r")})
+	if m.remove == nil {
+		t.Fatalf("expected remove modal")
 	}
-	if !strings.Contains(m.prompt.description, book.ManagedPath) {
-		t.Fatalf("expected prompt to show full file path")
+	if m.remove.step != removeStepChooseAction {
+		t.Fatalf("expected action step")
 	}
 
-	m.prompt.value = "delete"
-	m.applyPrompt()
-	m.closePrompt()
+	m.handleRemoveKey(tea.KeyMsg{Type: tea.KeyDown})
+	if m.remove.action != removeActionDeleteDisk {
+		t.Fatalf("expected delete-from-disk action selected")
+	}
+	m.handleRemoveKey(tea.KeyMsg{Type: tea.KeyEnter})
+	if m.remove.step != removeStepConfirm {
+		t.Fatalf("expected confirmation step")
+	}
+
+	m.remove.value = "delete"
+	m.applyRemove()
+	m.closeRemoveModal()
 
 	if _, err := os.Stat(book.ManagedPath); err != nil {
 		t.Fatalf("expected file to remain after wrong confirmation, stat error: %v", err)
 	}
-	if !strings.Contains(m.status, "Delete canceled") {
-		t.Fatalf("expected canceled status, got %q", m.status)
+	if !strings.Contains(m.statusText, "Delete canceled") {
+		t.Fatalf("expected canceled status, got %q", m.statusText)
 	}
 
-	m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("D")})
-	m.prompt.value = "DELETE"
-	m.applyPrompt()
-	m.closePrompt()
+	m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("r")})
+	m.handleRemoveKey(tea.KeyMsg{Type: tea.KeyDown})
+	m.handleRemoveKey(tea.KeyMsg{Type: tea.KeyEnter})
+	m.remove.value = "DELETE"
+	m.applyRemove()
+	m.closeRemoveModal()
 
 	if _, err := os.Stat(book.ManagedPath); !os.IsNotExist(err) {
 		t.Fatalf("expected managed file deleted, stat err: %v", err)
 	}
 	if len(m.libraryBooks) != 0 {
 		t.Fatalf("expected book removed from library, got %d", len(m.libraryBooks))
+	}
+}
+
+func TestLibraryDeleteShortcutIsDisabled(t *testing.T) {
+	container := newTestContainer(t)
+	seedBookWithEPUBCache(t, container, "no-d-shortcut", "")
+
+	m := New(container).(model)
+	m.startupCompleted = true
+	if err := m.refreshLibrary(); err != nil {
+		t.Fatalf("refresh library: %v", err)
+	}
+	if len(m.libraryBooks) == 0 {
+		t.Fatalf("expected seeded library book")
+	}
+
+	m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("D")})
+
+	if m.remove != nil {
+		t.Fatalf("expected no remove modal on D key")
+	}
+	if m.prompt != nil {
+		t.Fatalf("expected no prompt on D key")
+	}
+}
+
+func TestAddFlowStartsFileSelectorAtHomeDirectory(t *testing.T) {
+	home, err := os.UserHomeDir()
+	if err != nil || strings.TrimSpace(home) == "" {
+		t.Skip("home directory unavailable")
+	}
+
+	container := newTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+
+	m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("a")})
+	if m.browserDir != filepath.Clean(home) {
+		t.Fatalf("expected browserDir %q, got %q", filepath.Clean(home), m.browserDir)
+	}
+
+	m.addSourceMethod = addSourceSelector
+	m.handleAddKey(tea.KeyMsg{Type: tea.KeyEnter})
+	if m.addStep != addStepFileSelector {
+		t.Fatalf("expected file selector step, got %v", m.addStep)
+	}
+	if m.browserDir != filepath.Clean(home) {
+		t.Fatalf("expected selector to open at %q, got %q", filepath.Clean(home), m.browserDir)
+	}
+}
+
+func TestLoadBrowserShowsOnlyDirectoriesAndSupportedFiles(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+
+	dir := t.TempDir()
+	if err := os.Mkdir(filepath.Join(dir, "docs"), 0o755); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+	for _, name := range []string{"book.epub", "paper.PDF", "notes.txt", "archive.zip"} {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte("x"), 0o644); err != nil {
+			t.Fatalf("write file %s: %v", name, err)
+		}
+	}
+
+	m.loadBrowser(dir)
+
+	got := make(map[string]bool)
+	for _, entry := range m.browserEntries {
+		got[entry.name] = true
+	}
+
+	if !got["docs"] {
+		t.Fatalf("expected directory entry")
+	}
+	if !got["book.epub"] {
+		t.Fatalf("expected epub entry")
+	}
+	if !got["paper.PDF"] {
+		t.Fatalf("expected pdf entry")
+	}
+	if got["notes.txt"] {
+		t.Fatalf("expected txt file to be filtered out")
+	}
+	if got["archive.zip"] {
+		t.Fatalf("expected zip file to be filtered out")
 	}
 }
 
@@ -180,6 +278,149 @@ func TestCtrlCSavesReaderProgressBeforeQuit(t *testing.T) {
 	}
 	if saved.Locator.Offset <= 0 {
 		t.Fatalf("expected positive saved offset, got %d", saved.Locator.Offset)
+	}
+}
+
+func TestRenderPageBoxHighlightsChapterLinesWithoutChangingTextStructure(t *testing.T) {
+	container := newTestContainer(t)
+	book := seedBookWithEPUBCache(t, container, "chapter-style", "")
+
+	cacheDir := container.Paths.BookCacheDir(book.ID)
+	cache := domain.EPUBCache{
+		Title:    book.Title,
+		Author:   book.Author,
+		Sections: []string{"Chapter One\nalpha beta gamma\ndelta epsilon"},
+		SectionChapterLineIndexes: [][]int{
+			{0},
+		},
+	}
+	cacheBytes, err := json.Marshal(cache)
+	if err != nil {
+		t.Fatalf("marshal epub cache: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(cacheDir, "epub_cache.json"), cacheBytes, 0o644); err != nil {
+		t.Fatalf("write epub cache: %v", err)
+	}
+
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.width = 90
+	m.height = 20
+
+	if err := m.openBook(book.ID, nil); err != nil {
+		t.Fatalf("open seeded book: %v", err)
+	}
+
+	content, lineStarts, lineRanges := m.readerPageContent(0, 60, 10)
+	if content == "" {
+		t.Fatalf("expected first page content")
+	}
+
+	unstyledModel := m
+	unstyledModel.readerChapterStarts = nil
+	unstyled := unstyledModel.renderPageBox(content, lineStarts, lineRanges, 1, 1, 60, 10)
+	styled := m.renderPageBox(content, lineStarts, lineRanges, 1, 1, 60, 10)
+
+	if len(lineStarts) == 0 {
+		t.Fatalf("expected line starts for first page")
+	}
+	if _, ok := m.readerChapterStarts[lineStarts[0]]; !ok {
+		t.Fatalf("expected first line to be marked as chapter heading")
+	}
+
+	plainStyled := stripANSI(styled)
+	plainUnstyled := stripANSI(unstyled)
+	if plainStyled != plainUnstyled {
+		t.Fatalf("expected identical plain text structure after stripping ANSI\nunstyled:\n%s\nstyled:\n%s", plainUnstyled, plainStyled)
+	}
+}
+
+func TestEPUBChapterStartsAtTopOfPage(t *testing.T) {
+	container := newTestContainer(t)
+	book := seedBookWithEPUBCache(t, container, "chapter-top", "")
+
+	cacheDir := container.Paths.BookCacheDir(book.ID)
+	cache := domain.EPUBCache{
+		Title:  book.Title,
+		Author: book.Author,
+		Sections: []string{
+			"line1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nCHAPTER TWO\nafter chapter",
+		},
+		SectionChapterLineIndexes: [][]int{
+			{8},
+		},
+	}
+	cacheBytes, err := json.Marshal(cache)
+	if err != nil {
+		t.Fatalf("marshal epub cache: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(cacheDir, "epub_cache.json"), cacheBytes, 0o644); err != nil {
+		t.Fatalf("write epub cache: %v", err)
+	}
+
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.width = 90
+	m.height = 13
+
+	if err := m.openBook(book.ID, nil); err != nil {
+		t.Fatalf("open seeded book: %v", err)
+	}
+	if m.readerPageCount() < 2 {
+		t.Fatalf("expected at least 2 pages, got %d", m.readerPageCount())
+	}
+
+	secondPage := strings.Split(m.readerPagination.Pages[1], "\n")
+	if len(secondPage) == 0 || secondPage[0] != "CHAPTER TWO" {
+		t.Fatalf("expected chapter on top of page 2, got %q", m.readerPagination.Pages[1])
+	}
+}
+
+func TestEffectiveStatusHidesReadyAndReading(t *testing.T) {
+	m := model{}
+
+	if _, _, visible := m.effectiveStatus(time.Now(), "Ready"); visible {
+		t.Fatalf("expected Ready fallback to be hidden")
+	}
+	if _, _, visible := m.effectiveStatus(time.Now(), "Reading"); visible {
+		t.Fatalf("expected Reading fallback to be hidden")
+	}
+}
+
+func TestEffectiveStatusAutoDismissesAfterTenSeconds(t *testing.T) {
+	m := model{}
+	m.setStatusSuccess("Imported: Book")
+
+	soon := m.statusSetAt.Add(9 * time.Second)
+	if _, _, visible := m.effectiveStatus(soon, "Ready"); !visible {
+		t.Fatalf("expected status to still be visible before timeout")
+	}
+
+	late := m.statusSetAt.Add(10 * time.Second)
+	if _, _, visible := m.effectiveStatus(late, "Ready"); visible {
+		t.Fatalf("expected status to hide at timeout")
+	}
+}
+
+func TestRenderStatusToastUsesVariantStyle(t *testing.T) {
+	m := model{}
+
+	m.setStatusSuccess("Saved")
+	success := m.renderStatusToast("Ready")
+	if !strings.Contains(success, "Saved") {
+		t.Fatalf("expected success toast text, got %q", success)
+	}
+	if _, kind, visible := m.effectiveStatus(time.Now(), "Ready"); !visible || kind != statusSuccess {
+		t.Fatalf("expected visible success status, got visible=%v kind=%q", visible, kind)
+	}
+
+	m.setStatusDestructive("Failed")
+	destructive := m.renderStatusToast("Ready")
+	if !strings.Contains(destructive, "Failed") {
+		t.Fatalf("expected destructive toast text, got %q", destructive)
+	}
+	if _, kind, visible := m.effectiveStatus(time.Now(), "Ready"); !visible || kind != statusDestructive {
+		t.Fatalf("expected visible destructive status, got visible=%v kind=%q", visible, kind)
 	}
 }
 
@@ -273,6 +514,10 @@ func seedBookWithEPUBCache(t *testing.T, container *application.Container, id st
 		Title:    book.Title,
 		Author:   book.Author,
 		Sections: []string{"chapter one words", "chapter two words"},
+		SectionChapterLineIndexes: [][]int{
+			{0},
+			{0},
+		},
 	}
 	cacheBytes, err := json.Marshal(cache)
 	if err != nil {
@@ -283,4 +528,10 @@ func seedBookWithEPUBCache(t *testing.T, container *application.Container, id st
 	}
 
 	return book
+}
+
+var ansiPattern = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+
+func stripANSI(value string) string {
+	return ansiPattern.ReplaceAllString(value, "")
 }

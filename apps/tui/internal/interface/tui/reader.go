@@ -19,7 +19,7 @@ func (m *model) handleReaderKey(msg tea.KeyMsg) {
 	switch msg.String() {
 	case "q":
 		if err := m.saveReaderState(); err != nil {
-			m.status = fmt.Sprintf("Failed to save progress: %v", err)
+			m.setStatusDestructive(fmt.Sprintf("Failed to save progress: %v", err))
 		}
 		m.currentView = viewLibrary
 		m.readerHelp = false
@@ -43,7 +43,7 @@ func (m *model) handleReaderKey(msg tea.KeyMsg) {
 		return
 	case "/":
 		if !m.isReaderTextMode() {
-			m.status = "In-book search is available in EPUB and PDF text mode"
+			m.setStatusDefault("In-book search is available in EPUB and PDF text mode")
 			return
 		}
 		m.promptFor(promptReaderSearch, "In-Book Search", "Find text in current reading mode", "search", m.readerSearchQuery)
@@ -108,6 +108,7 @@ func (m *model) openTextMode(bookID string, mode domain.ReadingMode) error {
 	m.readerMode = mode
 	m.readerTextDocument = session.Document
 	m.readerSectionStarts = session.SectionStarts
+	m.readerChapterStarts = toOffsetSet(session.ChapterStarts)
 	m.readerLayoutPages = nil
 	m.readerSearchMatches = nil
 	m.readerSearchIndex = 0
@@ -131,9 +132,9 @@ func (m *model) openTextMode(bookID string, mode domain.ReadingMode) error {
 
 	m.currentView = viewReader
 	m.readerHelp = false
-	m.status = ""
+	m.clearStatus()
 	if err := m.container.Library.MarkOpened(context.Background(), session.Book.ID, time.Now().UTC()); err != nil {
-		m.status = fmt.Sprintf("Opened book, but failed to update last-opened: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Opened book, but failed to update last-opened: %v", err))
 	}
 	return nil
 }
@@ -150,6 +151,7 @@ func (m *model) openLayoutMode(bookID string) error {
 	m.readerTextDocument = reader.TextDocument{}
 	m.readerPagination = reader.TextPagination{}
 	m.readerSectionStarts = nil
+	m.readerChapterStarts = nil
 	m.readerPage = clamp(session.State.Locator.PageIndex, 0, len(session.Pages)-1)
 	m.readerSearchMatches = nil
 	m.readerSearchIndex = 0
@@ -157,9 +159,9 @@ func (m *model) openLayoutMode(bookID string) error {
 	m.readerFinished = session.State.IsFinished
 	m.currentView = viewReader
 	m.readerHelp = false
-	m.status = ""
+	m.clearStatus()
 	if err := m.container.Library.MarkOpened(context.Background(), session.Book.ID, time.Now().UTC()); err != nil {
-		m.status = fmt.Sprintf("Opened book, but failed to update last-opened: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Opened book, but failed to update last-opened: %v", err))
 	}
 	return nil
 }
@@ -175,28 +177,28 @@ func (m *model) isReaderTextMode() bool {
 
 func (m *model) togglePDFMode() {
 	if m.readerBook.Format != domain.BookFormatPDF {
-		m.status = "PDF mode toggle is only available for PDF books"
+		m.setStatusDefault("PDF mode toggle is only available for PDF books")
 		return
 	}
 
 	if err := m.saveReaderState(); err != nil {
-		m.status = fmt.Sprintf("Failed to save before mode switch: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Failed to save before mode switch: %v", err))
 	}
 
 	if m.readerMode == domain.ReadingModePDFLayout {
 		if err := m.openTextMode(m.readerBook.ID, domain.ReadingModePDFText); err != nil {
-			m.status = fmt.Sprintf("Failed to switch mode: %v", err)
+			m.setStatusDestructive(fmt.Sprintf("Failed to switch mode: %v", err))
 			return
 		}
-		m.status = "Switched to PDF text mode"
+		m.setStatusSuccess("Switched to PDF text mode")
 		return
 	}
 
 	if err := m.openLayoutMode(m.readerBook.ID); err != nil {
-		m.status = fmt.Sprintf("Failed to switch mode: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Failed to switch mode: %v", err))
 		return
 	}
-	m.status = "Switched to PDF layout mode"
+	m.setStatusSuccess("Switched to PDF layout mode")
 }
 
 func (m *model) toggleFinished() {
@@ -206,19 +208,19 @@ func (m *model) toggleFinished() {
 
 	next := !m.readerFinished
 	if err := m.container.Reader.SetFinished(context.Background(), m.readerBook.ID, next); err != nil {
-		m.status = fmt.Sprintf("Failed to update finished state: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Failed to update finished state: %v", err))
 		return
 	}
 	m.readerFinished = next
 	if err := m.saveReaderState(); err != nil {
-		m.status = fmt.Sprintf("Finished state changed, but save failed: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Finished state changed, but save failed: %v", err))
 		return
 	}
 
 	if next {
-		m.status = "Marked as finished"
+		m.setStatusSuccess("Marked as finished")
 	} else {
-		m.status = "Marked as unfinished"
+		m.setStatusSuccess("Marked as unfinished")
 	}
 }
 
@@ -227,7 +229,11 @@ func (m *model) repaginateReader(anchorOffset int) {
 		return
 	}
 	pageWidth, pageHeight := m.readerPageSize()
-	m.readerPagination = m.readerTextDocument.Paginate(pageWidth, pageHeight)
+	forcedStarts := map[int]struct{}(nil)
+	if m.readerMode == domain.ReadingModeEPUB {
+		forcedStarts = m.readerChapterStarts
+	}
+	m.readerPagination = m.readerTextDocument.PaginateWithForcedPageStarts(pageWidth, pageHeight, forcedStarts)
 	m.readerPage = clamp(m.readerPagination.PageForOffset(anchorOffset), 0, m.readerPageCount()-1)
 }
 
@@ -287,7 +293,7 @@ func (m *model) moveReaderPage(delta int) {
 	}
 	m.readerPage = next
 	if err := m.saveReaderState(); err != nil {
-		m.status = fmt.Sprintf("Failed to save progress: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Failed to save progress: %v", err))
 	}
 }
 
@@ -344,6 +350,23 @@ func (m *model) saveReaderState() error {
 	return m.container.Reader.SaveState(context.Background(), state)
 }
 
+func toOffsetSet(offsets []int) map[int]struct{} {
+	if len(offsets) == 0 {
+		return nil
+	}
+	result := make(map[int]struct{}, len(offsets))
+	for _, offset := range offsets {
+		if offset < 0 {
+			continue
+		}
+		result[offset] = struct{}{}
+	}
+	if len(result) == 0 {
+		return nil
+	}
+	return result
+}
+
 func (m *model) readerSectionIndexForOffset(offset int) int {
 	if m.readerMode != domain.ReadingModeEPUB || len(m.readerSectionStarts) == 0 {
 		return 0
@@ -368,17 +391,17 @@ func (m *model) applyReaderSearch(query string) {
 	m.readerSearchIndex = 0
 
 	if query == "" {
-		m.status = "Cleared in-book search"
+		m.setStatusDefault("Cleared in-book search")
 		return
 	}
 	if !m.isReaderTextMode() {
-		m.status = "Search is available only in EPUB and PDF text mode"
+		m.setStatusDefault("Search is available only in EPUB and PDF text mode")
 		return
 	}
 
 	matches := m.readerTextDocument.SearchTokenOffsets(query)
 	if len(matches) == 0 {
-		m.status = fmt.Sprintf("No matches for %q", query)
+		m.setStatusDefault(fmt.Sprintf("No matches for %q", query))
 		return
 	}
 
@@ -387,19 +410,19 @@ func (m *model) applyReaderSearch(query string) {
 	offset := matches[0]
 	m.readerPage = clamp(m.readerPagination.PageForOffset(offset), 0, m.readerPageCount()-1)
 	if err := m.saveReaderState(); err != nil {
-		m.status = fmt.Sprintf("Match found, but failed to save position: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Match found, but failed to save position: %v", err))
 		return
 	}
-	m.status = fmt.Sprintf("Found %d match(es)", len(matches))
+	m.setStatusSuccess(fmt.Sprintf("Found %d match(es)", len(matches)))
 }
 
 func (m *model) jumpToSearchResult(direction int) {
 	if len(m.readerSearchMatches) == 0 {
-		m.status = "No active search results"
+		m.setStatusDefault("No active search results")
 		return
 	}
 	if !m.isReaderTextMode() {
-		m.status = "Search navigation is unavailable in layout mode"
+		m.setStatusDefault("Search navigation is unavailable in layout mode")
 		return
 	}
 
@@ -411,35 +434,35 @@ func (m *model) jumpToSearchResult(direction int) {
 	offset := m.readerSearchMatches[m.readerSearchIndex]
 	m.readerPage = clamp(m.readerPagination.PageForOffset(offset), 0, m.readerPageCount()-1)
 	if err := m.saveReaderState(); err != nil {
-		m.status = fmt.Sprintf("Failed to save search position: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Failed to save search position: %v", err))
 		return
 	}
-	m.status = fmt.Sprintf("Match %d/%d", m.readerSearchIndex+1, count)
+	m.setStatusSuccess(fmt.Sprintf("Match %d/%d", m.readerSearchIndex+1, count))
 }
 
 func (m *model) applyGoToPage(value string) {
 	pageNumber, err := parsePositiveInt(value)
 	if err != nil {
-		m.status = "Invalid page number"
+		m.setStatusDestructive("Invalid page number")
 		return
 	}
 	if m.readerPageCount() == 0 {
-		m.status = "No pages available"
+		m.setStatusDestructive("No pages available")
 		return
 	}
 
 	m.readerPage = clamp(pageNumber-1, 0, m.readerPageCount()-1)
 	if err := m.saveReaderState(); err != nil {
-		m.status = fmt.Sprintf("Jumped to page, but failed to save: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Jumped to page, but failed to save: %v", err))
 		return
 	}
-	m.status = fmt.Sprintf("Jumped to page %d", m.readerPage+1)
+	m.setStatusSuccess(fmt.Sprintf("Jumped to page %d", m.readerPage+1))
 }
 
 func (m *model) applyGoToPercent(value string) {
 	percent, err := strconv.ParseFloat(strings.TrimSpace(value), 64)
 	if err != nil {
-		m.status = "Invalid percent value"
+		m.setStatusDestructive("Invalid percent value")
 		return
 	}
 	if percent < 0 {
@@ -449,17 +472,17 @@ func (m *model) applyGoToPercent(value string) {
 		percent = 100
 	}
 	if m.readerPageCount() == 0 {
-		m.status = "No pages available"
+		m.setStatusDestructive("No pages available")
 		return
 	}
 
 	target := int((percent / 100.0) * float64(m.readerPageCount()-1))
 	m.readerPage = clamp(target, 0, m.readerPageCount()-1)
 	if err := m.saveReaderState(); err != nil {
-		m.status = fmt.Sprintf("Jumped to percent, but failed to save: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Jumped to percent, but failed to save: %v", err))
 		return
 	}
-	m.status = fmt.Sprintf("Jumped to %.1f%%", percent)
+	m.setStatusSuccess(fmt.Sprintf("Jumped to %.1f%%", percent))
 }
 
 func (m *model) tryAutoOpenResumeBook() {
@@ -469,11 +492,11 @@ func (m *model) tryAutoOpenResumeBook() {
 	book, err := m.container.Library.MostRecentUnfinishedBook(context.Background())
 	if err != nil {
 		if !errors.Is(err, repository.ErrNotFound) {
-			m.status = fmt.Sprintf("Resume check failed: %v", err)
+			m.setStatusDestructive(fmt.Sprintf("Resume check failed: %v", err))
 		}
 		return
 	}
 	if err := m.openBook(book.ID, nil); err != nil {
-		m.status = fmt.Sprintf("Failed to open resume book: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("Failed to open resume book: %v", err))
 	}
 }

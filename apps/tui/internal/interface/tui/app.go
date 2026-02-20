@@ -27,11 +27,21 @@ const (
 	viewReader
 )
 
-type addFocus int
+type addStep int
 
 const (
-	addFocusPath addFocus = iota
-	addFocusBrowser
+	addStepChooseSource addStep = iota
+	addStepPathInput
+	addStepFileSelector
+	addStepManagedCopy
+	addStepImporting
+)
+
+type addSourceMethod int
+
+const (
+	addSourcePath addSourceMethod = iota
+	addSourceSelector
 )
 
 type promptKind int
@@ -42,8 +52,6 @@ const (
 	promptReaderSearch
 	promptGotoPage
 	promptGotoPercent
-	promptRemoveConfirm
-	promptDeleteDiskConfirm
 )
 
 type promptState struct {
@@ -52,6 +60,29 @@ type promptState struct {
 	description string
 	value       string
 	placeholder string
+}
+
+type removeAction int
+
+const (
+	removeActionLibrary removeAction = iota
+	removeActionDeleteDisk
+)
+
+type removeStep int
+
+const (
+	removeStepChooseAction removeStep = iota
+	removeStepConfirm
+)
+
+type removeState struct {
+	bookID      string
+	bookTitle   string
+	managedPath string
+	step        removeStep
+	action      removeAction
+	value       string
 }
 
 type browserEntry struct {
@@ -78,6 +109,14 @@ type startupLoadedMsg struct {
 	err          error
 }
 
+type statusVariant string
+
+const (
+	statusDefault     statusVariant = "default"
+	statusSuccess     statusVariant = "success"
+	statusDestructive statusVariant = "destructive"
+)
+
 type model struct {
 	container *application.Container
 
@@ -85,7 +124,9 @@ type model struct {
 	height int
 
 	currentView viewID
-	status      string
+	statusText  string
+	statusKind  statusVariant
+	statusSetAt time.Time
 
 	prompt *promptState
 
@@ -98,7 +139,8 @@ type model struct {
 
 	addPath         string
 	addManagedCopy  bool
-	addFocus        addFocus
+	addStep         addStep
+	addSourceMethod addSourceMethod
 	browserDir      string
 	browserEntries  []browserEntry
 	browserSelected int
@@ -108,11 +150,14 @@ type model struct {
 	importCancel    context.CancelFunc
 	importEvents    <-chan tea.Msg
 
+	remove *removeState
+
 	readerBook          domain.Book
 	readerMode          domain.ReadingMode
 	readerTextDocument  reader.TextDocument
 	readerPagination    reader.TextPagination
 	readerSectionStarts []int
+	readerChapterStarts map[int]struct{}
 	readerLayoutPages   []string
 	readerPage          int
 	readerSearchQuery   string
@@ -128,7 +173,8 @@ func New(container *application.Container) tea.Model {
 		container:       container,
 		currentView:     viewLibrary,
 		addManagedCopy:  true,
-		addFocus:        addFocusPath,
+		addStep:         addStepChooseSource,
+		addSourceMethod: addSourcePath,
 		libraryProgress: map[string]float64{},
 		libraryFinished: map[string]bool{},
 	}
@@ -187,7 +233,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case startupLoadedMsg:
 		if msg.err != nil {
-			m.status = fmt.Sprintf("Startup error: %v", msg.err)
+			m.setStatusDestructive(fmt.Sprintf("Startup error: %v", msg.err))
 			m.startupCompleted = true
 			return m, nil
 		}
@@ -197,7 +243,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.startupCompleted = true
 		if msg.resumeBookID != "" {
 			if err := m.openBook(msg.resumeBookID, nil); err != nil {
-				m.status = fmt.Sprintf("Failed to auto-resume: %v", err)
+				m.setStatusDestructive(fmt.Sprintf("Failed to auto-resume: %v", err))
 			}
 		}
 		return m, nil
@@ -217,18 +263,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.importStage = ""
 		m.importPercent = 0
 		if msg.err != nil {
+			m.addStep = addStepManagedCopy
 			if errors.Is(msg.err, context.Canceled) {
-				m.status = "Import canceled"
+				m.setStatusDefault("Import canceled")
 			} else {
-				m.status = fmt.Sprintf("Import failed: %v", msg.err)
+				m.setStatusDestructive(fmt.Sprintf("Import failed: %v", msg.err))
 			}
 			return m, nil
 		}
 
-		m.status = fmt.Sprintf("Imported: %s", msg.book.Title)
+		m.setStatusSuccess(fmt.Sprintf("Imported: %s", msg.book.Title))
 		m.addPath = ""
+		m.addStep = addStepChooseSource
 		if err := m.refreshLibrary(); err != nil {
-			m.status = fmt.Sprintf("Imported, but failed to reload library: %v", err)
+			m.setStatusDestructive(fmt.Sprintf("Imported, but failed to reload library: %v", err))
+		} else {
+			m.currentView = viewLibrary
 		}
 		return m, nil
 
@@ -237,13 +287,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.importing {
 			m.importing = false
 			m.importCancel = nil
+			m.addStep = addStepManagedCopy
 		}
 		return m, nil
 
 	case tea.QuitMsg:
 		if m.currentView == viewReader {
 			if err := m.saveReaderState(); err != nil {
-				m.status = fmt.Sprintf("Failed to save progress before quit: %v", err)
+				m.setStatusDestructive(fmt.Sprintf("Failed to save progress before quit: %v", err))
 				return m, nil
 			}
 		}
@@ -252,6 +303,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		if msg.String() == "ctrl+c" {
 			return m, m.requestQuitCmd()
+		}
+
+		if m.remove != nil {
+			m.handleRemoveKey(msg)
+			return m, nil
 		}
 
 		if m.prompt != nil {
@@ -406,7 +462,7 @@ func (m *model) applyPrompt() {
 	case promptLibrarySearch:
 		m.libraryQuery = value
 		if err := m.refreshLibrary(); err != nil {
-			m.status = fmt.Sprintf("Search failed: %v", err)
+			m.setStatusDestructive(fmt.Sprintf("Search failed: %v", err))
 		}
 	case promptReaderSearch:
 		m.applyReaderSearch(value)
@@ -414,41 +470,13 @@ func (m *model) applyPrompt() {
 		m.applyGoToPage(value)
 	case promptGotoPercent:
 		m.applyGoToPercent(value)
-	case promptRemoveConfirm:
-		if strings.EqualFold(value, "REMOVE") {
-			book, ok := m.selectedBook()
-			if ok {
-				if err := m.container.Library.RemoveFromLibrary(context.Background(), book.ID); err != nil {
-					m.status = fmt.Sprintf("Remove failed: %v", err)
-				} else {
-					m.status = fmt.Sprintf("Removed from library: %s", book.Title)
-					_ = m.refreshLibrary()
-				}
-			}
-		} else {
-			m.status = "Removal canceled: type REMOVE to confirm"
-		}
-	case promptDeleteDiskConfirm:
-		if value == "DELETE" {
-			book, ok := m.selectedBook()
-			if ok {
-				if err := m.container.Library.DeleteFromDisk(context.Background(), book.ID); err != nil {
-					m.status = fmt.Sprintf("Delete failed: %v", err)
-				} else {
-					m.status = fmt.Sprintf("Deleted from disk: %s", book.Title)
-					_ = m.refreshLibrary()
-				}
-			}
-		} else {
-			m.status = "Delete canceled: type DELETE exactly to confirm"
-		}
 	}
 }
 
 func (m *model) requestQuitCmd() tea.Cmd {
 	if m.currentView == viewReader {
 		if err := m.saveReaderState(); err != nil {
-			m.status = fmt.Sprintf("Failed to save progress before quit: %v", err)
+			m.setStatusDestructive(fmt.Sprintf("Failed to save progress before quit: %v", err))
 			return nil
 		}
 	}
@@ -473,7 +501,11 @@ func (m model) View() string {
 	}
 
 	if m.prompt != nil {
-		body += "\n" + m.renderPrompt()
+		return m.renderPromptModal()
+	}
+
+	if m.remove != nil {
+		return m.renderRemoveModal()
 	}
 
 	return body
@@ -481,8 +513,8 @@ func (m model) View() string {
 
 func (m model) renderLoading() string {
 	message := "Loading local library..."
-	if m.status != "" {
-		message = m.status
+	if m.statusText != "" {
+		message = m.statusText
 	}
 
 	if m.width > 0 && m.height > 0 {
@@ -517,4 +549,49 @@ func parsePositiveInt(value string) (int, error) {
 		return 0, errors.New("value must be positive")
 	}
 	return parsed, nil
+}
+
+func (m *model) setStatusDefault(msg string) {
+	m.statusText = strings.TrimSpace(msg)
+	m.statusKind = statusDefault
+	m.statusSetAt = time.Now()
+}
+
+func (m *model) setStatusSuccess(msg string) {
+	m.statusText = strings.TrimSpace(msg)
+	m.statusKind = statusSuccess
+	m.statusSetAt = time.Now()
+}
+
+func (m *model) setStatusDestructive(msg string) {
+	m.statusText = strings.TrimSpace(msg)
+	m.statusKind = statusDestructive
+	m.statusSetAt = time.Now()
+}
+
+func (m *model) clearStatus() {
+	m.statusText = ""
+	m.statusKind = ""
+	m.statusSetAt = time.Time{}
+}
+
+func (m model) effectiveStatus(now time.Time, fallback string) (string, statusVariant, bool) {
+	text := strings.TrimSpace(m.statusText)
+	if text == "" {
+		text = fallback
+	}
+
+	if text == "" || text == "Ready" || text == "Reading" {
+		return "", statusDefault, false
+	}
+
+	if !m.statusSetAt.IsZero() && now.Sub(m.statusSetAt) >= 10*time.Second {
+		return "", statusDefault, false
+	}
+
+	kind := m.statusKind
+	if kind == "" {
+		kind = statusDefault
+	}
+	return text, kind, true
 }

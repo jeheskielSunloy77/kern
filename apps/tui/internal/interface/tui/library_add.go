@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/zeile/tui/internal/domain"
 )
 
 func (m *model) handleLibraryKey(msg tea.KeyMsg) tea.Cmd {
@@ -26,35 +27,23 @@ func (m *model) handleLibraryKey(msg tea.KeyMsg) tea.Cmd {
 	case "/":
 		m.promptFor(promptLibrarySearch, "Library Search", "Search title/author/file name", "query", m.libraryQuery)
 	case "a":
-		m.currentView = viewAdd
-		m.status = ""
+		m.startAddFlow()
+		m.clearStatus()
 	case "enter":
 		book, ok := m.selectedBook()
 		if !ok {
 			return nil
 		}
 		if err := m.openBook(book.ID, nil); err != nil {
-			m.status = fmt.Sprintf("Open failed: %v", err)
+			m.setStatusDestructive(fmt.Sprintf("Open failed: %v", err))
 		}
 	case "r":
 		book, ok := m.selectedBook()
 		if ok {
-			m.promptFor(
-				promptRemoveConfirm,
-				"Remove From Library",
-				fmt.Sprintf("Type REMOVE to remove '%s' from library only", book.Title),
-				"REMOVE",
-				"",
-			)
-		}
-	case "D":
-		book, ok := m.selectedBook()
-		if ok {
-			description := fmt.Sprintf("Scary action! Type DELETE to permanently delete file:\n%s", book.ManagedPath)
-			m.promptFor(promptDeleteDiskConfirm, "Delete From Disk", description, "DELETE", "")
+			m.openRemoveModal(book)
 		}
 	case "?":
-		m.status = "Library: / search | a add | Enter open | r remove | D delete disk | q quit"
+		m.setStatusDefault("Library: / search  a add  Enter open  r remove  q quit")
 	}
 	return nil
 }
@@ -74,31 +63,39 @@ func (m *model) handleAddKey(msg tea.KeyMsg) tea.Cmd {
 	case "q":
 		m.currentView = viewLibrary
 		return nil
-	case "tab":
-		if m.addFocus == addFocusPath {
-			m.addFocus = addFocusBrowser
-		} else {
-			m.addFocus = addFocusPath
-		}
-		return nil
-	case "m":
-		m.addManagedCopy = !m.addManagedCopy
-		return nil
-	case "u":
-		parent := filepath.Dir(m.browserDir)
-		m.loadBrowser(parent)
+	case "b":
+		m.backAddStep()
 		return nil
 	}
 
-	if m.addFocus == addFocusPath {
+	switch m.addStep {
+	case addStepChooseSource:
+		switch msg.String() {
+		case "up", "k", "down", "j", "left", "h", "right", "l":
+			if m.addSourceMethod == addSourcePath {
+				m.addSourceMethod = addSourceSelector
+			} else {
+				m.addSourceMethod = addSourcePath
+			}
+		case "enter":
+			if m.addSourceMethod == addSourcePath {
+				m.addStep = addStepPathInput
+			} else {
+				m.loadBrowserHome()
+				m.addStep = addStepFileSelector
+			}
+		}
+		return nil
+
+	case addStepPathInput:
 		switch msg.String() {
 		case "enter":
 			path := strings.TrimSpace(m.addPath)
 			if path == "" {
-				m.status = "Enter a file path or use the file browser"
+				m.setStatusDestructive("Enter a file path")
 				return nil
 			}
-			return m.startImport(path)
+			m.addStep = addStepManagedCopy
 		case "backspace":
 			if len(m.addPath) > 0 {
 				runes := []rune(m.addPath)
@@ -110,37 +107,198 @@ func (m *model) handleAddKey(msg tea.KeyMsg) tea.Cmd {
 			}
 		}
 		return nil
-	}
 
-	if len(m.browserEntries) == 0 {
-		return nil
-	}
-
-	switch msg.String() {
-	case "up", "k":
-		if m.browserSelected > 0 {
-			m.browserSelected--
-		}
-	case "down", "j":
-		if m.browserSelected < len(m.browserEntries)-1 {
-			m.browserSelected++
-		}
-	case "enter", "i":
-		entry := m.browserEntries[m.browserSelected]
-		if entry.isDir {
-			m.loadBrowser(entry.path)
+	case addStepFileSelector:
+		switch msg.String() {
+		case "u":
+			parent := filepath.Dir(m.browserDir)
+			m.loadBrowser(parent)
 			return nil
 		}
-		m.addPath = entry.path
-		return m.startImport(entry.path)
+		if len(m.browserEntries) == 0 {
+			return nil
+		}
+
+		switch msg.String() {
+		case "up", "k":
+			if m.browserSelected > 0 {
+				m.browserSelected--
+			}
+		case "down", "j":
+			if m.browserSelected < len(m.browserEntries)-1 {
+				m.browserSelected++
+			}
+		case "enter", "i":
+			entry := m.browserEntries[m.browserSelected]
+			if entry.isDir {
+				m.loadBrowser(entry.path)
+				return nil
+			}
+			m.addPath = entry.path
+			m.addStep = addStepManagedCopy
+		}
+		return nil
+
+	case addStepManagedCopy:
+		switch msg.String() {
+		case "left", "h", "down", "j", "n":
+			m.addManagedCopy = false
+			return nil
+		case "right", "l", "up", "k", "y":
+			m.addManagedCopy = true
+			return nil
+		case "m":
+			m.addManagedCopy = !m.addManagedCopy
+			return nil
+		case "enter":
+			path := strings.TrimSpace(m.addPath)
+			if path == "" {
+				m.setStatusDestructive("Select or enter a file path first")
+				return nil
+			}
+			cmd := m.startImport(path)
+			if m.importing {
+				m.addStep = addStepImporting
+			}
+			return cmd
+		}
+		return nil
 	}
 
 	return nil
 }
 
+func (m *model) startAddFlow() {
+	m.currentView = viewAdd
+	m.addStep = addStepChooseSource
+	m.addSourceMethod = addSourcePath
+	m.addPath = ""
+	m.importing = false
+	m.importCancel = nil
+	m.importEvents = nil
+	m.importStage = ""
+	m.importPercent = 0
+	if m.container != nil {
+		m.addManagedCopy = m.container.Config.ManagedCopyDefault
+	}
+	m.loadBrowserHome()
+}
+
+func (m *model) loadBrowserHome() {
+	home, err := os.UserHomeDir()
+	if err != nil || strings.TrimSpace(home) == "" {
+		return
+	}
+	m.loadBrowser(home)
+}
+
+func (m *model) backAddStep() {
+	switch m.addStep {
+	case addStepPathInput, addStepFileSelector:
+		m.addStep = addStepChooseSource
+	case addStepManagedCopy:
+		if m.addSourceMethod == addSourceSelector {
+			m.addStep = addStepFileSelector
+		} else {
+			m.addStep = addStepPathInput
+		}
+	}
+}
+
+func (m *model) openRemoveModal(book domain.Book) {
+	m.remove = &removeState{
+		bookID:      book.ID,
+		bookTitle:   book.Title,
+		managedPath: book.ManagedPath,
+		step:        removeStepChooseAction,
+		action:      removeActionLibrary,
+	}
+}
+
+func (m *model) closeRemoveModal() {
+	m.remove = nil
+}
+
+func (m *model) handleRemoveKey(msg tea.KeyMsg) {
+	if m.remove == nil {
+		return
+	}
+
+	switch m.remove.step {
+	case removeStepChooseAction:
+		switch msg.String() {
+		case "esc", "q":
+			m.closeRemoveModal()
+		case "up", "k", "down", "j", "left", "h", "right", "l":
+			if m.remove.action == removeActionLibrary {
+				m.remove.action = removeActionDeleteDisk
+			} else {
+				m.remove.action = removeActionLibrary
+			}
+		case "enter":
+			m.remove.step = removeStepConfirm
+			m.remove.value = ""
+		}
+	case removeStepConfirm:
+		switch msg.String() {
+		case "esc":
+			m.remove.step = removeStepChooseAction
+			m.remove.value = ""
+			return
+		case "q":
+			m.closeRemoveModal()
+			return
+		case "backspace":
+			if len(m.remove.value) > 0 {
+				runes := []rune(m.remove.value)
+				m.remove.value = string(runes[:len(runes)-1])
+			}
+			return
+		case "enter":
+			m.applyRemove()
+			m.closeRemoveModal()
+			return
+		}
+		if len(msg.Runes) > 0 {
+			m.remove.value += string(msg.Runes)
+		}
+	}
+}
+
+func (m *model) applyRemove() {
+	if m.remove == nil {
+		return
+	}
+
+	switch m.remove.action {
+	case removeActionLibrary:
+		if !strings.EqualFold(strings.TrimSpace(m.remove.value), "REMOVE") {
+			m.setStatusDefault("Removal canceled: type REMOVE to confirm")
+			return
+		}
+		if err := m.container.Library.RemoveFromLibrary(context.Background(), m.remove.bookID); err != nil {
+			m.setStatusDestructive(fmt.Sprintf("Remove failed: %v", err))
+			return
+		}
+		m.setStatusSuccess(fmt.Sprintf("Removed from library: %s", m.remove.bookTitle))
+		_ = m.refreshLibrary()
+	case removeActionDeleteDisk:
+		if strings.TrimSpace(m.remove.value) != "DELETE" {
+			m.setStatusDefault("Delete canceled: type DELETE exactly to confirm")
+			return
+		}
+		if err := m.container.Library.DeleteFromDisk(context.Background(), m.remove.bookID); err != nil {
+			m.setStatusDestructive(fmt.Sprintf("Delete failed: %v", err))
+			return
+		}
+		m.setStatusSuccess(fmt.Sprintf("Deleted from disk: %s", m.remove.bookTitle))
+		_ = m.refreshLibrary()
+	}
+}
+
 func (m *model) startImport(path string) tea.Cmd {
 	if m.container == nil || m.container.Library == nil {
-		m.status = "Library service unavailable"
+		m.setStatusDestructive("Library service unavailable")
 		return nil
 	}
 
@@ -180,7 +338,7 @@ func (m *model) startImport(path string) tea.Cmd {
 func (m *model) loadBrowser(dir string) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		m.status = fmt.Sprintf("File browser error: %v", err)
+		m.setStatusDestructive(fmt.Sprintf("File browser error: %v", err))
 		return
 	}
 
@@ -195,6 +353,11 @@ func (m *model) loadBrowser(dir string) {
 		name := entry.Name()
 		if strings.HasPrefix(name, ".") {
 			continue
+		}
+		if !entry.IsDir() {
+			if _, err := domain.DetectFormat(name); err != nil {
+				continue
+			}
 		}
 		browserEntries = append(browserEntries, browserEntry{
 			name:  name,
