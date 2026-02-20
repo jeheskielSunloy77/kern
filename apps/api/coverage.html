@@ -1,0 +1,3772 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>application: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/jeheskielSunloy77/zeile/internal/application/auth.go (74.2%)</option>
+				
+				<option value="file1">github.com/jeheskielSunloy77/zeile/internal/application/authorization.go (30.4%)</option>
+				
+				<option value="file2">github.com/jeheskielSunloy77/zeile/internal/application/resource.go (21.4%)</option>
+				
+				<option value="file3">github.com/jeheskielSunloy77/zeile/internal/application/resource_mock.go (0.0%)</option>
+				
+				<option value="file4">github.com/jeheskielSunloy77/zeile/internal/application/services.go (0.0%)</option>
+				
+				<option value="file5">github.com/jeheskielSunloy77/zeile/internal/application/user.go (78.6%)</option>
+				
+				<option value="file6">github.com/jeheskielSunloy77/zeile/internal/infrastructure/repository/auth.go (78.3%)</option>
+				
+				<option value="file7">github.com/jeheskielSunloy77/zeile/internal/infrastructure/repository/auth_session.go (0.0%)</option>
+				
+				<option value="file8">github.com/jeheskielSunloy77/zeile/internal/infrastructure/repository/email_verification.go (90.9%)</option>
+				
+				<option value="file9">github.com/jeheskielSunloy77/zeile/internal/infrastructure/repository/repositories.go (0.0%)</option>
+				
+				<option value="file10">github.com/jeheskielSunloy77/zeile/internal/infrastructure/repository/resource.go (62.9%)</option>
+				
+				<option value="file11">github.com/jeheskielSunloy77/zeile/internal/infrastructure/repository/resource_mock.go (0.0%)</option>
+				
+				<option value="file12">github.com/jeheskielSunloy77/zeile/internal/infrastructure/repository/user.go (100.0%)</option>
+				
+				<option value="file13">github.com/jeheskielSunloy77/zeile/internal/interface/http/handler/auth.go (73.4%)</option>
+				
+				<option value="file14">github.com/jeheskielSunloy77/zeile/internal/interface/http/handler/base.go (51.3%)</option>
+				
+				<option value="file15">github.com/jeheskielSunloy77/zeile/internal/interface/http/handler/handlers.go (0.0%)</option>
+				
+				<option value="file16">github.com/jeheskielSunloy77/zeile/internal/interface/http/handler/health.go (0.0%)</option>
+				
+				<option value="file17">github.com/jeheskielSunloy77/zeile/internal/interface/http/handler/openapi.go (0.0%)</option>
+				
+				<option value="file18">github.com/jeheskielSunloy77/zeile/internal/interface/http/handler/resource.go (26.8%)</option>
+				
+				<option value="file19">github.com/jeheskielSunloy77/zeile/internal/interface/http/handler/user.go (0.0%)</option>
+				
+				<option value="file20">github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware/auth.go (0.0%)</option>
+				
+				<option value="file21">github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware/authorization.go (91.3%)</option>
+				
+				<option value="file22">github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware/context.go (27.3%)</option>
+				
+				<option value="file23">github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware/global.go (0.0%)</option>
+				
+				<option value="file24">github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware/middlewares.go (0.0%)</option>
+				
+				<option value="file25">github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware/rate_limit.go (0.0%)</option>
+				
+				<option value="file26">github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware/request_id.go (0.0%)</option>
+				
+				<option value="file27">github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware/tracing.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package application
+
+import (
+        "context"
+        "crypto/hmac"
+        "crypto/rand"
+        "crypto/sha256"
+        "encoding/base64"
+        "encoding/hex"
+        "encoding/json"
+        "errors"
+        "fmt"
+        "math/big"
+        "regexp"
+        "strings"
+        "time"
+
+        "github.com/golang-jwt/jwt/v5"
+        "github.com/google/uuid"
+        "github.com/hibiken/asynq"
+        "github.com/jeheskielSunloy77/zeile/internal/app/errs"
+        "github.com/jeheskielSunloy77/zeile/internal/app/sqlerr"
+        applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/job"
+        "github.com/rs/zerolog"
+        "golang.org/x/crypto/bcrypt"
+        "golang.org/x/oauth2"
+        googleoauth "golang.org/x/oauth2/google"
+        "google.golang.org/api/idtoken"
+        "gorm.io/gorm"
+)
+
+var (
+        minPasswordLength = 8
+        emailRegex        = regexp.MustCompile(`^[^@\s]+@[^@\s]+\.[^@\s]+$`)
+)
+
+const googleStateTTL = 10 * time.Minute
+
+type googleOAuthConfig interface {
+        AuthCodeURL(state string, opts ...oauth2.AuthCodeOption) string
+        Exchange(ctx context.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error)
+}
+
+type googleTokenValidator func(ctx context.Context, idToken, audience string) (*idtoken.Payload, error)
+
+type googleStatePayload struct {
+        State     string    `json:"state"`
+        ExpiresAt time.Time `json:"expiresAt"`
+}
+
+type authService struct {
+        repo                 port.AuthRepository
+        sessionRepo          port.AuthSessionRepository
+        verificationRepo     port.EmailVerificationRepository
+        taskEnqueuer         TaskEnqueuer
+        logger               *zerolog.Logger
+        secretKey            []byte
+        accessTokenTTL       time.Duration
+        refreshTokenTTL      time.Duration
+        googleClientID       string
+        googleClientSecret   string
+        googleRedirectURL    string
+        googleOAuthConfig    googleOAuthConfig
+        googleTokenValidator googleTokenValidator
+        emailVerificationTTL time.Duration
+        now                  func() time.Time
+}
+
+type AuthToken struct {
+        Token     string    `json:"token"`
+        ExpiresAt time.Time `json:"expiresAt"`
+}
+
+type AuthResult struct {
+        User         *domain.User `json:"user"`
+        Token        AuthToken    `json:"token"`
+        RefreshToken AuthToken    `json:"refreshToken"`
+}
+
+type AuthService interface {
+        Register(ctx context.Context, input applicationdto.RegisterInput, userAgent, ipAddress string) (*AuthResult, error)
+        Login(ctx context.Context, input applicationdto.LoginInput, userAgent, ipAddress string) (*AuthResult, error)
+        StartGoogleAuth(ctx context.Context) (*GoogleAuthStart, error)
+        CompleteGoogleAuth(ctx context.Context, code, state, stateCookie, userAgent, ipAddress string) (*AuthResult, error)
+        VerifyEmail(ctx context.Context, input applicationdto.VerifyEmailInput) (*domain.User, error)
+        Refresh(ctx context.Context, refreshToken, userAgent, ipAddress string) (*AuthResult, error)
+        Logout(ctx context.Context, refreshToken string) error
+        LogoutAll(ctx context.Context, userID uuid.UUID) error
+        CurrentUser(ctx context.Context, userID uuid.UUID) (*domain.User, error)
+        ResendVerification(ctx context.Context, userID uuid.UUID) error
+}
+
+type TaskEnqueuer interface {
+        EnqueueContext(ctx context.Context, task *asynq.Task, opts ...asynq.Option) (*asynq.TaskInfo, error)
+}
+
+type GoogleAuthStart struct {
+        AuthURL        string
+        StateCookie    string
+        StateExpiresAt time.Time
+}
+
+func NewAuthService(cfg *config.AuthConfig, repo port.AuthRepository, sessionRepo port.AuthSessionRepository, verificationRepo port.EmailVerificationRepository, taskEnqueuer TaskEnqueuer, logger *zerolog.Logger) AuthService <span class="cov10" title="21">{
+        refreshTTL := cfg.RefreshTokenTTL
+        if refreshTTL &lt;= 0 </span><span class="cov10" title="21">{
+                refreshTTL = 30 * 24 * time.Hour
+        }</span>
+
+        <span class="cov10" title="21">oauthConfig := &amp;oauth2.Config{
+                ClientID:     cfg.GoogleClientID,
+                ClientSecret: cfg.GoogleClientSecret,
+                RedirectURL:  cfg.GoogleRedirectURL,
+                Scopes:       []string{"openid", "email", "profile"},
+                Endpoint:     googleoauth.Endpoint,
+        }
+
+        return &amp;authService{
+                repo:                 repo,
+                sessionRepo:          sessionRepo,
+                verificationRepo:     verificationRepo,
+                taskEnqueuer:         taskEnqueuer,
+                logger:               logger,
+                secretKey:            []byte(cfg.SecretKey),
+                accessTokenTTL:       cfg.AccessTokenTTL,
+                refreshTokenTTL:      refreshTTL,
+                googleClientID:       cfg.GoogleClientID,
+                googleClientSecret:   cfg.GoogleClientSecret,
+                googleRedirectURL:    cfg.GoogleRedirectURL,
+                googleOAuthConfig:    oauthConfig,
+                googleTokenValidator: idtoken.Validate,
+                emailVerificationTTL: cfg.EmailVerificationTTL,
+                now:                  time.Now,
+        }</span>
+}
+
+func (s *authService) Register(ctx context.Context, input applicationdto.RegisterInput, userAgent, ipAddress string) (*AuthResult, error) <span class="cov3" title="2">{
+        if len(input.Password) &lt; minPasswordLength </span><span class="cov1" title="1">{
+                return nil, errs.NewBadRequestError(
+                        fmt.Sprintf("Password must be at least %d characters", minPasswordLength),
+                        true,
+                        []errs.FieldError{{Field: "password", Error: "too short"}},
+                        nil,
+                )
+        }</span>
+
+        <span class="cov1" title="1">passwordHash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov1" title="1">user := &amp;domain.User{
+                Email:        input.Email,
+                Username:     input.Username,
+                PasswordHash: string(passwordHash),
+        }
+
+        if err := s.repo.CreateUser(ctx, user); err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+
+        <span class="cov1" title="1">if err := s.queueEmailVerification(ctx, user); err != nil </span><span class="cov0" title="0">{
+                s.logVerificationQueueError(err)
+        }</span>
+
+        <span class="cov1" title="1">token, exp, err := s.generateToken(user)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov1" title="1">refreshToken, refreshExp, err := s.createSession(ctx, user, userAgent, ipAddress)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov1" title="1">return &amp;AuthResult{
+                User:         user,
+                Token:        AuthToken{Token: token, ExpiresAt: exp},
+                RefreshToken: AuthToken{Token: refreshToken, ExpiresAt: refreshExp},
+        }, nil</span>
+}
+
+func (s *authService) Login(ctx context.Context, input applicationdto.LoginInput, userAgent, ipAddress string) (*AuthResult, error) <span class="cov4" title="3">{
+        user, err := s.lookupUser(ctx, input.Identifier)
+        if err != nil </span><span class="cov1" title="1">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov1" title="1">{
+                        return nil, errs.NewUnauthorizedError("Invalid credentials", true)
+                }</span>
+                <span class="cov0" title="0">return nil, sqlerr.HandleError(err)</span>
+        }
+
+        <span class="cov3" title="2">if user.PasswordHash == "" </span><span class="cov0" title="0">{
+                return nil, errs.NewUnauthorizedError("Password login not available for this account", true)
+        }</span>
+
+        <span class="cov3" title="2">if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(input.Password)); err != nil </span><span class="cov1" title="1">{
+                return nil, errs.NewUnauthorizedError("Invalid credentials", true)
+        }</span>
+
+        <span class="cov1" title="1">now := time.Now().UTC()
+        _ = s.repo.UpdateLoginAt(ctx, user.ID, now)
+
+        token, exp, err := s.generateToken(user)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov1" title="1">refreshToken, refreshExp, err := s.createSession(ctx, user, userAgent, ipAddress)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov1" title="1">return &amp;AuthResult{
+                User:         user,
+                Token:        AuthToken{Token: token, ExpiresAt: exp},
+                RefreshToken: AuthToken{Token: refreshToken, ExpiresAt: refreshExp},
+        }, nil</span>
+}
+
+func (s *authService) StartGoogleAuth(ctx context.Context) (*GoogleAuthStart, error) <span class="cov3" title="2">{
+        if !s.googleConfigReady() </span><span class="cov1" title="1">{
+                return nil, errs.NewBadRequestError("Google login is not configured", false, nil, nil)
+        }</span>
+
+        <span class="cov1" title="1">state, cookieValue, expiresAt, err := s.buildGoogleStateCookie()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov1" title="1">authURL := s.googleOAuthConfig.AuthCodeURL(state)
+
+        return &amp;GoogleAuthStart{
+                AuthURL:        authURL,
+                StateCookie:    cookieValue,
+                StateExpiresAt: expiresAt,
+        }, nil</span>
+}
+
+func (s *authService) CompleteGoogleAuth(ctx context.Context, code, state, stateCookie, userAgent, ipAddress string) (*AuthResult, error) <span class="cov1" title="1">{
+        if !s.googleConfigReady() </span><span class="cov0" title="0">{
+                return nil, errs.NewBadRequestError("Google login is not configured", false, nil, nil)
+        }</span>
+        <span class="cov1" title="1">if strings.TrimSpace(code) == "" || strings.TrimSpace(state) == "" || strings.TrimSpace(stateCookie) == "" </span><span class="cov0" title="0">{
+                return nil, errs.NewBadRequestError("Invalid Google login request", false, nil, nil)
+        }</span>
+
+        <span class="cov1" title="1">cookiePayload, err := s.parseGoogleStateCookie(stateCookie)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errs.NewBadRequestError("Invalid Google login state", false, nil, nil)
+        }</span>
+        <span class="cov1" title="1">if cookiePayload.State != state </span><span class="cov0" title="0">{
+                return nil, errs.NewBadRequestError("Invalid Google login state", false, nil, nil)
+        }</span>
+
+        <span class="cov1" title="1">token, err := s.googleOAuthConfig.Exchange(ctx, code)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errs.NewUnauthorizedError("Invalid Google token", false)
+        }</span>
+
+        <span class="cov1" title="1">rawIDToken, ok := token.Extra("id_token").(string)
+        if !ok || strings.TrimSpace(rawIDToken) == "" </span><span class="cov0" title="0">{
+                return nil, errs.NewUnauthorizedError("Invalid Google token", false)
+        }</span>
+
+        <span class="cov1" title="1">claims, err := s.googleTokenValidator(ctx, rawIDToken, s.googleClientID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errs.NewUnauthorizedError("Invalid Google token", false)
+        }</span>
+
+        <span class="cov1" title="1">subject := claims.Subject
+        emailClaim, _ := claims.Claims["email"].(string)
+        emailVerified, _ := claims.Claims["email_verified"].(bool)
+
+        return s.loginWithGoogleClaims(ctx, subject, emailClaim, emailVerified, userAgent, ipAddress)</span>
+}
+
+func (s *authService) loginWithGoogleClaims(ctx context.Context, subject, emailClaim string, emailVerified bool, userAgent, ipAddress string) (*AuthResult, error) <span class="cov1" title="1">{
+        if subject == "" </span><span class="cov0" title="0">{
+                return nil, errs.NewUnauthorizedError("Invalid Google token", false)
+        }</span>
+        <span class="cov1" title="1">if emailClaim == "" || !emailVerified </span><span class="cov0" title="0">{
+                return nil, errs.NewUnauthorizedError("Google account email is not verified", true)
+        }</span>
+
+        <span class="cov1" title="1">user, findErr := s.repo.GetByGoogleID(ctx, subject)
+        if findErr != nil &amp;&amp; !errors.Is(findErr, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(findErr)
+        }</span>
+
+        <span class="cov1" title="1">if user == nil </span><span class="cov1" title="1">{
+                // Try to link existing account by email
+                user, findErr = s.repo.GetByEmail(ctx, emailClaim)
+                switch </span>{
+                case findErr == nil:<span class="cov0" title="0">
+                        user.GoogleID = &amp;subject
+                        if err := s.repo.Save(ctx, user); err != nil </span><span class="cov0" title="0">{
+                                return nil, sqlerr.HandleError(err)
+                        }</span>
+                case errors.Is(findErr, gorm.ErrRecordNotFound):<span class="cov1" title="1">
+                        username := deriveUsername(emailClaim)
+                        user = &amp;domain.User{
+                                Email:    emailClaim,
+                                Username: username,
+                                GoogleID: &amp;subject,
+                        }
+                        if err := s.repo.CreateUser(ctx, user); err != nil </span><span class="cov0" title="0">{
+                                return nil, sqlerr.HandleError(err)
+                        }</span>
+                default:<span class="cov0" title="0">
+                        return nil, sqlerr.HandleError(findErr)</span>
+                }
+        }
+
+        <span class="cov1" title="1">now := time.Now().UTC()
+        _ = s.repo.UpdateLoginAt(ctx, user.ID, now)
+        if user.EmailVerifiedAt == nil </span><span class="cov1" title="1">{
+                _ = s.repo.UpdateEmailVerifiedAt(ctx, user.ID, now)
+                user.EmailVerifiedAt = &amp;now
+        }</span>
+
+        <span class="cov1" title="1">token, exp, err := s.generateToken(user)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov1" title="1">refreshToken, refreshExp, err := s.createSession(ctx, user, userAgent, ipAddress)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov1" title="1">return &amp;AuthResult{
+                User:         user,
+                Token:        AuthToken{Token: token, ExpiresAt: exp},
+                RefreshToken: AuthToken{Token: refreshToken, ExpiresAt: refreshExp},
+        }, nil</span>
+}
+
+func (s *authService) googleConfigReady() bool <span class="cov4" title="3">{
+        return s.googleClientID != "" &amp;&amp; s.googleClientSecret != "" &amp;&amp; s.googleRedirectURL != "" &amp;&amp; s.googleOAuthConfig != nil
+}</span>
+
+func (s *authService) buildGoogleStateCookie() (string, string, time.Time, error) <span class="cov3" title="2">{
+        state, err := generateStateToken()
+        if err != nil </span><span class="cov0" title="0">{
+                return "", "", time.Time{}, err
+        }</span>
+
+        <span class="cov3" title="2">now := time.Now
+        if s.now != nil </span><span class="cov3" title="2">{
+                now = s.now
+        }</span>
+
+        <span class="cov3" title="2">expiresAt := now().UTC().Add(googleStateTTL)
+        payload := googleStatePayload{State: state, ExpiresAt: expiresAt}
+        rawPayload, err := json.Marshal(payload)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", "", time.Time{}, err
+        }</span>
+
+        <span class="cov3" title="2">encoded := base64.RawURLEncoding.EncodeToString(rawPayload)
+        signature := s.signGoogleState(encoded)
+        cookieValue := encoded + "." + hex.EncodeToString(signature)
+
+        return state, cookieValue, expiresAt, nil</span>
+}
+
+func (s *authService) parseGoogleStateCookie(cookieValue string) (*googleStatePayload, error) <span class="cov3" title="2">{
+        parts := strings.SplitN(cookieValue, ".", 2)
+        if len(parts) != 2 </span><span class="cov0" title="0">{
+                return nil, errors.New("invalid state cookie format")
+        }</span>
+
+        <span class="cov3" title="2">payloadPart := parts[0]
+        signaturePart := parts[1]
+
+        signature, err := hex.DecodeString(signaturePart)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("invalid state cookie signature")
+        }</span>
+
+        <span class="cov3" title="2">expectedSignature := s.signGoogleState(payloadPart)
+        if !hmac.Equal(signature, expectedSignature) </span><span class="cov0" title="0">{
+                return nil, errors.New("invalid state cookie signature")
+        }</span>
+
+        <span class="cov3" title="2">payloadBytes, err := base64.RawURLEncoding.DecodeString(payloadPart)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("invalid state cookie payload")
+        }</span>
+
+        <span class="cov3" title="2">var payload googleStatePayload
+        if err := json.Unmarshal(payloadBytes, &amp;payload); err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("invalid state cookie payload")
+        }</span>
+
+        <span class="cov3" title="2">if payload.State == "" </span><span class="cov0" title="0">{
+                return nil, errors.New("invalid state cookie payload")
+        }</span>
+
+        <span class="cov3" title="2">now := time.Now
+        if s.now != nil </span><span class="cov3" title="2">{
+                now = s.now
+        }</span>
+
+        <span class="cov3" title="2">if payload.ExpiresAt.Before(now().UTC()) </span><span class="cov0" title="0">{
+                return nil, errors.New("state cookie expired")
+        }</span>
+
+        <span class="cov3" title="2">return &amp;payload, nil</span>
+}
+
+func (s *authService) signGoogleState(payload string) []byte <span class="cov5" title="4">{
+        mac := hmac.New(sha256.New, s.secretKey)
+        _, _ = mac.Write([]byte(payload))
+        return mac.Sum(nil)
+}</span>
+
+func (s *authService) lookupUser(ctx context.Context, identifier string) (*domain.User, error) <span class="cov4" title="3">{
+        if emailRegex.MatchString(identifier) </span><span class="cov3" title="2">{
+                return s.repo.GetByEmail(ctx, identifier)
+        }</span>
+        <span class="cov1" title="1">return s.repo.GetByUsername(ctx, identifier)</span>
+}
+
+func (s *authService) VerifyEmail(ctx context.Context, input applicationdto.VerifyEmailInput) (*domain.User, error) <span class="cov3" title="2">{
+        email := normalizeEmail(input.Email)
+        if email == "" </span><span class="cov0" title="0">{
+                return nil, errs.NewBadRequestError("Invalid email", true, []errs.FieldError{{Field: "email", Error: "invalid email"}}, nil)
+        }</span>
+
+        <span class="cov3" title="2">code := strings.TrimSpace(input.Code)
+        if code == "" </span><span class="cov0" title="0">{
+                return nil, errs.NewBadRequestError("Invalid code", true, []errs.FieldError{{Field: "code", Error: "invalid code"}}, nil)
+        }</span>
+
+        <span class="cov3" title="2">user, err := s.repo.GetByEmail(ctx, email)
+        if err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                        return nil, invalidVerificationError()
+                }</span>
+                <span class="cov0" title="0">return nil, sqlerr.HandleError(err)</span>
+        }
+
+        <span class="cov3" title="2">if user.EmailVerifiedAt != nil </span><span class="cov0" title="0">{
+                return user, nil
+        }</span>
+
+        <span class="cov3" title="2">if s.verificationRepo == nil </span><span class="cov0" title="0">{
+                return nil, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov3" title="2">codeHash := hashVerificationCode(code)
+        now := time.Now().UTC()
+        verification, err := s.verificationRepo.GetActiveByUserIDAndCodeHash(ctx, user.ID, codeHash, now)
+        if err != nil </span><span class="cov1" title="1">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov1" title="1">{
+                        return nil, invalidVerificationError()
+                }</span>
+                <span class="cov0" title="0">return nil, sqlerr.HandleError(err)</span>
+        }
+
+        <span class="cov1" title="1">if err := s.verificationRepo.MarkVerified(ctx, verification.ID, now); err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+
+        <span class="cov1" title="1">if err := s.repo.UpdateEmailVerifiedAt(ctx, user.ID, now); err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+
+        <span class="cov1" title="1">user.EmailVerifiedAt = &amp;now
+        return user, nil</span>
+}
+
+func (s *authService) CurrentUser(ctx context.Context, userID uuid.UUID) (*domain.User, error) <span class="cov1" title="1">{
+        user, err := s.repo.GetByID(ctx, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+        <span class="cov1" title="1">return user, nil</span>
+}
+
+func (s *authService) Refresh(ctx context.Context, refreshToken, userAgent, ipAddress string) (*AuthResult, error) <span class="cov5" title="5">{
+        if refreshToken == "" </span><span class="cov1" title="1">{
+                return nil, errs.NewUnauthorizedError("Unauthorized", false)
+        }</span>
+        <span class="cov5" title="4">if s.sessionRepo == nil </span><span class="cov0" title="0">{
+                return nil, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov5" title="4">tokenHash := hashRefreshToken(refreshToken)
+        session, err := s.sessionRepo.GetByRefreshTokenHash(ctx, tokenHash)
+        if err != nil </span><span class="cov1" title="1">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov1" title="1">{
+                        return nil, errs.NewUnauthorizedError("Unauthorized", false)
+                }</span>
+                <span class="cov0" title="0">return nil, sqlerr.HandleError(err)</span>
+        }
+
+        <span class="cov4" title="3">now := time.Now().UTC()
+        if session.RevokedAt != nil || session.ExpiresAt.Before(now) </span><span class="cov3" title="2">{
+                return nil, errs.NewUnauthorizedError("Unauthorized", false)
+        }</span>
+
+        <span class="cov1" title="1">user, err := s.repo.GetByID(ctx, session.UserID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+
+        <span class="cov1" title="1">if err := s.sessionRepo.RevokeByID(ctx, session.ID, now); err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+
+        <span class="cov1" title="1">rotatedToken, rotatedExp, err := s.createSession(ctx, user, userAgent, ipAddress)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov1" title="1">accessToken, accessExp, err := s.generateToken(user)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov1" title="1">return &amp;AuthResult{
+                User:         user,
+                Token:        AuthToken{Token: accessToken, ExpiresAt: accessExp},
+                RefreshToken: AuthToken{Token: rotatedToken, ExpiresAt: rotatedExp},
+        }, nil</span>
+}
+
+func (s *authService) Logout(ctx context.Context, refreshToken string) error <span class="cov3" title="2">{
+        if refreshToken == "" || s.sessionRepo == nil </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov3" title="2">tokenHash := hashRefreshToken(refreshToken)
+        session, err := s.sessionRepo.GetByRefreshTokenHash(ctx, tokenHash)
+        if err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                        return nil
+                }</span>
+                <span class="cov0" title="0">return sqlerr.HandleError(err)</span>
+        }
+
+        <span class="cov3" title="2">if session.RevokedAt != nil </span><span class="cov1" title="1">{
+                return nil
+        }</span>
+
+        <span class="cov1" title="1">now := time.Now().UTC()
+        return sqlerr.HandleError(s.sessionRepo.RevokeByID(ctx, session.ID, now))</span>
+}
+
+func (s *authService) LogoutAll(ctx context.Context, userID uuid.UUID) error <span class="cov1" title="1">{
+        if s.sessionRepo == nil </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov1" title="1">now := time.Now().UTC()
+        return sqlerr.HandleError(s.sessionRepo.RevokeByUserID(ctx, userID, now))</span>
+}
+
+func (s *authService) ResendVerification(ctx context.Context, userID uuid.UUID) error <span class="cov3" title="2">{
+        user, err := s.repo.GetByID(ctx, userID)
+        if err != nil </span><span class="cov0" title="0">{
+                return sqlerr.HandleError(err)
+        }</span>
+
+        <span class="cov3" title="2">if user.EmailVerifiedAt != nil </span><span class="cov1" title="1">{
+                return nil
+        }</span>
+
+        <span class="cov1" title="1">if err := s.queueEmailVerification(ctx, user); err != nil </span><span class="cov0" title="0">{
+                s.logVerificationQueueError(err)
+                return errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov1" title="1">return nil</span>
+}
+
+func (s *authService) generateToken(user *domain.User) (string, time.Time, error) <span class="cov5" title="4">{
+        if user == nil </span><span class="cov0" title="0">{
+                return "", time.Time{}, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov5" title="4">exp := time.Now().Add(s.accessTokenTTL)
+        claims := domain.AuthClaims{
+                RegisteredClaims: jwt.RegisteredClaims{
+                        Subject:   user.ID.String(),
+                        ExpiresAt: jwt.NewNumericDate(exp),
+                        IssuedAt:  jwt.NewNumericDate(time.Now()),
+                },
+                Email:   user.Email,
+                IsAdmin: user.IsAdmin,
+        }
+
+        token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+        signed, err := token.SignedString(s.secretKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", time.Time{}, err
+        }</span>
+        <span class="cov5" title="4">return signed, exp, nil</span>
+}
+
+func (s *authService) createSession(ctx context.Context, user *domain.User, userAgent, ipAddress string) (string, time.Time, error) <span class="cov5" title="4">{
+        if s.sessionRepo == nil || user == nil </span><span class="cov0" title="0">{
+                return "", time.Time{}, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov5" title="4">refreshToken, err := generateRefreshToken()
+        if err != nil </span><span class="cov0" title="0">{
+                return "", time.Time{}, errs.NewInternalServerError()
+        }</span>
+
+        <span class="cov5" title="4">expiresAt := time.Now().UTC().Add(s.refreshTokenTTL)
+        var agent *string
+        if strings.TrimSpace(userAgent) != "" </span><span class="cov5" title="4">{
+                clean := strings.TrimSpace(userAgent)
+                agent = &amp;clean
+        }</span>
+        <span class="cov5" title="4">var ip *string
+        if strings.TrimSpace(ipAddress) != "" </span><span class="cov5" title="4">{
+                clean := strings.TrimSpace(ipAddress)
+                ip = &amp;clean
+        }</span>
+
+        <span class="cov5" title="4">session := &amp;domain.AuthSession{
+                UserID:           user.ID,
+                RefreshTokenHash: hashRefreshToken(refreshToken),
+                UserAgent:        agent,
+                IPAddress:        ip,
+                ExpiresAt:        expiresAt,
+        }
+
+        if err := s.sessionRepo.Create(ctx, session); err != nil </span><span class="cov0" title="0">{
+                return "", time.Time{}, sqlerr.HandleError(err)
+        }</span>
+
+        <span class="cov5" title="4">return refreshToken, expiresAt, nil</span>
+}
+
+func deriveUsername(email string) string <span class="cov1" title="1">{
+        parts := regexp.MustCompile("@").Split(email, 2)
+        if len(parts) &gt; 0 &amp;&amp; parts[0] != "" </span><span class="cov1" title="1">{
+                return parts[0]
+        }</span>
+        <span class="cov0" title="0">return fmt.Sprintf("user-%s", uuid.New().String()[:8])</span>
+}
+
+func generateStateToken() (string, error) <span class="cov3" title="2">{
+        tokenBytes := make([]byte, 32)
+        if _, err := rand.Read(tokenBytes); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov3" title="2">return hex.EncodeToString(tokenBytes), nil</span>
+}
+
+func generateRefreshToken() (string, error) <span class="cov5" title="4">{
+        tokenBytes := make([]byte, 32)
+        if _, err := rand.Read(tokenBytes); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov5" title="4">return hex.EncodeToString(tokenBytes), nil</span>
+}
+
+func hashRefreshToken(token string) string <span class="cov8" title="12">{
+        sum := sha256.Sum256([]byte(token))
+        return hex.EncodeToString(sum[:])
+}</span>
+
+func (s *authService) queueEmailVerification(ctx context.Context, user *domain.User) error <span class="cov3" title="2">{
+        if user == nil || user.Email == "" || user.EmailVerifiedAt != nil || s.verificationRepo == nil </span><span class="cov1" title="1">{
+                return nil
+        }</span>
+
+        <span class="cov1" title="1">code, err := generateVerificationCode()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov1" title="1">now := time.Now().UTC()
+        ttl := s.emailVerificationTTL
+        if err := s.verificationRepo.ExpireActiveByUserID(ctx, user.ID, now); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov1" title="1">verification := &amp;domain.EmailVerification{
+                UserID:    user.ID,
+                Email:     user.Email,
+                CodeHash:  hashVerificationCode(code),
+                ExpiresAt: now.Add(ttl),
+        }
+        if err := s.verificationRepo.Create(ctx, verification); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov1" title="1">if s.taskEnqueuer == nil </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+
+        <span class="cov1" title="1">expiresInMinutes := int(ttl.Minutes())
+        if expiresInMinutes &lt;= 0 </span><span class="cov0" title="0">{
+                expiresInMinutes = 1
+        }</span>
+        <span class="cov1" title="1">task, err := job.NewEmailVerificationTask(job.EmailVerificationPayload{
+                To:               user.Email,
+                Username:         user.Username,
+                Code:             code,
+                ExpiresInMinutes: expiresInMinutes,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov1" title="1">_, err = s.taskEnqueuer.EnqueueContext(ctx, task)
+        return err</span>
+}
+
+func (s *authService) logVerificationQueueError(err error) <span class="cov0" title="0">{
+        if err == nil || s.logger == nil </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov0" title="0">s.logger.Error().Err(err).Msg("failed to queue email verification")</span>
+}
+
+func generateVerificationCode() (string, error) <span class="cov1" title="1">{
+        const codeLength = 6
+        const maxDigit = 10
+
+        code := make([]byte, 0, codeLength)
+        for range codeLength </span><span class="cov6" title="6">{
+                n, err := rand.Int(rand.Reader, big.NewInt(maxDigit))
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov6" title="6">code = append(code, byte('0'+n.Int64()))</span>
+        }
+
+        <span class="cov1" title="1">return string(code), nil</span>
+}
+
+func hashVerificationCode(code string) string <span class="cov5" title="4">{
+        sum := sha256.Sum256([]byte(code))
+        return hex.EncodeToString(sum[:])
+}</span>
+
+func invalidVerificationError() *errs.ErrorResponse <span class="cov1" title="1">{
+        return errs.NewBadRequestError(
+                "Invalid or expired verification code",
+                true,
+                []errs.FieldError{{Field: "code", Error: "invalid or expired"}},
+                nil,
+        )
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package application
+
+import (
+        "context"
+        _ "embed"
+        "errors"
+        "fmt"
+
+        "github.com/casbin/casbin/v2"
+        "github.com/casbin/casbin/v2/model"
+        gormadapter "github.com/casbin/gorm-adapter/v3"
+        "github.com/rs/zerolog"
+        "gorm.io/gorm"
+)
+
+//go:embed authorization_model.conf
+var authorizationModelConf string
+
+type AuthorizationSubject struct {
+        ID      string `json:"id"`
+        Email   string `json:"email,omitempty"`
+        IsAdmin bool   `json:"is_admin"`
+}
+
+type AuthorizationObject struct {
+        Route  string            `json:"route"`
+        Path   string            `json:"path,omitempty"`
+        Params map[string]string `json:"params,omitempty"`
+        Query  map[string]string `json:"query,omitempty"`
+}
+
+type AuthorizationEnforcer interface {
+        Enforce(rvals ...any) (bool, error)
+}
+
+type AuthorizationService struct {
+        enforcer AuthorizationEnforcer
+        logger   *zerolog.Logger
+}
+
+func NewAuthorizationService(db *gorm.DB, logger *zerolog.Logger) (*AuthorizationService, error) <span class="cov0" title="0">{
+        if db == nil </span><span class="cov0" title="0">{
+                return nil, errors.New("authorization: db is nil")
+        }</span>
+
+        <span class="cov0" title="0">modelConf, err := model.NewModelFromString(authorizationModelConf)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("authorization: load model: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">adapter, err := gormadapter.NewAdapterByDB(db)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("authorization: init adapter: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">enforcer, err := casbin.NewSyncedEnforcer(modelConf, adapter)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("authorization: init enforcer: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">if err := enforcer.LoadPolicy(); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("authorization: load policy: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">enforcer.EnableAutoSave(true)
+
+        return &amp;AuthorizationService{
+                enforcer: enforcer,
+                logger:   logger,
+        }, nil</span>
+}
+
+func NewAuthorizationServiceWithEnforcer(enforcer AuthorizationEnforcer, logger *zerolog.Logger) *AuthorizationService <span class="cov6" title="2">{
+        return &amp;AuthorizationService{
+                enforcer: enforcer,
+                logger:   logger,
+        }
+}</span>
+
+func (a *AuthorizationService) Enforce(ctx context.Context, sub AuthorizationSubject, obj AuthorizationObject, act string) (bool, error) <span class="cov10" title="3">{
+        _ = ctx
+        if a == nil || a.enforcer == nil </span><span class="cov1" title="1">{
+                return false, errors.New("authorization: enforcer not initialized")
+        }</span>
+
+        <span class="cov6" title="2">allowed, err := a.enforcer.Enforce(sub, obj, act)
+        if err != nil &amp;&amp; a.logger != nil </span><span class="cov0" title="0">{
+                a.logger.Error().Err(err).Msg("authorization enforcement failed")
+        }</span>
+        <span class="cov6" title="2">return allowed, err</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package application
+
+import (
+        "context"
+
+        "github.com/google/uuid"
+        "github.com/jeheskielSunloy77/zeile/internal/app/errs"
+        "github.com/jeheskielSunloy77/zeile/internal/app/sqlerr"
+        applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "gorm.io/gorm"
+)
+
+type ResourceService[T domain.BaseModel, S applicationdto.StoreDTO[T], U applicationdto.UpdateDTO[T]] interface {
+        Store(ctx context.Context, dto S) (*T, error)
+        GetByID(ctx context.Context, id uuid.UUID, preloads []string) (*T, error)
+        GetMany(ctx context.Context, opts port.GetManyOptions) ([]T, int64, error)
+        Destroy(ctx context.Context, id uuid.UUID) error
+        Kill(ctx context.Context, id uuid.UUID) error
+        Update(ctx context.Context, id uuid.UUID, dto U) (*T, error)
+        Restore(ctx context.Context, id uuid.UUID, preloads []string) (*T, error)
+}
+
+type resourceService[T domain.BaseModel, S applicationdto.StoreDTO[T], U applicationdto.UpdateDTO[T]] struct {
+        repo         port.ResourceRepository[T]
+        resourceName string
+}
+
+func NewResourceService[T domain.BaseModel, S applicationdto.StoreDTO[T], U applicationdto.UpdateDTO[T]](resourceName string, repo port.ResourceRepository[T]) ResourceService[T, S, U] <span class="cov10" title="6">{
+        return &amp;resourceService[T, S, U]{resourceName: resourceName, repo: repo}
+}</span>
+
+func (s *resourceService[T, S, U]) Store(ctx context.Context, dto S) (*T, error) <span class="cov0" title="0">{
+        entity := dto.ToModel()
+        if err := s.repo.Store(ctx, entity); err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+        <span class="cov0" title="0">return entity, nil</span>
+}
+
+func (s *resourceService[T, S, U]) GetByID(ctx context.Context, id uuid.UUID, preloads []string) (*T, error) <span class="cov1" title="1">{
+        entity, err := s.repo.GetByID(ctx, id, preloads)
+        if err != nil </span><span class="cov1" title="1">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+        <span class="cov0" title="0">return entity, nil</span>
+}
+
+func (s *resourceService[T, S, U]) GetMany(ctx context.Context, opts port.GetManyOptions) ([]T, int64, error) <span class="cov0" title="0">{
+        entities, total, err := s.repo.GetMany(ctx, opts)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, 0, sqlerr.HandleError(err)
+        }</span>
+        <span class="cov0" title="0">return entities, total, nil</span>
+}
+
+func (s *resourceService[T, S, U]) Update(ctx context.Context, id uuid.UUID, dto U) (*T, error) <span class="cov1" title="1">{
+        updates := dto.ToMap()
+
+        entity, err := s.repo.GetByID(ctx, id, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+
+        <span class="cov1" title="1">if len(updates) == 0 </span><span class="cov1" title="1">{
+                return entity, nil
+        }</span>
+
+        <span class="cov0" title="0">updatedEntity, err := s.repo.Update(ctx, *entity, updates)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+
+        <span class="cov0" title="0">return updatedEntity, nil</span>
+}
+
+func (s *resourceService[T, S, U]) Destroy(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        if err := s.repo.Destroy(ctx, id); err != nil </span><span class="cov0" title="0">{
+                if err == gorm.ErrRecordNotFound </span><span class="cov0" title="0">{
+                        return errs.NewNotFoundError(s.resourceName+" not found", true)
+                }</span>
+                <span class="cov0" title="0">return sqlerr.HandleError(err)</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (s *resourceService[T, S, U]) Kill(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        if err := s.repo.Kill(ctx, id); err != nil </span><span class="cov0" title="0">{
+                if err == gorm.ErrRecordNotFound </span><span class="cov0" title="0">{
+                        return errs.NewNotFoundError(s.resourceName+" not found", true)
+                }</span>
+                <span class="cov0" title="0">return sqlerr.HandleError(err)</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (s *resourceService[T, S, U]) Restore(ctx context.Context, id uuid.UUID, preloads []string) (*T, error) <span class="cov0" title="0">{
+        entity, err := s.repo.Restore(ctx, id)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+        <span class="cov0" title="0">if len(preloads) == 0 </span><span class="cov0" title="0">{
+                return entity, nil
+        }</span>
+
+        <span class="cov0" title="0">entity, err = s.repo.GetByID(ctx, id, preloads)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+        <span class="cov0" title="0">return entity, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package application
+
+import (
+        "context"
+
+        "github.com/google/uuid"
+        applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+)
+
+// MockResourceService is a generic mock for ResourceService interfaces in tests.
+type MockResourceService[T domain.BaseModel, S applicationdto.StoreDTO[T], U applicationdto.UpdateDTO[T]] struct {
+        StoreFn   func(ctx context.Context, dto S) (*T, error)
+        GetByIDFn func(ctx context.Context, id uuid.UUID, preloads []string) (*T, error)
+        GetManyFn func(ctx context.Context, opts port.GetManyOptions) ([]T, int64, error)
+        DestroyFn func(ctx context.Context, id uuid.UUID) error
+        KillFn    func(ctx context.Context, id uuid.UUID) error
+        UpdateFn  func(ctx context.Context, id uuid.UUID, dto U) (*T, error)
+        RestoreFn func(ctx context.Context, id uuid.UUID, preloads []string) (*T, error)
+}
+
+func NewMockResourceService[T domain.BaseModel, S applicationdto.StoreDTO[T], U applicationdto.UpdateDTO[T]]() *MockResourceService[T, S, U] <span class="cov0" title="0">{
+        return &amp;MockResourceService[T, S, U]{}
+}</span>
+
+func (m *MockResourceService[T, S, U]) Store(ctx context.Context, dto S) (*T, error) <span class="cov0" title="0">{
+        if m.StoreFn != nil </span><span class="cov0" title="0">{
+                return m.StoreFn(ctx, dto)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+func (m *MockResourceService[T, S, U]) GetByID(ctx context.Context, id uuid.UUID, preloads []string) (*T, error) <span class="cov0" title="0">{
+        if m.GetByIDFn != nil </span><span class="cov0" title="0">{
+                return m.GetByIDFn(ctx, id, preloads)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+func (m *MockResourceService[T, S, U]) GetMany(ctx context.Context, opts port.GetManyOptions) ([]T, int64, error) <span class="cov0" title="0">{
+        if m.GetManyFn != nil </span><span class="cov0" title="0">{
+                return m.GetManyFn(ctx, opts)
+        }</span>
+        <span class="cov0" title="0">return nil, 0, nil</span>
+}
+
+func (m *MockResourceService[T, S, U]) Destroy(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        if m.DestroyFn != nil </span><span class="cov0" title="0">{
+                return m.DestroyFn(ctx, id)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockResourceService[T, S, U]) Kill(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        if m.KillFn != nil </span><span class="cov0" title="0">{
+                return m.KillFn(ctx, id)
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *MockResourceService[T, S, U]) Update(ctx context.Context, id uuid.UUID, dto U) (*T, error) <span class="cov0" title="0">{
+        if m.UpdateFn != nil </span><span class="cov0" title="0">{
+                return m.UpdateFn(ctx, id, dto)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+
+func (m *MockResourceService[T, S, U]) Restore(ctx context.Context, id uuid.UUID, preloads []string) (*T, error) <span class="cov0" title="0">{
+        if m.RestoreFn != nil </span><span class="cov0" title="0">{
+                return m.RestoreFn(ctx, id, preloads)
+        }</span>
+        <span class="cov0" title="0">return nil, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package application
+
+import (
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/job"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+)
+
+type Services struct {
+        Auth          AuthService
+        User          UserService
+        Authorization *AuthorizationService
+        Job           *job.JobService
+}
+
+func NewServices(s *server.Server, repos *port.Repositories) (*Services, error) <span class="cov0" title="0">{
+        var enqueuer TaskEnqueuer
+        if s.Job != nil </span><span class="cov0" title="0">{
+                enqueuer = s.Job.Client
+        }</span>
+        <span class="cov0" title="0">authService := NewAuthService(&amp;s.Config.Auth, repos.Auth, repos.AuthSession, repos.EmailVerification, enqueuer, s.Logger)
+        userService := NewUserService(repos.User)
+        authorizationService, err := NewAuthorizationService(s.DB.DB, s.Logger)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return &amp;Services{
+                Job:           s.Job,
+                Auth:          authService,
+                User:          userService,
+                Authorization: authorizationService,
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package application
+
+import (
+        "context"
+        "fmt"
+        "strings"
+
+        "github.com/google/uuid"
+        "github.com/jeheskielSunloy77/zeile/internal/app/errs"
+        "github.com/jeheskielSunloy77/zeile/internal/app/sqlerr"
+        applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "golang.org/x/crypto/bcrypt"
+)
+
+type UserService interface {
+        ResourceService[domain.User, *applicationdto.StoreUserInput, *applicationdto.UpdateUserInput]
+}
+
+type userService struct {
+        ResourceService[domain.User, *applicationdto.StoreUserInput, *applicationdto.UpdateUserInput]
+        repo port.UserRepository
+}
+
+func NewUserService(repo port.UserRepository) UserService <span class="cov0" title="0">{
+        return &amp;userService{
+                ResourceService: NewResourceService[domain.User, *applicationdto.StoreUserInput, *applicationdto.UpdateUserInput]("user", repo),
+                repo:            repo,
+        }
+}</span>
+
+func (s *userService) Store(ctx context.Context, dto *applicationdto.StoreUserInput) (*domain.User, error) <span class="cov1" title="1">{
+        user := dto.ToModel()
+
+        if dto.Password != "" </span><span class="cov1" title="1">{
+                hash, err := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, errs.NewInternalServerError()
+                }</span>
+                <span class="cov1" title="1">user.PasswordHash = string(hash)</span>
+        }
+
+        <span class="cov1" title="1">if err := s.repo.Store(ctx, user); err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+        <span class="cov1" title="1">return user, nil</span>
+}
+
+func (s *userService) Update(ctx context.Context, id uuid.UUID, dto *applicationdto.UpdateUserInput) (*domain.User, error) <span class="cov8" title="3">{
+        if dto == nil </span><span class="cov0" title="0">{
+                return s.GetByID(ctx, id, nil)
+        }</span>
+
+        <span class="cov8" title="3">updates := dto.ToMap()
+
+        if email, ok := updates["email"].(string); ok </span><span class="cov5" title="2">{
+                email = normalizeEmail(email)
+                if email == "" </span><span class="cov1" title="1">{
+                        delete(updates, "email")
+                }</span> else<span class="cov1" title="1"> {
+                        updates["email"] = email
+                }</span>
+        }
+
+        <span class="cov8" title="3">if username, ok := updates["username"].(string); ok </span><span class="cov1" title="1">{
+                username = strings.TrimSpace(username)
+                if username == "" </span><span class="cov0" title="0">{
+                        delete(updates, "username")
+                }</span> else<span class="cov1" title="1"> {
+                        updates["username"] = username
+                }</span>
+        }
+
+        <span class="cov8" title="3">if password, ok := updates["password_hash"].(string); ok </span><span class="cov5" title="2">{
+                if password == "" </span><span class="cov0" title="0">{
+                        delete(updates, "password_hash")
+                }</span> else<span class="cov5" title="2"> {
+                        if len(password) &lt; minPasswordLength </span><span class="cov1" title="1">{
+                                return nil, errs.NewBadRequestError(
+                                        fmt.Sprintf("Password must be at least %d characters", minPasswordLength),
+                                        true,
+                                        []errs.FieldError{{Field: "password", Error: "too short"}},
+                                        nil,
+                                )
+                        }</span>
+                        <span class="cov1" title="1">hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return nil, errs.NewInternalServerError()
+                        }</span>
+                        <span class="cov1" title="1">updates["password_hash"] = string(hash)</span>
+                }
+        }
+
+        <span class="cov5" title="2">entity, err := s.repo.GetByID(ctx, id, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+
+        <span class="cov5" title="2">if len(updates) == 0 </span><span class="cov1" title="1">{
+                return entity, nil
+        }</span>
+
+        <span class="cov1" title="1">updatedUser, err := s.repo.Update(ctx, *entity, updates)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, sqlerr.HandleError(err)
+        }</span>
+        <span class="cov1" title="1">return updatedUser, nil</span>
+}
+
+func normalizeEmail(email string) string <span class="cov10" title="4">{
+        return strings.ToLower(strings.TrimSpace(email))
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package repository
+
+import (
+        "context"
+        "strings"
+        "time"
+
+        "github.com/google/uuid"
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "gorm.io/gorm"
+)
+
+type AuthRepository = port.AuthRepository
+
+type authRepository struct {
+        db *gorm.DB
+}
+
+func NewAuthRepository(db *gorm.DB) AuthRepository <span class="cov8" title="1">{
+        return &amp;authRepository{db: db}
+}</span>
+
+func (r *authRepository) Save(ctx context.Context, user *domain.User) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).Save(user).Error
+}</span>
+
+func (r *authRepository) CreateUser(ctx context.Context, user *domain.User) error <span class="cov8" title="1">{
+        if user.ID == uuid.Nil </span><span class="cov8" title="1">{
+                user.ID = uuid.New()
+        }</span>
+        <span class="cov8" title="1">return r.db.WithContext(ctx).Create(user).Error</span>
+}
+
+func (r *authRepository) GetByID(ctx context.Context, id uuid.UUID) (*domain.User, error) <span class="cov8" title="1">{
+        var user domain.User
+        if err := r.db.WithContext(ctx).First(&amp;user, "id = ?", id).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;user, nil</span>
+}
+
+func (r *authRepository) GetByEmail(ctx context.Context, email string) (*domain.User, error) <span class="cov8" title="1">{
+        var user domain.User
+        if err := r.db.WithContext(ctx).First(&amp;user, "LOWER(email) = ?", strings.ToLower(email)).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;user, nil</span>
+}
+
+func (r *authRepository) GetByUsername(ctx context.Context, username string) (*domain.User, error) <span class="cov8" title="1">{
+        var user domain.User
+        if err := r.db.WithContext(ctx).First(&amp;user, "LOWER(username) = ?", strings.ToLower(username)).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;user, nil</span>
+}
+
+func (r *authRepository) GetByGoogleID(ctx context.Context, googleID string) (*domain.User, error) <span class="cov8" title="1">{
+        var user domain.User
+        if err := r.db.WithContext(ctx).First(&amp;user, "google_id = ?", googleID).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;user, nil</span>
+}
+
+func (r *authRepository) UpdateLoginAt(ctx context.Context, id uuid.UUID, ts time.Time) error <span class="cov8" title="1">{
+        return r.db.WithContext(ctx).
+                Model(&amp;domain.User{}).
+                Where("id = ?", id).
+                Update("last_login_at", ts).
+                Error
+}</span>
+
+func (r *authRepository) UpdateEmailVerifiedAt(ctx context.Context, id uuid.UUID, ts time.Time) error <span class="cov8" title="1">{
+        return r.db.WithContext(ctx).
+                Model(&amp;domain.User{}).
+                Where("id = ?", id).
+                Update("email_verified_at", ts).
+                Error
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package repository
+
+import (
+        "context"
+        "time"
+
+        "github.com/google/uuid"
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "gorm.io/gorm"
+)
+
+type AuthSessionRepository = port.AuthSessionRepository
+
+type authSessionRepository struct {
+        db *gorm.DB
+}
+
+func NewAuthSessionRepository(db *gorm.DB) AuthSessionRepository <span class="cov0" title="0">{
+        return &amp;authSessionRepository{db: db}
+}</span>
+
+func (r *authSessionRepository) Create(ctx context.Context, session *domain.AuthSession) error <span class="cov0" title="0">{
+        if session.ID == uuid.Nil </span><span class="cov0" title="0">{
+                session.ID = uuid.New()
+        }</span>
+        <span class="cov0" title="0">return r.db.WithContext(ctx).Create(session).Error</span>
+}
+
+func (r *authSessionRepository) GetByRefreshTokenHash(ctx context.Context, hash string) (*domain.AuthSession, error) <span class="cov0" title="0">{
+        var session domain.AuthSession
+        if err := r.db.WithContext(ctx).First(&amp;session, "refresh_token_hash = ?", hash).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return &amp;session, nil</span>
+}
+
+func (r *authSessionRepository) RevokeByID(ctx context.Context, id uuid.UUID, revokedAt time.Time) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).
+                Model(&amp;domain.AuthSession{}).
+                Where("id = ?", id).
+                Updates(map[string]any{
+                        "revoked_at": revokedAt,
+                }).
+                Error
+}</span>
+
+func (r *authSessionRepository) RevokeByUserID(ctx context.Context, userID uuid.UUID, revokedAt time.Time) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).
+                Model(&amp;domain.AuthSession{}).
+                Where("user_id = ? AND revoked_at IS NULL", userID).
+                Updates(map[string]any{
+                        "revoked_at": revokedAt,
+                }).
+                Error
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package repository
+
+import (
+        "context"
+        "time"
+
+        "github.com/google/uuid"
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "gorm.io/gorm"
+)
+
+type EmailVerificationRepository = port.EmailVerificationRepository
+
+type emailVerificationRepository struct {
+        db *gorm.DB
+}
+
+func NewEmailVerificationRepository(db *gorm.DB) EmailVerificationRepository <span class="cov1" title="1">{
+        return &amp;emailVerificationRepository{db: db}
+}</span>
+
+func (r *emailVerificationRepository) Create(ctx context.Context, verification *domain.EmailVerification) error <span class="cov1" title="1">{
+        if verification.ID == uuid.Nil </span><span class="cov1" title="1">{
+                verification.ID = uuid.New()
+        }</span>
+        <span class="cov1" title="1">return r.db.WithContext(ctx).Create(verification).Error</span>
+}
+
+func (r *emailVerificationRepository) GetActiveByUserIDAndCodeHash(ctx context.Context, userID uuid.UUID, codeHash string, now time.Time) (*domain.EmailVerification, error) <span class="cov10" title="2">{
+        var verification domain.EmailVerification
+        err := r.db.WithContext(ctx).
+                Where("user_id = ? AND code_hash = ? AND verified_at IS NULL AND expires_at &gt; ?", userID, codeHash, now).
+                Order("created_at desc").
+                First(&amp;verification).
+                Error
+        if err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov1" title="1">return &amp;verification, nil</span>
+}
+
+func (r *emailVerificationRepository) ExpireActiveByUserID(ctx context.Context, userID uuid.UUID, now time.Time) error <span class="cov0" title="0">{
+        return r.db.WithContext(ctx).
+                Model(&amp;domain.EmailVerification{}).
+                Where("user_id = ? AND verified_at IS NULL AND expires_at &gt; ?", userID, now).
+                Update("expires_at", now).
+                Error
+}</span>
+
+func (r *emailVerificationRepository) MarkVerified(ctx context.Context, id uuid.UUID, verifiedAt time.Time) error <span class="cov1" title="1">{
+        return r.db.WithContext(ctx).
+                Model(&amp;domain.EmailVerification{}).
+                Where("id = ?", id).
+                Updates(map[string]any{
+                        "verified_at": verifiedAt,
+                        "updated_at":  verifiedAt,
+                }).
+                Error
+}</span>
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package repository
+
+import (
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/cache"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+)
+
+type Repositories = port.Repositories
+
+func NewRepositories(s *server.Server, cacheClient cache.Cache) *Repositories <span class="cov0" title="0">{
+        return &amp;Repositories{
+                Auth:              NewAuthRepository(s.DB.DB),
+                AuthSession:       NewAuthSessionRepository(s.DB.DB),
+                User:              NewUserRepository(s.Config, s.DB.DB, cacheClient),
+                EmailVerification: NewEmailVerificationRepository(s.DB.DB),
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package repository
+
+import (
+        "context"
+        "strings"
+
+        "github.com/google/uuid"
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/cache"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/utils"
+        "gorm.io/gorm"
+)
+
+type ResourceRepository[T domain.BaseModel] = port.ResourceRepository[T]
+
+type JoinClause = port.JoinClause
+type WhereClause = port.WhereClause
+type GetManyOptions = port.GetManyOptions
+
+type resourceRepository[T domain.BaseModel] struct {
+        cfg            *config.Config
+        db             *gorm.DB
+        cache          cache.Cache
+        isCacheEnabled bool
+}
+
+func NewResourceRepository[T domain.BaseModel](cfg *config.Config, db *gorm.DB, cacheClient cache.Cache) ResourceRepository[T] <span class="cov6" title="3">{
+        isCacheEnabled := cacheClient != nil &amp;&amp; cfg.Cache.TTL &gt; 0
+
+        return &amp;resourceRepository[T]{db: db, cache: cacheClient, cfg: cfg, isCacheEnabled: isCacheEnabled}
+}</span>
+
+func (r *resourceRepository[T]) CacheEnabled() bool <span class="cov0" title="0">{
+        return r.isCacheEnabled
+}</span>
+
+func (r *resourceRepository[T]) EvictCache(ctx context.Context, id uuid.UUID) <span class="cov9" title="5">{
+        if r.isCacheEnabled </span><span class="cov4" title="2">{
+                _ = r.cache.Delete(ctx, utils.GetModelCacheKey[T](id))
+        }</span>
+}
+
+func (r *resourceRepository[T]) Store(ctx context.Context, entity *T) error <span class="cov10" title="6">{
+        if err := r.db.WithContext(ctx).Create(entity).Error; err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov10" title="6">if r.isCacheEnabled </span><span class="cov6" title="3">{
+                id := (*entity).GetID()
+                _ = r.cache.SetJSON(ctx, utils.GetModelCacheKey[T](id), entity)
+        }</span>
+
+        <span class="cov10" title="6">return nil</span>
+}
+
+func (r *resourceRepository[T]) GetByID(ctx context.Context, id uuid.UUID, preloads []string) (*T, error) <span class="cov10" title="6">{
+        if len(preloads) == 0 &amp;&amp; r.isCacheEnabled </span><span class="cov4" title="2">{
+                if cached, ok := r.getCachedByID(ctx, id); ok </span><span class="cov4" title="2">{
+                        return cached, nil
+                }</span>
+        }
+
+        <span class="cov7" title="4">var entity T
+        query := applyPreloads(r.db.WithContext(ctx), preloads)
+        if err := query.First(&amp;entity, id).Error; err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov6" title="3">if r.isCacheEnabled </span><span class="cov0" title="0">{
+                _ = r.cache.SetJSON(ctx, utils.GetModelCacheKey[T](id), &amp;entity)
+        }</span>
+
+        <span class="cov6" title="3">return &amp;entity, nil</span>
+}
+
+func (r *resourceRepository[T]) Update(ctx context.Context, entity T, updates ...map[string]any) (*T, error) <span class="cov4" title="2">{
+        // if the updates are provided, use them to only update specific fields, if not replace the entire entity
+        var err error
+        if len(updates) &gt; 0 </span><span class="cov4" title="2">{
+                err = r.db.WithContext(ctx).Model(&amp;entity).Updates(updates[0]).Error
+        }</span> else<span class="cov0" title="0"> {
+                err = r.db.WithContext(ctx).Save(&amp;entity).Error
+        }</span>
+        <span class="cov4" title="2">if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov4" title="2">r.EvictCache(ctx, entity.GetID())
+
+        // return updated entity
+        return &amp;entity, nil</span>
+}
+
+func (r *resourceRepository[T]) Destroy(ctx context.Context, id uuid.UUID) error <span class="cov4" title="2">{
+        if err := r.db.WithContext(ctx).Delete(new(T), id).Error; err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov4" title="2">r.EvictCache(ctx, id)
+
+        return nil</span>
+}
+
+func (r *resourceRepository[T]) Kill(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        if err := r.db.WithContext(ctx).Unscoped().Delete(new(T), id).Error; err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">r.EvictCache(ctx, id)
+
+        return nil</span>
+}
+
+func (r *resourceRepository[T]) Restore(ctx context.Context, id uuid.UUID) (*T, error) <span class="cov1" title="1">{
+        if err := r.db.WithContext(ctx).
+                Unscoped().
+                Model(new(T)).
+                Where("id = ?", id).
+                Update("deleted_at", nil).
+                Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov1" title="1">r.EvictCache(ctx, id)
+
+        return r.GetByID(ctx, id, nil)</span>
+}
+
+func (r *resourceRepository[T]) GetMany(ctx context.Context, opts GetManyOptions) ([]T, int64, error) <span class="cov1" title="1">{
+        opts.Normalize()
+
+        var (
+                entities []T
+                total    int64
+        )
+
+        countQuery := r.db.WithContext(ctx).Model(new(T))
+        countQuery = applyJoins(countQuery, opts.Joins)
+        countQuery = applyFilters(countQuery, opts.Filters)
+        countQuery = applyWheres(countQuery, opts.Wheres)
+        if err := countQuery.Count(&amp;total).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, 0, err
+        }</span>
+
+        <span class="cov1" title="1">listQuery := r.db.WithContext(ctx).Model(new(T))
+        listQuery = applyJoins(listQuery, opts.Joins)
+        listQuery = applyFilters(listQuery, opts.Filters)
+        listQuery = applyWheres(listQuery, opts.Wheres)
+        listQuery = applyPreloads(listQuery, opts.Preloads)
+        if err := listQuery.Limit(opts.Limit).Offset(opts.Offset).Order(opts.OrderBy + " " + opts.OrderDirection).Find(&amp;entities).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, 0, err
+        }</span>
+
+        <span class="cov1" title="1">return entities, total, nil</span>
+}
+
+func applyFilters(db *gorm.DB, filters map[string]any) *gorm.DB <span class="cov4" title="2">{
+        if len(filters) &gt; 0 </span><span class="cov0" title="0">{
+                return db.Where(filters)
+        }</span>
+        <span class="cov4" title="2">return db</span>
+}
+
+func applyWheres(db *gorm.DB, wheres []WhereClause) *gorm.DB <span class="cov4" title="2">{
+        for _, where := range wheres </span><span class="cov0" title="0">{
+                query := strings.TrimSpace(where.Query)
+                if query == "" </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov0" title="0">if len(where.Args) &gt; 0 </span><span class="cov0" title="0">{
+                        db = db.Where(query, where.Args...)
+                        continue</span>
+                }
+                <span class="cov0" title="0">db = db.Where(query)</span>
+        }
+        <span class="cov4" title="2">return db</span>
+}
+
+func applyJoins(db *gorm.DB, joins []JoinClause) *gorm.DB <span class="cov4" title="2">{
+        for _, join := range joins </span><span class="cov0" title="0">{
+                query := strings.TrimSpace(join.Query)
+                if query == "" </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov0" title="0">if len(join.Args) &gt; 0 </span><span class="cov0" title="0">{
+                        db = db.Joins(query, join.Args...)
+                        continue</span>
+                }
+                <span class="cov0" title="0">db = db.Joins(query)</span>
+        }
+        <span class="cov4" title="2">return db</span>
+}
+
+func applyPreloads(db *gorm.DB, preloads []string) *gorm.DB <span class="cov9" title="5">{
+        for _, preload := range preloads </span><span class="cov0" title="0">{
+                name := strings.TrimSpace(preload)
+                if name == "" </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov0" title="0">db = db.Preload(name)</span>
+        }
+        <span class="cov9" title="5">return db</span>
+}
+
+func (r *resourceRepository[T]) getCachedByID(ctx context.Context, id uuid.UUID) (*T, bool) <span class="cov4" title="2">{
+        key := utils.GetModelCacheKey[T](id)
+        var entity T
+
+        if err := r.cache.GetJSON(ctx, key, &amp;entity); err != nil </span><span class="cov0" title="0">{
+                return nil, false
+        }</span>
+
+        <span class="cov4" title="2">return &amp;entity, true</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package repository
+
+import (
+        "context"
+        "reflect"
+        "strings"
+        "sync"
+        "unicode"
+
+        "github.com/google/uuid"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "gorm.io/gorm"
+)
+
+// MockResourceRepository is a simple in-memory implementation of
+// repository.ResourceRepository[T] for use in tests across entities.
+type MockResourceRepository[T domain.BaseModel] struct {
+        mu      sync.RWMutex
+        data    map[uuid.UUID]T
+        deleted map[uuid.UUID]T
+        cacheEn bool
+}
+
+func NewMockResourceRepository[T domain.BaseModel](cacheEnabled bool) *MockResourceRepository[T] <span class="cov0" title="0">{
+        return &amp;MockResourceRepository[T]{
+                data:    make(map[uuid.UUID]T),
+                deleted: make(map[uuid.UUID]T),
+                cacheEn: cacheEnabled,
+        }
+}</span>
+
+func (m *MockResourceRepository[T]) EvictCache(ctx context.Context, id uuid.UUID) {<span class="cov0" title="0">
+        // no-op for mock
+}</span>
+
+func (m *MockResourceRepository[T]) CacheEnabled() bool <span class="cov0" title="0">{
+        return m.cacheEn
+}</span>
+
+func (m *MockResourceRepository[T]) Store(ctx context.Context, entity *T) error <span class="cov0" title="0">{
+        m.mu.Lock()
+        defer m.mu.Unlock()
+        id := (*entity).GetID()
+        m.data[id] = *entity
+        // if it existed in deleted, remove tombstone
+        delete(m.deleted, id)
+        return nil
+}</span>
+
+func (m *MockResourceRepository[T]) GetByID(ctx context.Context, id uuid.UUID, preloads []string) (*T, error) <span class="cov0" title="0">{
+        m.mu.RLock()
+        defer m.mu.RUnlock()
+        if v, ok := m.data[id]; ok </span><span class="cov0" title="0">{
+                return &amp;v, nil
+        }</span>
+        // not found
+        <span class="cov0" title="0">return nil, gorm.ErrRecordNotFound</span>
+}
+
+func (m *MockResourceRepository[T]) GetMany(ctx context.Context, opts GetManyOptions) ([]T, int64, error) <span class="cov0" title="0">{
+        m.mu.RLock()
+        defer m.mu.RUnlock()
+        list := make([]T, 0, len(m.data))
+        for _, v := range m.data </span><span class="cov0" title="0">{
+                list = append(list, v)
+        }</span>
+        <span class="cov0" title="0">return list, int64(len(list)), nil</span>
+}
+
+func (m *MockResourceRepository[T]) Update(ctx context.Context, entity T, updates ...map[string]any) (*T, error) <span class="cov0" title="0">{
+        m.mu.Lock()
+        defer m.mu.Unlock()
+        id := entity.GetID()
+        if _, ok := m.data[id]; !ok </span><span class="cov0" title="0">{
+                return nil, gorm.ErrRecordNotFound
+        }</span>
+        <span class="cov0" title="0">if len(updates) &gt; 0 &amp;&amp; updates[0] != nil </span><span class="cov0" title="0">{
+                applyUpdates(&amp;entity, updates[0])
+        }</span>
+        <span class="cov0" title="0">m.data[id] = entity
+        return &amp;entity, nil</span>
+}
+
+func (m *MockResourceRepository[T]) Destroy(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        m.mu.Lock()
+        defer m.mu.Unlock()
+        if v, ok := m.data[id]; ok </span><span class="cov0" title="0">{
+                // soft-delete: move to deleted map
+                m.deleted[id] = v
+                delete(m.data, id)
+                return nil
+        }</span>
+        <span class="cov0" title="0">return gorm.ErrRecordNotFound</span>
+}
+
+func (m *MockResourceRepository[T]) Kill(ctx context.Context, id uuid.UUID) error <span class="cov0" title="0">{
+        m.mu.Lock()
+        defer m.mu.Unlock()
+        delete(m.data, id)
+        delete(m.deleted, id)
+        return nil
+}</span>
+
+func (m *MockResourceRepository[T]) Restore(ctx context.Context, id uuid.UUID) (*T, error) <span class="cov0" title="0">{
+        m.mu.Lock()
+        defer m.mu.Unlock()
+        if v, ok := m.deleted[id]; ok </span><span class="cov0" title="0">{
+                m.data[id] = v
+                delete(m.deleted, id)
+                return &amp;v, nil
+        }</span>
+        <span class="cov0" title="0">return nil, gorm.ErrRecordNotFound</span>
+}
+
+// applyUpdates maps update keys to struct fields and applies values via reflection.
+func applyUpdates[T any](entity *T, updates map[string]any) <span class="cov0" title="0">{
+        if entity == nil || len(updates) == 0 </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">rv := reflect.ValueOf(entity)
+        if rv.Kind() != reflect.Pointer || rv.IsNil() </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov0" title="0">rv = rv.Elem()
+        if rv.Kind() == reflect.Pointer </span><span class="cov0" title="0">{
+                if rv.IsNil() </span><span class="cov0" title="0">{
+                        return
+                }</span>
+                <span class="cov0" title="0">rv = rv.Elem()</span>
+        }
+        <span class="cov0" title="0">if rv.Kind() != reflect.Struct </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">fieldIndex := buildFieldIndex(rv.Type())
+        for key, value := range updates </span><span class="cov0" title="0">{
+                if idx, ok := fieldIndex[normalizeFieldKey(key)]; ok </span><span class="cov0" title="0">{
+                        field := rv.Field(idx)
+                        setFieldValue(field, value)
+                }</span>
+        }
+}
+
+func buildFieldIndex(rt reflect.Type) map[string]int <span class="cov0" title="0">{
+        index := make(map[string]int, rt.NumField()*3)
+        for i := 0; i &lt; rt.NumField(); i++ </span><span class="cov0" title="0">{
+                field := rt.Field(i)
+                if field.PkgPath != "" </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov0" title="0">addKey(index, field.Name, i)
+                addKey(index, toSnakeCase(field.Name), i)
+                if jsonTag := strings.Split(field.Tag.Get("json"), ",")[0]; jsonTag != "" &amp;&amp; jsonTag != "-" </span><span class="cov0" title="0">{
+                        addKey(index, jsonTag, i)
+                }</span>
+                <span class="cov0" title="0">if gormTag := field.Tag.Get("gorm"); gormTag != "" </span><span class="cov0" title="0">{
+                        for _, part := range strings.Split(gormTag, ";") </span><span class="cov0" title="0">{
+                                if strings.HasPrefix(part, "column:") </span><span class="cov0" title="0">{
+                                        addKey(index, strings.TrimPrefix(part, "column:"), i)
+                                }</span>
+                        }
+                }
+        }
+        <span class="cov0" title="0">return index</span>
+}
+
+func addKey(index map[string]int, key string, fieldIndex int) <span class="cov0" title="0">{
+        key = normalizeFieldKey(key)
+        if key == "" </span><span class="cov0" title="0">{
+                return
+        }</span>
+        <span class="cov0" title="0">if _, exists := index[key]; !exists </span><span class="cov0" title="0">{
+                index[key] = fieldIndex
+        }</span>
+}
+
+func normalizeFieldKey(key string) string <span class="cov0" title="0">{
+        return strings.ToLower(strings.TrimSpace(key))
+}</span>
+
+func toSnakeCase(s string) string <span class="cov0" title="0">{
+        if s == "" </span><span class="cov0" title="0">{
+                return ""
+        }</span>
+        <span class="cov0" title="0">runes := []rune(s)
+        var b strings.Builder
+        b.Grow(len(runes) + 4)
+        for i, r := range runes </span><span class="cov0" title="0">{
+                if unicode.IsUpper(r) </span><span class="cov0" title="0">{
+                        if i &gt; 0 </span><span class="cov0" title="0">{
+                                prev := runes[i-1]
+                                nextLower := i+1 &lt; len(runes) &amp;&amp; unicode.IsLower(runes[i+1])
+                                if unicode.IsLower(prev) || (unicode.IsUpper(prev) &amp;&amp; nextLower) </span><span class="cov0" title="0">{
+                                        b.WriteByte('_')
+                                }</span>
+                        }
+                        <span class="cov0" title="0">b.WriteRune(unicode.ToLower(r))
+                        continue</span>
+                }
+                <span class="cov0" title="0">b.WriteRune(r)</span>
+        }
+        <span class="cov0" title="0">return b.String()</span>
+}
+
+func setFieldValue(field reflect.Value, value any) <span class="cov0" title="0">{
+        if !field.IsValid() || !field.CanSet() </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">if value == nil </span><span class="cov0" title="0">{
+                field.Set(reflect.Zero(field.Type()))
+                return
+        }</span>
+
+        <span class="cov0" title="0">val := reflect.ValueOf(value)
+        if !val.IsValid() </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov0" title="0">if field.Kind() == reflect.Pointer </span><span class="cov0" title="0">{
+                setPointerFieldValue(field, val)
+                return
+        }</span>
+
+        <span class="cov0" title="0">if val.Type().AssignableTo(field.Type()) </span><span class="cov0" title="0">{
+                field.Set(val)
+                return
+        }</span>
+        <span class="cov0" title="0">if val.Type().ConvertibleTo(field.Type()) </span><span class="cov0" title="0">{
+                field.Set(val.Convert(field.Type()))
+                return
+        }</span>
+        <span class="cov0" title="0">if val.Kind() == reflect.Pointer &amp;&amp; !val.IsNil() </span><span class="cov0" title="0">{
+                elem := val.Elem()
+                if elem.Type().AssignableTo(field.Type()) </span><span class="cov0" title="0">{
+                        field.Set(elem)
+                        return
+                }</span>
+                <span class="cov0" title="0">if elem.Type().ConvertibleTo(field.Type()) </span><span class="cov0" title="0">{
+                        field.Set(elem.Convert(field.Type()))
+                }</span>
+        }
+}
+
+func setPointerFieldValue(field reflect.Value, val reflect.Value) <span class="cov0" title="0">{
+        if val.Type().AssignableTo(field.Type()) </span><span class="cov0" title="0">{
+                field.Set(val)
+                return
+        }</span>
+        <span class="cov0" title="0">if val.Type().ConvertibleTo(field.Type()) </span><span class="cov0" title="0">{
+                field.Set(val.Convert(field.Type()))
+                return
+        }</span>
+
+        <span class="cov0" title="0">elemType := field.Type().Elem()
+        if val.Kind() == reflect.Pointer </span><span class="cov0" title="0">{
+                if val.IsNil() </span><span class="cov0" title="0">{
+                        field.Set(reflect.Zero(field.Type()))
+                        return
+                }</span>
+                <span class="cov0" title="0">val = val.Elem()</span>
+        }
+        <span class="cov0" title="0">if val.Type().AssignableTo(elemType) </span><span class="cov0" title="0">{
+                ptr := reflect.New(elemType)
+                ptr.Elem().Set(val)
+                field.Set(ptr)
+                return
+        }</span>
+        <span class="cov0" title="0">if val.Type().ConvertibleTo(elemType) </span><span class="cov0" title="0">{
+                ptr := reflect.New(elemType)
+                ptr.Elem().Set(val.Convert(elemType))
+                field.Set(ptr)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package repository
+
+import (
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/cache"
+        "gorm.io/gorm"
+)
+
+type UserRepository = port.UserRepository
+
+type userRepository struct {
+        ResourceRepository[domain.User]
+}
+
+func NewUserRepository(cfg *config.Config, db *gorm.DB, cacheClient cache.Cache) UserRepository <span class="cov10" title="3">{
+        return &amp;userRepository{
+                ResourceRepository: NewResourceRepository[domain.User](cfg, db, cacheClient),
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package handler
+
+import (
+        "net/http"
+        "net/url"
+        "regexp"
+        "strings"
+        "time"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/google/uuid"
+        "github.com/jeheskielSunloy77/zeile/internal/app/errs"
+        "github.com/jeheskielSunloy77/zeile/internal/application"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
+        httpdto "github.com/jeheskielSunloy77/zeile/internal/interface/http/dto"
+        "github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware"
+        "github.com/jeheskielSunloy77/zeile/internal/interface/http/response"
+)
+
+type AuthHandler struct {
+        Handler
+        authService application.AuthService
+}
+
+func NewAuthHandler(h Handler, authService application.AuthService) *AuthHandler <span class="cov10" title="13">{
+        return &amp;AuthHandler{
+                Handler:     h,
+                authService: authService,
+        }
+}</span>
+
+func (h *AuthHandler) Register() fiber.Handler <span class="cov3" title="2">{
+        return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.RegisterRequest) (*domain.User, error) </span><span class="cov1" title="1">{
+                result, err := h.authService.Register(c.UserContext(), req.ToUsecase(), c.Get(fiber.HeaderUserAgent), c.IP())
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov1" title="1">h.setAuthCookies(c, result)
+                return result.User, nil</span>
+        }, http.StatusCreated, &amp;httpdto.RegisterRequest{})
+}
+
+func (h *AuthHandler) Login() fiber.Handler <span class="cov1" title="1">{
+        return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.LoginRequest) (*domain.User, error) </span><span class="cov1" title="1">{
+                identifier := req.Identifier
+                if isEmail(identifier) </span><span class="cov1" title="1">{
+                        identifier = normalizeEmail(identifier)
+                }</span>
+
+                <span class="cov1" title="1">input := req.ToUsecase()
+                input.Identifier = identifier
+                result, err := h.authService.Login(c.UserContext(), input, c.Get(fiber.HeaderUserAgent), c.IP())
+                if err != nil </span><span class="cov1" title="1">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">h.setAuthCookies(c, result)
+                return result.User, nil</span>
+        }, http.StatusOK, &amp;httpdto.LoginRequest{})
+}
+
+func (h *AuthHandler) GoogleLogin() fiber.Handler <span class="cov1" title="1">{
+        return func(c *fiber.Ctx) error </span><span class="cov1" title="1">{
+                start, err := h.authService.StartGoogleAuth(c.UserContext())
+                if err != nil </span><span class="cov0" title="0">{
+                        return h.redirectGoogleFailure(c, err)
+                }</span>
+
+                <span class="cov1" title="1">h.setGoogleStateCookie(c, start)
+                return c.Redirect(start.AuthURL, http.StatusFound)</span>
+        }
+}
+
+func (h *AuthHandler) GoogleCallback() fiber.Handler <span class="cov1" title="1">{
+        return func(c *fiber.Ctx) error </span><span class="cov1" title="1">{
+                code := c.Query("code")
+                state := c.Query("state")
+                stateCookie := c.Cookies(googleStateCookieName)
+
+                result, err := h.authService.CompleteGoogleAuth(
+                        c.UserContext(),
+                        code,
+                        state,
+                        stateCookie,
+                        c.Get(fiber.HeaderUserAgent),
+                        c.IP(),
+                )
+
+                h.clearGoogleStateCookie(c)
+
+                if err != nil </span><span class="cov0" title="0">{
+                        return h.redirectGoogleFailure(c, err)
+                }</span>
+
+                <span class="cov1" title="1">h.setAuthCookies(c, result)
+
+                return c.Redirect(h.server.Config.Auth.GoogleSuccessRedirectURL, http.StatusFound)</span>
+        }
+}
+
+func (h *AuthHandler) VerifyEmail() fiber.Handler <span class="cov3" title="2">{
+        return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.VerifyEmailRequest) (*domain.User, error) </span><span class="cov1" title="1">{
+                return h.authService.VerifyEmail(c.UserContext(), req.ToUsecase())
+        }</span>, http.StatusOK, &amp;httpdto.VerifyEmailRequest{})
+}
+
+func (h *AuthHandler) Refresh() fiber.Handler <span class="cov1" title="1">{
+        return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*domain.User, error) </span><span class="cov1" title="1">{
+                refreshToken := c.Cookies(h.refreshCookieName())
+                result, err := h.authService.Refresh(c.UserContext(), refreshToken, c.Get(fiber.HeaderUserAgent), c.IP())
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov1" title="1">h.setAuthCookies(c, result)
+                return result.User, nil</span>
+        }, http.StatusOK, &amp;httpdto.Empty{})
+}
+
+func (h *AuthHandler) Me() fiber.Handler <span class="cov3" title="2">{
+        return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*domain.User, error) </span><span class="cov3" title="2">{
+                userID, err := h.parseUserID(c)
+                if err != nil </span><span class="cov1" title="1">{
+                        return nil, err
+                }</span>
+                <span class="cov1" title="1">return h.authService.CurrentUser(c.UserContext(), userID)</span>
+        }, http.StatusOK, &amp;httpdto.Empty{})
+}
+
+func (h *AuthHandler) ResendVerification() fiber.Handler <span class="cov1" title="1">{
+        return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*response.Response[any], error) </span><span class="cov1" title="1">{
+                userID, err := h.parseUserID(c)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov1" title="1">if err := h.authService.ResendVerification(c.UserContext(), userID); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov1" title="1">resp := response.Response[any]{
+                        Status:  http.StatusOK,
+                        Success: true,
+                        Message: "Verification email sent if needed.",
+                }
+                return &amp;resp, nil</span>
+        }, http.StatusOK, &amp;httpdto.Empty{})
+}
+
+func (h *AuthHandler) Logout() fiber.Handler <span class="cov1" title="1">{
+        return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*response.Response[any], error) </span><span class="cov1" title="1">{
+                refreshToken := c.Cookies(h.refreshCookieName())
+                if err := h.authService.Logout(c.UserContext(), refreshToken); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov1" title="1">h.clearAuthCookies(c)
+
+                resp := response.Response[any]{
+                        Status:  http.StatusOK,
+                        Success: true,
+                        Message: "Logged out successfully.",
+                }
+                return &amp;resp, nil</span>
+        }, http.StatusOK, &amp;httpdto.Empty{})
+}
+
+func (h *AuthHandler) LogoutAll() fiber.Handler <span class="cov1" title="1">{
+        return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*response.Response[any], error) </span><span class="cov1" title="1">{
+                userID, err := h.parseUserID(c)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov1" title="1">if err := h.authService.LogoutAll(c.UserContext(), userID); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov1" title="1">h.clearAuthCookies(c)
+
+                resp := response.Response[any]{
+                        Status:  http.StatusOK,
+                        Success: true,
+                        Message: "Logged out from all sessions.",
+                }
+                return &amp;resp, nil</span>
+        }, http.StatusOK, &amp;httpdto.Empty{})
+}
+
+func (h *AuthHandler) parseUserID(c *fiber.Ctx) (uuid.UUID, error) <span class="cov5" title="4">{
+        raw := middleware.GetUserID(c)
+        if raw == "" </span><span class="cov1" title="1">{
+                return uuid.Nil, errs.NewUnauthorizedError("Unauthorized", false)
+        }</span>
+        <span class="cov4" title="3">userID, err := uuid.Parse(raw)
+        if err != nil </span><span class="cov0" title="0">{
+                return uuid.Nil, errs.NewUnauthorizedError("Unauthorized", false)
+        }</span>
+        <span class="cov4" title="3">return userID, nil</span>
+}
+
+func (h *AuthHandler) setAuthCookies(c *fiber.Ctx, result *application.AuthResult) <span class="cov4" title="3">{
+        if result == nil </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov4" title="3">sameSite := string(h.server.Config.Auth.CookieSameSite)
+        secure := h.server.Config.Primary.Env == config.EnvProduction
+
+        accessCookie := &amp;fiber.Cookie{
+                Name:     h.accessCookieName(),
+                Value:    result.Token.Token,
+                Expires:  result.Token.ExpiresAt,
+                HTTPOnly: true,
+                Secure:   secure,
+                SameSite: sameSite,
+                Path:     "/",
+                Domain:   h.server.Config.Auth.CookieDomain,
+        }
+        refreshCookie := &amp;fiber.Cookie{
+                Name:     h.refreshCookieName(),
+                Value:    result.RefreshToken.Token,
+                Expires:  result.RefreshToken.ExpiresAt,
+                HTTPOnly: true,
+                Secure:   secure,
+                SameSite: sameSite,
+                Path:     "/",
+                Domain:   h.server.Config.Auth.CookieDomain,
+        }
+
+        c.Cookie(accessCookie)
+        c.Cookie(refreshCookie)</span>
+}
+
+func (h *AuthHandler) clearAuthCookies(c *fiber.Ctx) <span class="cov3" title="2">{
+        sameSite := string(h.server.Config.Auth.CookieSameSite)
+        secure := h.server.Config.Primary.Env == config.EnvProduction
+        expired := time.Unix(0, 0)
+
+        c.Cookie(&amp;fiber.Cookie{
+                Name:     h.accessCookieName(),
+                Value:    "",
+                Expires:  expired,
+                MaxAge:   -1,
+                HTTPOnly: true,
+                Secure:   secure,
+                SameSite: sameSite,
+                Path:     "/",
+                Domain:   h.server.Config.Auth.CookieDomain,
+        })
+        c.Cookie(&amp;fiber.Cookie{
+                Name:     h.refreshCookieName(),
+                Value:    "",
+                Expires:  expired,
+                MaxAge:   -1,
+                HTTPOnly: true,
+                Secure:   secure,
+                SameSite: sameSite,
+                Path:     "/",
+                Domain:   h.server.Config.Auth.CookieDomain,
+        })
+}</span>
+
+func (h *AuthHandler) accessCookieName() string <span class="cov6" title="5">{
+        if h.server != nil &amp;&amp; h.server.Config.Auth.AccessCookieName != "" </span><span class="cov6" title="5">{
+                return h.server.Config.Auth.AccessCookieName
+        }</span>
+        <span class="cov0" title="0">return "access_token"</span>
+}
+
+func (h *AuthHandler) refreshCookieName() string <span class="cov7" title="7">{
+        if h.server != nil &amp;&amp; h.server.Config.Auth.RefreshCookieName != "" </span><span class="cov7" title="7">{
+                return h.server.Config.Auth.RefreshCookieName
+        }</span>
+        <span class="cov0" title="0">return "refresh_token"</span>
+}
+
+const googleStateCookieName = "google_auth_state"
+
+func (h *AuthHandler) setGoogleStateCookie(c *fiber.Ctx, start *application.GoogleAuthStart) <span class="cov1" title="1">{
+        if start == nil </span><span class="cov0" title="0">{
+                return
+        }</span>
+
+        <span class="cov1" title="1">sameSite := string(h.server.Config.Auth.CookieSameSite)
+        secure := h.server.Config.Primary.Env == config.EnvProduction
+
+        c.Cookie(&amp;fiber.Cookie{
+                Name:     googleStateCookieName,
+                Value:    start.StateCookie,
+                Expires:  start.StateExpiresAt,
+                HTTPOnly: true,
+                Secure:   secure,
+                SameSite: sameSite,
+                Path:     "/api/v1/auth/google",
+                Domain:   h.server.Config.Auth.CookieDomain,
+        })</span>
+}
+
+func (h *AuthHandler) clearGoogleStateCookie(c *fiber.Ctx) <span class="cov1" title="1">{
+        sameSite := string(h.server.Config.Auth.CookieSameSite)
+        secure := h.server.Config.Primary.Env == config.EnvProduction
+        expired := time.Unix(0, 0)
+
+        c.Cookie(&amp;fiber.Cookie{
+                Name:     googleStateCookieName,
+                Value:    "",
+                Expires:  expired,
+                MaxAge:   -1,
+                HTTPOnly: true,
+                Secure:   secure,
+                SameSite: sameSite,
+                Path:     "/api/v1/auth/google",
+                Domain:   h.server.Config.Auth.CookieDomain,
+        })
+}</span>
+
+func (h *AuthHandler) defaultAuthOrigin() string <span class="cov0" title="0">{
+        if h.server == nil || h.server.Config == nil </span><span class="cov0" title="0">{
+                return ""
+        }</span>
+
+        <span class="cov0" title="0">if len(h.server.Config.Server.CORSAllowedOrigins) == 0 </span><span class="cov0" title="0">{
+                return ""
+        }</span>
+
+        <span class="cov0" title="0">origin := strings.TrimSpace(h.server.Config.Server.CORSAllowedOrigins[0])
+        if origin == "" || origin == "*" </span><span class="cov0" title="0">{
+                return ""
+        }</span>
+
+        <span class="cov0" title="0">return origin</span>
+}
+
+func (h *AuthHandler) redirectGoogleFailure(c *fiber.Ctx, err error) error <span class="cov0" title="0">{
+        middleware.GetLogger(c).Warn().Err(err).Msg("google auth failed")
+        redirectURL := appendQueryParam(h.server.Config.Auth.GoogleFailureRedirectURL, "error", "google_auth_failed")
+        return c.Redirect(redirectURL, http.StatusFound)
+}</span>
+
+func appendQueryParam(rawURL, key, value string) string <span class="cov0" title="0">{
+        parsed, err := url.Parse(rawURL)
+        if err != nil </span><span class="cov0" title="0">{
+                return rawURL
+        }</span>
+
+        <span class="cov0" title="0">query := parsed.Query()
+        query.Set(key, value)
+        parsed.RawQuery = query.Encode()
+
+        return parsed.String()</span>
+}
+
+func isEmail(identifier string) bool <span class="cov1" title="1">{
+        emailRegex := regexp.MustCompile(`^[^@\s]+@[^@\s]+\.[^@\s]+$`)
+        return emailRegex.MatchString(identifier)
+}</span>
+
+func normalizeEmail(email string) string <span class="cov1" title="1">{
+        return strings.ToLower(strings.TrimSpace(email))
+}</span>
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package handler
+
+import (
+        "time"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+        "github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware"
+        "github.com/jeheskielSunloy77/zeile/internal/interface/http/validation"
+        "github.com/newrelic/go-agent/v3/integrations/nrpkgerrors"
+        "github.com/newrelic/go-agent/v3/newrelic"
+)
+
+// Handler provides base functionality for all handlers
+type Handler struct {
+        server *server.Server
+}
+
+// NewHandler creates a new base handler
+func NewHandler(s *server.Server) Handler <span class="cov10" title="16">{
+        return Handler{server: s}
+}</span>
+
+// HandlerFunc represents a typed handler function that processes a request and returns a response
+type HandlerFunc[Req validation.Validatable, Res any] func(c *fiber.Ctx, req Req) (Res, error)
+
+// HandlerFuncNoContent represents a typed handler function that processes a request without returning content
+type HandlerFuncNoContent[Req validation.Validatable] func(c *fiber.Ctx, req Req) error
+
+// ResponseHandler defines the interface for handling different response types
+type ResponseHandler interface {
+        Handle(c *fiber.Ctx, result any) error
+        GetOperation() string
+        AddAttributes(txn *newrelic.Transaction, result any)
+}
+
+// JSONResponseHandler handles JSON responses
+type JSONResponseHandler struct {
+        status int
+}
+
+func (h JSONResponseHandler) Handle(c *fiber.Ctx, result any) error <span class="cov8" title="9">{
+        return c.Status(h.status).JSON(result)
+}</span>
+
+func (h JSONResponseHandler) GetOperation() string <span class="cov9" title="14">{
+        return "handler"
+}</span>
+
+func (h JSONResponseHandler) AddAttributes(txn *newrelic.Transaction, result any) {<span class="cov0" title="0">
+        // http.status_code is already set by tracing middleware
+}</span>
+
+// NoContentResponseHandler handles no-content responses
+type NoContentResponseHandler struct {
+        status int
+}
+
+func (h NoContentResponseHandler) Handle(c *fiber.Ctx, result any) error <span class="cov0" title="0">{
+        return c.SendStatus(h.status)
+}</span>
+
+func (h NoContentResponseHandler) GetOperation() string <span class="cov0" title="0">{
+        return "handler_no_content"
+}</span>
+
+func (h NoContentResponseHandler) AddAttributes(txn *newrelic.Transaction, result any) {<span class="cov0" title="0">
+        // http.status_code is already set by tracing middleware
+}</span>
+
+// FileResponseHandler handles file responses
+type FileResponseHandler struct {
+        status      int
+        filename    string
+        contentType string
+}
+
+func (h FileResponseHandler) Handle(c *fiber.Ctx, result any) error <span class="cov0" title="0">{
+        data := result.([]byte)
+        c.Response().Header.Set("Content-Disposition", "attachment; filename="+h.filename)
+        c.Set(fiber.HeaderContentType, h.contentType)
+        return c.Status(h.status).Send(data)
+}</span>
+
+func (h FileResponseHandler) GetOperation() string <span class="cov0" title="0">{
+        return "handler_file"
+}</span>
+
+func (h FileResponseHandler) AddAttributes(txn *newrelic.Transaction, result any) <span class="cov0" title="0">{
+        if txn != nil </span><span class="cov0" title="0">{
+                // http.status_code is already set by tracing middleware
+                txn.AddAttribute("file.name", h.filename)
+                txn.AddAttribute("file.content_type", h.contentType)
+                if data, ok := result.([]byte); ok </span><span class="cov0" title="0">{
+                        txn.AddAttribute("file.size_bytes", len(data))
+                }</span>
+        }
+}
+
+// handleRequest is the unified handler function that eliminates code duplication
+func handleRequest[Req validation.Validatable](
+        c *fiber.Ctx,
+        req Req,
+        handler func(c *fiber.Ctx, req Req) (any, error),
+        responseHandler ResponseHandler,
+) error <span class="cov9" title="14">{
+        start := time.Now()
+        method := c.Method()
+        path := c.Path()
+        route := path
+        if c.Route() != nil &amp;&amp; c.Route().Path != "" </span><span class="cov9" title="14">{
+                route = c.Route().Path
+        }</span>
+
+        // Get New Relic transaction from context
+        <span class="cov9" title="14">txn := newrelic.FromContext(c.UserContext())
+        if txn != nil </span><span class="cov0" title="0">{
+                txn.AddAttribute("handler.name", route)
+                txn.AddAttribute("http.method", method)
+                txn.AddAttribute("http.route", route)
+                responseHandler.AddAttributes(txn, nil)
+        }</span>
+
+        // Get context-enhanced logger
+        <span class="cov9" title="14">loggerBuilder := middleware.GetLogger(c).With().
+                Str("operation", responseHandler.GetOperation()).
+                Str("method", method).
+                Str("path", path).
+                Str("route", route)
+
+        // Add file-specific fields to logger if it's a file handler
+        if fileHandler, ok := responseHandler.(FileResponseHandler); ok </span><span class="cov0" title="0">{
+                loggerBuilder = loggerBuilder.
+                        Str("filename", fileHandler.filename).
+                        Str("content_type", fileHandler.contentType)
+        }</span>
+
+        <span class="cov9" title="14">logger := loggerBuilder.Logger()
+
+        // user.id is already set by tracing middleware
+
+        logger.Info().Msg("handling request")
+
+        // Validation with observability
+        validationStart := time.Now()
+        if err := validation.BindAndValidate(c, req); err != nil </span><span class="cov4" title="3">{
+                validationDuration := time.Since(validationStart)
+
+                logger.Error().
+                        Err(err).
+                        Dur("validation_duration", validationDuration).
+                        Msg("request validation failed")
+
+                if txn != nil </span><span class="cov0" title="0">{
+                        txn.NoticeError(nrpkgerrors.Wrap(err))
+                        txn.AddAttribute("validation.status", "failed")
+                        txn.AddAttribute("validation.duration_ms", validationDuration.Milliseconds())
+                }</span>
+                <span class="cov4" title="3">return err</span>
+        }
+
+        <span class="cov8" title="11">validationDuration := time.Since(validationStart)
+        if txn != nil </span><span class="cov0" title="0">{
+                txn.AddAttribute("validation.status", "success")
+                txn.AddAttribute("validation.duration_ms", validationDuration.Milliseconds())
+        }</span>
+
+        <span class="cov8" title="11">logger.Debug().
+                Dur("validation_duration", validationDuration).
+                Msg("request validation successful")
+
+        // Execute handler with observability
+        handlerStart := time.Now()
+        result, err := handler(c, req)
+        handlerDuration := time.Since(handlerStart)
+
+        if err != nil </span><span class="cov3" title="2">{
+                totalDuration := time.Since(start)
+
+                logger.Error().
+                        Err(err).
+                        Dur("handler_duration", handlerDuration).
+                        Dur("total_duration", totalDuration).
+                        Msg("handler execution failed")
+
+                if txn != nil </span><span class="cov0" title="0">{
+                        txn.NoticeError(nrpkgerrors.Wrap(err))
+                        txn.AddAttribute("handler.status", "error")
+                        txn.AddAttribute("handler.duration_ms", handlerDuration.Milliseconds())
+                        txn.AddAttribute("total.duration_ms", totalDuration.Milliseconds())
+                }</span>
+                <span class="cov3" title="2">return err</span>
+        }
+
+        <span class="cov8" title="9">totalDuration := time.Since(start)
+
+        // Record success metrics and tracing
+        if txn != nil </span><span class="cov0" title="0">{
+                txn.AddAttribute("handler.status", "success")
+                txn.AddAttribute("handler.duration_ms", handlerDuration.Milliseconds())
+                txn.AddAttribute("total.duration_ms", totalDuration.Milliseconds())
+                responseHandler.AddAttributes(txn, result)
+        }</span>
+
+        <span class="cov8" title="9">logger.Info().
+                Dur("handler_duration", handlerDuration).
+                Dur("validation_duration", validationDuration).
+                Dur("total_duration", totalDuration).
+                Msg("request completed successfully")
+
+        return responseHandler.Handle(c, result)</span>
+}
+
+// Handle wraps a handler with validation, error handling, logging, metrics, and tracing
+func Handle[Req validation.Validatable, Res any](
+        h Handler,
+        handler HandlerFunc[Req, Res],
+        status int,
+        req Req,
+) fiber.Handler <span class="cov9" title="14">{
+        return func(c *fiber.Ctx) error </span><span class="cov9" title="14">{
+                return handleRequest(c, req, func(c *fiber.Ctx, req Req) (any, error) </span><span class="cov8" title="11">{
+                        return handler(c, req)
+                }</span>, JSONResponseHandler{status: status})
+        }
+}
+
+func HandleFile[Req validation.Validatable](
+        h Handler,
+        handler HandlerFunc[Req, []byte],
+        status int,
+        req Req,
+        filename string,
+        contentType string,
+) fiber.Handler <span class="cov0" title="0">{
+        return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return handleRequest(c, req, func(c *fiber.Ctx, req Req) (any, error) </span><span class="cov0" title="0">{
+                        return handler(c, req)
+                }</span>, FileResponseHandler{
+                        status:      status,
+                        filename:    filename,
+                        contentType: contentType,
+                })
+        }
+}
+
+// HandleNoContent wraps a handler with validation, error handling, logging, metrics, and tracing for endpoints that don't return content
+func HandleNoContent[Req validation.Validatable](
+        h Handler,
+        handler HandlerFuncNoContent[Req],
+        status int,
+        req Req,
+) fiber.Handler <span class="cov0" title="0">{
+        return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return handleRequest(c, req, func(c *fiber.Ctx, req Req) (any, error) </span><span class="cov0" title="0">{
+                        err := handler(c, req)
+                        return nil, err
+                }</span>, NoContentResponseHandler{status: status})
+        }
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package handler
+
+import (
+        "github.com/jeheskielSunloy77/zeile/internal/application"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+)
+
+type Handlers struct {
+        Health  *HealthHandler
+        Auth    *AuthHandler
+        User    *UserHandler
+        OpenAPI *OpenAPIHandler
+}
+
+func NewHandlers(s *server.Server, services *application.Services) *Handlers <span class="cov0" title="0">{
+        h := NewHandler(s)
+
+        return &amp;Handlers{
+                Health:  NewHealthHandler(h),
+                Auth:    NewAuthHandler(h, services.Auth),
+                User:    NewUserHandler(h, services.User),
+                OpenAPI: NewOpenAPIHandler(h),
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package handler
+
+import (
+        "context"
+        "fmt"
+        "net/http"
+        "time"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware"
+        "github.com/jeheskielSunloy77/zeile/internal/interface/http/response"
+)
+
+type HealthHandler struct {
+        Handler
+}
+
+func NewHealthHandler(h Handler) *HealthHandler <span class="cov0" title="0">{
+        return &amp;HealthHandler{
+                Handler: h,
+        }
+}</span>
+
+func (h *HealthHandler) GetHealth(c *fiber.Ctx) error <span class="cov0" title="0">{
+        start := time.Now()
+        logger := middleware.GetLogger(c).With().
+                Str("operation", "health_check").
+                Logger()
+
+        result := map[string]any{
+                "status":      "healthy",
+                "timestamp":   time.Now().UTC(),
+                "environment": h.server.Config.Primary.Env,
+                "checks":      make(map[string]any),
+        }
+
+        checks := result["checks"].(map[string]any)
+        isHealthy := true
+
+        // Check database connectivity
+        ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        sqlDB := h.server.DB.SQLDB
+        dbStart := time.Now()
+        if sqlDB == nil </span><span class="cov0" title="0">{
+                checks["database"] = map[string]any{
+                        "status":        "unhealthy",
+                        "response_time": time.Since(dbStart).String(),
+                        "error":         "database connection not initialized",
+                }
+                isHealthy = false
+                logger.Error().Msg("database health check failed: no connection")
+        }</span> else<span class="cov0" title="0"> if err := sqlDB.PingContext(ctx); err != nil </span><span class="cov0" title="0">{
+                checks["database"] = map[string]any{
+                        "status":        "unhealthy",
+                        "response_time": time.Since(dbStart).String(),
+                        "error":         err.Error(),
+                }
+                isHealthy = false
+                logger.Error().Err(err).Dur("response_time", time.Since(dbStart)).Msg("database health check failed")
+                if h.server.LoggerService != nil &amp;&amp; h.server.LoggerService.GetApplication() != nil </span><span class="cov0" title="0">{
+                        h.server.LoggerService.GetApplication().RecordCustomEvent(
+                                "HealthCheckError", map[string]any{
+                                        "check_type":       "database",
+                                        "operation":        "health_check",
+                                        "error_type":       "database_unhealthy",
+                                        "response_time_ms": time.Since(dbStart).Milliseconds(),
+                                        "error_message":    err.Error(),
+                                })
+                }</span>
+        } else<span class="cov0" title="0"> {
+                checks["database"] = map[string]any{
+                        "status":        "healthy",
+                        "response_time": time.Since(dbStart).String(),
+                }
+                logger.Info().Dur("response_time", time.Since(dbStart)).Msg("database health check passed")
+        }</span>
+
+        // Check Redis connectivity
+        <span class="cov0" title="0">if h.server.Redis != nil </span><span class="cov0" title="0">{
+                ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+                defer cancel()
+
+                redisStart := time.Now()
+                if err := h.server.Redis.Ping(ctx).Err(); err != nil </span><span class="cov0" title="0">{
+                        checks["redis"] = map[string]any{
+                                "status":        "unhealthy",
+                                "response_time": time.Since(redisStart).String(),
+                                "error":         err.Error(),
+                        }
+                        logger.Error().Err(err).Dur("response_time", time.Since(redisStart)).Msg("redis health check failed")
+                        if h.server.LoggerService != nil &amp;&amp; h.server.LoggerService.GetApplication() != nil </span><span class="cov0" title="0">{
+                                h.server.LoggerService.GetApplication().RecordCustomEvent(
+                                        "HealthCheckError", map[string]any{
+                                                "check_type":       "redis",
+                                                "operation":        "health_check",
+                                                "error_type":       "redis_unhealthy",
+                                                "response_time_ms": time.Since(redisStart).Milliseconds(),
+                                                "error_message":    err.Error(),
+                                        })
+                        }</span>
+                } else<span class="cov0" title="0"> {
+                        checks["redis"] = map[string]any{
+                                "status":        "healthy",
+                                "response_time": time.Since(redisStart).String(),
+                        }
+                        logger.Info().Dur("response_time", time.Since(redisStart)).Msg("redis health check passed")
+                }</span>
+        }
+
+        <span class="cov0" title="0">resp := response.Response[map[string]any]{
+                Message: "Health check completed, all systems operational",
+                Data:    &amp;result,
+                Status:  http.StatusOK,
+                Success: true,
+        }
+
+        // Set overall status
+        if !isHealthy </span><span class="cov0" title="0">{
+                result["status"] = "unhealthy"
+                resp.Message = "Health check completed, some systems are unhealthy"
+                resp.Data = &amp;result
+
+                logger.Warn().
+                        Dur("total_duration", time.Since(start)).
+                        Msg("health check failed")
+                if h.server.LoggerService != nil &amp;&amp; h.server.LoggerService.GetApplication() != nil </span><span class="cov0" title="0">{
+                        h.server.LoggerService.GetApplication().RecordCustomEvent(
+                                "HealthCheckError", map[string]any{
+                                        "check_type":        "overall",
+                                        "operation":         "health_check",
+                                        "error_type":        "overall_unhealthy",
+                                        "total_duration_ms": time.Since(start).Milliseconds(),
+                                })
+                }</span>
+
+                <span class="cov0" title="0">return c.Status(http.StatusServiceUnavailable).JSON(resp)</span>
+        }
+
+        <span class="cov0" title="0">logger.Info().
+                Dur("total_duration", time.Since(start)).
+                Msg("health check passed")
+
+        err := c.Status(http.StatusOK).JSON(resp)
+        if err != nil </span><span class="cov0" title="0">{
+                logger.Error().Err(err).Msg("failed to write JSON response")
+                if h.server.LoggerService != nil &amp;&amp; h.server.LoggerService.GetApplication() != nil </span><span class="cov0" title="0">{
+                        h.server.LoggerService.GetApplication().RecordCustomEvent(
+                                "HealthCheckError", map[string]any{
+                                        "check_type":    "response",
+                                        "operation":     "health_check",
+                                        "error_type":    "json_response_error",
+                                        "error_message": err.Error(),
+                                })
+                }</span>
+                <span class="cov0" title="0">return fmt.Errorf("failed to write JSON response: %w", err)</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package handler
+
+import (
+        "fmt"
+        "net/http"
+        "os"
+
+        "github.com/gofiber/fiber/v2"
+)
+
+type OpenAPIHandler struct {
+        Handler
+}
+
+func NewOpenAPIHandler(h Handler) *OpenAPIHandler <span class="cov0" title="0">{
+        return &amp;OpenAPIHandler{
+                Handler: h,
+        }
+}</span>
+
+func (h *OpenAPIHandler) ServeOpenAPIUI(c *fiber.Ctx) error <span class="cov0" title="0">{
+        templateBytes, err := os.ReadFile("static/openapi.html")
+        c.Set("Cache-Control", "no-cache")
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to read OpenAPI UI template: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">templateString := string(templateBytes)
+
+        if err := c.Type("html").Status(http.StatusOK).SendString(templateString); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to write HTML response: %w", err)
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package handler
+
+import (
+        "net/http"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/jeheskielSunloy77/zeile/internal/application"
+        applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
+        "github.com/jeheskielSunloy77/zeile/internal/application/port"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        httpdto "github.com/jeheskielSunloy77/zeile/internal/interface/http/dto"
+        "github.com/jeheskielSunloy77/zeile/internal/interface/http/response"
+        httputils "github.com/jeheskielSunloy77/zeile/internal/interface/http/utils"
+)
+
+type ResourceHandler[T domain.BaseModel, S applicationdto.StoreDTO[T], U applicationdto.UpdateDTO[T], TS httpdto.StoreDTO[S], TU httpdto.UpdateDTO[U]] struct {
+        Handler
+        resourceName string
+        service      application.ResourceService[T, S, U]
+}
+
+func NewResourceHandler[T domain.BaseModel, S applicationdto.StoreDTO[T], U applicationdto.UpdateDTO[T], TS httpdto.StoreDTO[S], TU httpdto.UpdateDTO[U]](resourceName string, base Handler, service application.ResourceService[T, S, U]) *ResourceHandler[T, S, U, TS, TU] <span class="cov10" title="3">{
+        return &amp;ResourceHandler[T, S, U, TS, TU]{
+                resourceName: resourceName,
+                Handler:      base,
+                service:      service,
+        }
+}</span>
+
+func (h *ResourceHandler[T, S, U, TS, TU]) Update() fiber.Handler <span class="cov0" title="0">{
+        return Handle(h.Handler, func(c *fiber.Ctx, dto TU) (*T, error) </span><span class="cov0" title="0">{
+                id, err := httputils.ParseUUIDParam(c.Params("id"))
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">return h.service.Update(c.UserContext(), id, dto.ToUsecase())</span>
+        }, http.StatusOK, httpdto.NewDTO[TU]())
+}
+
+func (h *ResourceHandler[T, S, U, TS, TU]) GetByID() fiber.Handler <span class="cov0" title="0">{
+        return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*T, error) </span><span class="cov0" title="0">{
+                id, err := httputils.ParseUUIDParam(c.Params("id"))
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">preloads := port.ParsePreloads(c.Query("preloads"))
+                return h.service.GetByID(c.UserContext(), id, preloads)</span>
+        }, http.StatusOK, &amp;httpdto.Empty{})
+}
+
+func (h *ResourceHandler[T, S, U, TS, TU]) GetMany() fiber.Handler <span class="cov1" title="1">{
+        return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (response.PaginatedResponse[T], error) </span><span class="cov1" title="1">{
+                options := getManyOptionsFromRequest(c)
+                entities, total, err := h.service.GetMany(c.UserContext(), options)
+                if err != nil </span><span class="cov0" title="0">{
+                        return response.PaginatedResponse[T]{}, err
+                }</span>
+
+                <span class="cov1" title="1">resp := response.NewPaginatedResponse("Successfully fetched "+h.resourceName+"s!", entities, total, options.Limit, options.Offset)
+                return resp, nil</span>
+        }, http.StatusOK, &amp;httpdto.Empty{})
+}
+
+func (h *ResourceHandler[T, S, U, TS, TU]) Destroy() fiber.Handler <span class="cov0" title="0">{
+        return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*response.Response[T], error) </span><span class="cov0" title="0">{
+                id, err := httputils.ParseUUIDParam(c.Params("id"))
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">err = h.service.Destroy(c.UserContext(), id)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">resp := response.Response[T]{
+                        Status:  http.StatusNoContent,
+                        Success: true,
+                        Message: "Successfully deleted " + h.resourceName + "!",
+                }
+
+                return &amp;resp, nil</span>
+        }, http.StatusNoContent, &amp;httpdto.Empty{})
+}
+
+func (h *ResourceHandler[T, S, U, TS, TU]) Kill() fiber.Handler <span class="cov0" title="0">{
+        return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*response.Response[T], error) </span><span class="cov0" title="0">{
+                id, err := httputils.ParseUUIDParam(c.Params("id"))
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">err = h.service.Kill(c.UserContext(), id)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">resp := response.Response[T]{
+                        Status:  http.StatusNoContent,
+                        Success: true,
+                        Message: "Successfully permanently deleted " + h.resourceName + "!",
+                }
+
+                return &amp;resp, nil</span>
+        }, http.StatusNoContent, &amp;httpdto.Empty{})
+}
+
+func (h *ResourceHandler[T, S, U, TS, TU]) Restore() fiber.Handler <span class="cov0" title="0">{
+        return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*response.Response[T], error) </span><span class="cov0" title="0">{
+                id, err := httputils.ParseUUIDParam(c.Params("id"))
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">preloads := port.ParsePreloads(c.Query("preloads"))
+                entity, err := h.service.Restore(c.UserContext(), id, preloads)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">resp := response.Response[T]{
+                        Status:  http.StatusOK,
+                        Success: true,
+                        Message: "Successfully restored " + h.resourceName + "!",
+                        Data:    entity,
+                }
+
+                return &amp;resp, nil</span>
+        }, http.StatusOK, &amp;httpdto.Empty{})
+}
+
+func (h *ResourceHandler[T, S, U, TS, TU]) Store() fiber.Handler <span class="cov6" title="2">{
+        return Handle(h.Handler, func(c *fiber.Ctx, dto TS) (*response.Response[T], error) </span><span class="cov1" title="1">{
+                entity, err := h.service.Store(c.UserContext(), dto.ToUsecase())
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov1" title="1">resp := response.Response[T]{
+                        Status:  http.StatusCreated,
+                        Success: true,
+                        Message: "Successfully created " + h.resourceName + "!",
+                        Data:    entity,
+                }
+
+                return &amp;resp, nil</span>
+        }, http.StatusCreated, httpdto.NewDTO[TS]())
+}
+
+func getManyOptionsFromRequest(c *fiber.Ctx) port.GetManyOptions <span class="cov1" title="1">{
+        opts := port.GetManyOptions{
+                Limit:          httputils.ParseQueryInt(c.Query("limit")),
+                Offset:         httputils.ParseQueryInt(c.Query("offset")),
+                Preloads:       port.ParsePreloads(c.Query("preloads")),
+                OrderBy:        c.Query("orderBy"),
+                OrderDirection: c.Query("orderDirection"),
+        }
+        opts.Normalize()
+        return opts
+}</span>
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package handler
+
+import (
+        "github.com/jeheskielSunloy77/zeile/internal/application"
+        applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        httpdto "github.com/jeheskielSunloy77/zeile/internal/interface/http/dto"
+)
+
+type UserHandler struct {
+        *ResourceHandler[domain.User, *applicationdto.StoreUserInput, *applicationdto.UpdateUserInput, *httpdto.StoreUserRequest, *httpdto.UpdateUserRequest]
+}
+
+func NewUserHandler(h Handler, service application.UserService) *UserHandler <span class="cov0" title="0">{
+        return &amp;UserHandler{
+                ResourceHandler: NewResourceHandler[domain.User, *applicationdto.StoreUserInput, *applicationdto.UpdateUserInput, *httpdto.StoreUserRequest, *httpdto.UpdateUserRequest]("user", h, service),
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package middleware
+
+import (
+        "strings"
+        "time"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/golang-jwt/jwt/v5"
+        "github.com/google/uuid"
+        "github.com/jeheskielSunloy77/zeile/internal/app/errs"
+        "github.com/jeheskielSunloy77/zeile/internal/domain"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+)
+
+type AuthMiddleware struct {
+        server           *server.Server
+        secret           []byte
+        accessCookieName string
+}
+
+func NewAuthMiddleware(s *server.Server) *AuthMiddleware <span class="cov0" title="0">{
+        cookieName := s.Config.Auth.AccessCookieName
+        if strings.TrimSpace(cookieName) == "" </span><span class="cov0" title="0">{
+                cookieName = "access_token"
+        }</span>
+
+        <span class="cov0" title="0">return &amp;AuthMiddleware{
+                server:           s,
+                secret:           []byte(s.Config.Auth.SecretKey),
+                accessCookieName: cookieName,
+        }</span>
+}
+
+func (auth *AuthMiddleware) RequireAuth() fiber.Handler <span class="cov0" title="0">{
+        return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                start := time.Now()
+
+                rawToken := ""
+                authHeader := c.Get(fiber.HeaderAuthorization)
+                if strings.TrimSpace(authHeader) != "" </span><span class="cov0" title="0">{
+                        parts := strings.Fields(authHeader)
+                        if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") </span><span class="cov0" title="0">{
+                                return errs.NewUnauthorizedError("Unauthorized", false)
+                        }</span>
+                        <span class="cov0" title="0">rawToken = strings.TrimSpace(parts[1])</span>
+                } else<span class="cov0" title="0"> {
+                        rawToken = strings.TrimSpace(c.Cookies(auth.accessCookieName))
+                }</span>
+
+                <span class="cov0" title="0">if rawToken == "" </span><span class="cov0" title="0">{
+                        return errs.NewUnauthorizedError("Unauthorized", false)
+                }</span>
+
+                <span class="cov0" title="0">claims := &amp;domain.AuthClaims{}
+                token, err := jwt.ParseWithClaims(rawToken, claims, func(token *jwt.Token) (any, error) </span><span class="cov0" title="0">{
+                        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok </span><span class="cov0" title="0">{
+                                return nil, errs.NewUnauthorizedError("invalid token", true)
+                        }</span>
+                        <span class="cov0" title="0">return auth.secret, nil</span>
+                })
+                <span class="cov0" title="0">if err != nil || !token.Valid </span><span class="cov0" title="0">{
+                        auth.server.Logger.Error().
+                                Err(err).
+                                Str("function", "RequireAuth").
+                                Str("request_id", GetRequestID(c)).
+                                Dur("duration", time.Since(start)).
+                                Msg("token validation failed")
+
+                        return errs.NewUnauthorizedError("Unauthorized", false)
+                }</span>
+
+                <span class="cov0" title="0">if claims.Subject == "" </span><span class="cov0" title="0">{
+                        return errs.NewUnauthorizedError("Unauthorized", false)
+                }</span>
+
+                <span class="cov0" title="0">if _, err := uuid.Parse(claims.Subject); err != nil </span><span class="cov0" title="0">{
+                        return errs.NewUnauthorizedError("Unauthorized", false)
+                }</span>
+
+                <span class="cov0" title="0">c.Locals(UserIDKey, claims.Subject)
+                c.Locals(UserEmailKey, claims.Email)
+                c.Locals(UserIsAdminKey, claims.IsAdmin)
+
+                auth.server.Logger.Info().
+                        Str("function", "RequireAuth").
+                        Str("user_id", claims.Subject).
+                        Str("request_id", GetRequestID(c)).
+                        Dur("duration", time.Since(start)).
+                        Msg("user authenticated successfully")
+
+                return c.Next()</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package middleware
+
+import (
+        "context"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/jeheskielSunloy77/zeile/internal/app/errs"
+        "github.com/jeheskielSunloy77/zeile/internal/application"
+)
+
+type AuthorizationMiddleware struct {
+        authorizer AuthorizationEnforcer
+}
+
+type AuthorizationEnforcer interface {
+        Enforce(ctx context.Context, sub application.AuthorizationSubject, obj application.AuthorizationObject, act string) (bool, error)
+}
+
+func NewAuthorizationMiddleware(authorizer AuthorizationEnforcer) *AuthorizationMiddleware <span class="cov10" title="5">{
+        return &amp;AuthorizationMiddleware{authorizer: authorizer}
+}</span>
+
+func (am *AuthorizationMiddleware) RequireAuthorization() fiber.Handler <span class="cov10" title="5">{
+        return func(c *fiber.Ctx) error </span><span class="cov10" title="5">{
+                userID := GetUserID(c)
+                if userID == "" </span><span class="cov1" title="1">{
+                        return errs.NewUnauthorizedError("Unauthorized", false)
+                }</span>
+
+                <span class="cov8" title="4">isAdmin := GetUserIsAdmin(c)
+                if isAdmin </span><span class="cov1" title="1">{
+                        return c.Next()
+                }</span>
+
+                <span class="cov7" title="3">if am.authorizer == nil </span><span class="cov0" title="0">{
+                        return errs.NewInternalServerError()
+                }</span>
+
+                <span class="cov7" title="3">subject := application.AuthorizationSubject{
+                        ID:      userID,
+                        Email:   GetUserEmail(c),
+                        IsAdmin: isAdmin,
+                }
+                obj := application.AuthorizationObject{
+                        Route:  routePattern(c),
+                        Path:   c.Path(),
+                        Params: c.AllParams(),
+                        Query:  c.Queries(),
+                }
+
+                allowed, err := am.authorizer.Enforce(c.UserContext(), subject, obj, c.Method())
+                if err != nil </span><span class="cov1" title="1">{
+                        logger := GetLogger(c)
+                        logger.Error().Err(err).Msg("authorization check failed")
+                        return errs.NewInternalServerError()
+                }</span>
+                <span class="cov4" title="2">if !allowed </span><span class="cov1" title="1">{
+                        return errs.NewForbiddenError("Forbidden", false)
+                }</span>
+
+                <span class="cov1" title="1">return c.Next()</span>
+        }
+}
+
+func routePattern(c *fiber.Ctx) string <span class="cov7" title="3">{
+        if c.Route() != nil &amp;&amp; c.Route().Path != "" </span><span class="cov7" title="3">{
+                return c.Route().Path
+        }</span>
+        <span class="cov0" title="0">return c.Path()</span>
+}
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package middleware
+
+import (
+        "context"
+        "time"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/logger"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+        "github.com/newrelic/go-agent/v3/newrelic"
+        "github.com/rs/zerolog"
+)
+
+const (
+        UserIDKey      = "user_id"
+        UserRoleKey    = "user_role"
+        UserEmailKey   = "user_email"
+        UserIsAdminKey = "user_is_admin"
+        LoggerKey      = "logger"
+)
+
+type ContextEnhancer struct {
+        server *server.Server
+}
+
+func NewContextEnhancer(s *server.Server) *ContextEnhancer <span class="cov0" title="0">{
+        return &amp;ContextEnhancer{server: s}
+}</span>
+
+func (ce *ContextEnhancer) WithTimeout() fiber.Handler <span class="cov0" title="0">{
+        return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                timeout := ce.timeoutForMethod(c.Method())
+                if timeout &lt;= 0 </span><span class="cov0" title="0">{
+                        return c.Next()
+                }</span>
+
+                <span class="cov0" title="0">ctx, cancel := context.WithTimeout(c.UserContext(), timeout)
+                defer cancel()
+
+                c.SetUserContext(ctx)
+
+                return c.Next()</span>
+        }
+}
+
+func (ce *ContextEnhancer) EnhanceContext() fiber.Handler <span class="cov0" title="0">{
+        return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                requestID := GetRequestID(c)
+
+                contextLogger := ce.server.Logger.With().
+                        Str("request_id", requestID).
+                        Str("method", c.Method()).
+                        Str("path", c.Path()).
+                        Str("ip", c.IP()).
+                        Logger()
+
+                if txn := newrelic.FromContext(c.UserContext()); txn != nil </span><span class="cov0" title="0">{
+                        contextLogger = logger.WithTraceContext(contextLogger, txn)
+                }</span>
+
+                <span class="cov0" title="0">if userID := ce.extractUserID(c); userID != "" </span><span class="cov0" title="0">{
+                        contextLogger = contextLogger.With().Str("user_id", userID).Logger()
+                }</span>
+
+                <span class="cov0" title="0">if userRole := ce.extractUserRole(c); userRole != "" </span><span class="cov0" title="0">{
+                        contextLogger = contextLogger.With().Str("user_role", userRole).Logger()
+                }</span>
+
+                <span class="cov0" title="0">c.Locals(LoggerKey, &amp;contextLogger)
+
+                ctx := context.WithValue(c.UserContext(), LoggerKey, &amp;contextLogger)
+                c.SetUserContext(ctx)
+
+                return c.Next()</span>
+        }
+}
+
+func (ce *ContextEnhancer) extractUserID(c *fiber.Ctx) string <span class="cov0" title="0">{
+        if userID, ok := c.Locals(UserIDKey).(string); ok &amp;&amp; userID != "" </span><span class="cov0" title="0">{
+                return userID
+        }</span>
+        <span class="cov0" title="0">return ""</span>
+}
+
+func (ce *ContextEnhancer) extractUserRole(c *fiber.Ctx) string <span class="cov0" title="0">{
+        if userRole, ok := c.Locals(UserRoleKey).(string); ok &amp;&amp; userRole != "" </span><span class="cov0" title="0">{
+                return userRole
+        }</span>
+        <span class="cov0" title="0">return ""</span>
+}
+
+func (ce *ContextEnhancer) timeoutForMethod(method string) time.Duration <span class="cov0" title="0">{
+        switch method </span>{
+        case fiber.MethodGet, fiber.MethodHead, fiber.MethodOptions:<span class="cov0" title="0">
+                return ce.server.Config.Server.ReadTimeout</span>
+        default:<span class="cov0" title="0">
+                return ce.server.Config.Server.WriteTimeout</span>
+        }
+}
+
+func GetUserID(c *fiber.Ctx) string <span class="cov10" title="5">{
+        if userID, ok := c.Locals(UserIDKey).(string); ok </span><span class="cov8" title="4">{
+                return userID
+        }</span>
+        <span class="cov1" title="1">return ""</span>
+}
+
+func GetUserEmail(c *fiber.Ctx) string <span class="cov7" title="3">{
+        if email, ok := c.Locals(UserEmailKey).(string); ok </span><span class="cov1" title="1">{
+                return email
+        }</span>
+        <span class="cov4" title="2">return ""</span>
+}
+
+func GetUserIsAdmin(c *fiber.Ctx) bool <span class="cov8" title="4">{
+        if isAdmin, ok := c.Locals(UserIsAdminKey).(bool); ok </span><span class="cov1" title="1">{
+                return isAdmin
+        }</span>
+        <span class="cov7" title="3">return false</span>
+}
+
+func GetLogger(c *fiber.Ctx) *zerolog.Logger <span class="cov1" title="1">{
+        if logger, ok := c.Locals(LoggerKey).(*zerolog.Logger); ok </span><span class="cov0" title="0">{
+                return logger
+        }</span>
+        <span class="cov1" title="1">logger := zerolog.Nop()
+        return &amp;logger</span>
+}
+</pre>
+		
+		<pre class="file" id="file23" style="display: none">package middleware
+
+import (
+        "net/http"
+        "time"
+
+        "github.com/gofiber/fiber/v2"
+        fiberrecover "github.com/gofiber/fiber/v2/middleware/recover"
+        "github.com/jeheskielSunloy77/zeile/internal/app/errs"
+        "github.com/jeheskielSunloy77/zeile/internal/app/sqlerr"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+        "github.com/pkg/errors"
+        "github.com/rs/zerolog"
+)
+
+type GlobalMiddlewares struct {
+        server *server.Server
+}
+
+func NewGlobalMiddlewares(s *server.Server) *GlobalMiddlewares <span class="cov0" title="0">{
+        return &amp;GlobalMiddlewares{
+                server: s,
+        }
+}</span>
+
+func (global *GlobalMiddlewares) RequestLogger() fiber.Handler <span class="cov0" title="0">{
+        return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                start := time.Now()
+                err := c.Next()
+
+                statusCode := c.Response().StatusCode()
+                if statusCode == 0 </span><span class="cov0" title="0">{
+                        statusCode = http.StatusOK
+                }</span>
+
+                <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                        var httpErr *errs.ErrorResponse
+                        var fiberErr *fiber.Error
+                        switch </span>{
+                        case errors.As(err, &amp;httpErr):<span class="cov0" title="0">
+                                statusCode = httpErr.Status</span>
+                        case errors.As(err, &amp;fiberErr):<span class="cov0" title="0">
+                                statusCode = fiberErr.Code</span>
+                        default:<span class="cov0" title="0">
+                                statusCode = http.StatusInternalServerError</span>
+                        }
+                }
+
+                <span class="cov0" title="0">logger := GetLogger(c)
+
+                var e *zerolog.Event
+
+                switch </span>{
+                case statusCode &gt;= 500:<span class="cov0" title="0">
+                        e = logger.Error().Err(err)</span>
+                case statusCode &gt;= 400:<span class="cov0" title="0">
+                        e = logger.Warn()</span>
+                default:<span class="cov0" title="0">
+                        e = logger.Info()</span>
+                }
+
+                <span class="cov0" title="0">if requestID := GetRequestID(c); requestID != "" </span><span class="cov0" title="0">{
+                        e = e.Str("request_id", requestID)
+                }</span>
+
+                <span class="cov0" title="0">if userID := GetUserID(c); userID != "" </span><span class="cov0" title="0">{
+                        e = e.Str("user_id", userID)
+                }</span>
+
+                <span class="cov0" title="0">e.
+                        Dur("latency", time.Since(start)).
+                        Int("status", statusCode).
+                        Str("method", c.Method()).
+                        Str("uri", c.OriginalURL()).
+                        Str("host", c.Hostname()).
+                        Str("ip", c.IP()).
+                        Str("user_agent", c.Get(fiber.HeaderUserAgent)).
+                        Msg("API")
+
+                return err</span>
+        }
+}
+
+func (global *GlobalMiddlewares) Recover() fiber.Handler <span class="cov0" title="0">{
+        return fiberrecover.New()
+}</span>
+
+func (global *GlobalMiddlewares) GlobalErrorHandler(c *fiber.Ctx, err error) error <span class="cov0" title="0">{
+        // First try to handle database errors and convert them to appropriate HTTP errors
+        originalErr := err
+
+        // Try to handle known database errors
+        // Only do this for errors that haven't already been converted to HTTPError
+        var httpErr *errs.ErrorResponse
+        if !errors.As(err, &amp;httpErr) </span><span class="cov0" title="0">{
+                var fiberErr *fiber.Error
+                if errors.As(err, &amp;fiberErr) </span><span class="cov0" title="0">{
+                        if fiberErr.Code == http.StatusNotFound </span><span class="cov0" title="0">{
+                                err = errs.NewNotFoundError("Route not found", false)
+                        }</span>
+                } else<span class="cov0" title="0"> {
+                        // Here we call our sqlerr handler which will convert database errors
+                        // to appropriate application errors
+                        err = sqlerr.HandleError(err)
+                }</span>
+        }
+
+        // Now process the possibly converted error
+        <span class="cov0" title="0">var fiberErr *fiber.Error
+        var status int
+        var code string
+        var message string
+        var fieldErrors []errs.FieldError
+        var action *errs.Action
+
+        switch </span>{
+        case errors.As(err, &amp;httpErr):<span class="cov0" title="0">
+                status = httpErr.Status
+                message = httpErr.Message
+                fieldErrors = httpErr.Errors
+                action = httpErr.Action</span>
+
+        case errors.As(err, &amp;fiberErr):<span class="cov0" title="0">
+                status = fiberErr.Code
+                code = errs.MakeUpperCaseWithUnderscores(http.StatusText(status))
+                message = fiberErr.Message</span>
+
+        default:<span class="cov0" title="0">
+                status = http.StatusInternalServerError
+                code = errs.MakeUpperCaseWithUnderscores(
+                        http.StatusText(http.StatusInternalServerError))
+                message = http.StatusText(http.StatusInternalServerError)</span>
+        }
+
+        // Log the original error to help with debugging
+        // Use enhanced logger from context which already includes request_id, method, path, ip, user context, and trace context
+        <span class="cov0" title="0">logger := *GetLogger(c)
+
+        logger.Error().Stack().
+                Err(originalErr).
+                Int("status", status).
+                Str("error_code", code).
+                Msg(message)
+
+        _ = c.Status(status).JSON(errs.ErrorResponse{
+                Success:  false,
+                Message:  message,
+                Status:   status,
+                Override: httpErr != nil &amp;&amp; httpErr.Override,
+                Errors:   fieldErrors,
+                Action:   action,
+        })
+
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file24" style="display: none">package middleware
+
+import (
+        "github.com/jeheskielSunloy77/zeile/internal/application"
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+        "github.com/newrelic/go-agent/v3/newrelic"
+)
+
+type Middlewares struct {
+        Global          *GlobalMiddlewares
+        Auth            *AuthMiddleware
+        Authorization   *AuthorizationMiddleware
+        ContextEnhancer *ContextEnhancer
+        Tracing         *TracingMiddleware
+        RateLimit       *RateLimitMiddleware
+}
+
+func NewMiddlewares(s *server.Server, services *application.Services) *Middlewares <span class="cov0" title="0">{
+        // Get New Relic application instance from server
+        var nrApp *newrelic.Application
+        if s.LoggerService != nil </span><span class="cov0" title="0">{
+                nrApp = s.LoggerService.GetApplication()
+        }</span>
+
+        <span class="cov0" title="0">var authorizer AuthorizationEnforcer
+        if services != nil </span><span class="cov0" title="0">{
+                authorizer = services.Authorization
+        }</span>
+
+        <span class="cov0" title="0">return &amp;Middlewares{
+                Global:          NewGlobalMiddlewares(s),
+                Auth:            NewAuthMiddleware(s),
+                Authorization:   NewAuthorizationMiddleware(authorizer),
+                ContextEnhancer: NewContextEnhancer(s),
+                Tracing:         NewTracingMiddleware(s, nrApp),
+                RateLimit:       NewRateLimitMiddleware(s),
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file25" style="display: none">package middleware
+
+import (
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+)
+
+type RateLimitMiddleware struct {
+        server *server.Server
+}
+
+func NewRateLimitMiddleware(s *server.Server) *RateLimitMiddleware <span class="cov0" title="0">{
+        return &amp;RateLimitMiddleware{
+                server: s,
+        }
+}</span>
+
+func (r *RateLimitMiddleware) RecordRateLimitHit(endpoint string) <span class="cov0" title="0">{
+        if r.server.LoggerService != nil &amp;&amp; r.server.LoggerService.GetApplication() != nil </span><span class="cov0" title="0">{
+                r.server.LoggerService.GetApplication().RecordCustomEvent("RateLimitHit", map[string]any{
+                        "endpoint": endpoint,
+                })
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file26" style="display: none">package middleware
+
+import (
+        "github.com/gofiber/fiber/v2"
+        "github.com/google/uuid"
+)
+
+const (
+        RequestIDHeader = "X-Request-ID"
+        RequestIDKey    = "request_id"
+)
+
+func RequestID() fiber.Handler <span class="cov0" title="0">{
+        return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                requestID := c.Get(RequestIDHeader)
+                if requestID == "" </span><span class="cov0" title="0">{
+                        requestID = uuid.New().String()
+                }</span>
+
+                <span class="cov0" title="0">c.Locals(RequestIDKey, requestID)
+                c.Set(RequestIDHeader, requestID)
+
+                return c.Next()</span>
+        }
+}
+
+func GetRequestID(c *fiber.Ctx) string <span class="cov0" title="0">{
+        if requestID, ok := c.Locals(RequestIDKey).(string); ok </span><span class="cov0" title="0">{
+                return requestID
+        }</span>
+        <span class="cov0" title="0">return ""</span>
+}
+</pre>
+		
+		<pre class="file" id="file27" style="display: none">package middleware
+
+import (
+        "fmt"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/newrelic/go-agent/v3/integrations/nrpkgerrors"
+        "github.com/newrelic/go-agent/v3/newrelic"
+
+        "github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+)
+
+type TracingMiddleware struct {
+        server *server.Server
+        nrApp  *newrelic.Application
+}
+
+func NewTracingMiddleware(s *server.Server, nrApp *newrelic.Application) *TracingMiddleware <span class="cov0" title="0">{
+        return &amp;TracingMiddleware{
+                server: s,
+                nrApp:  nrApp,
+        }
+}</span>
+
+// NewRelicMiddleware instruments fiber requests with New Relic.
+func (tm *TracingMiddleware) NewRelicMiddleware() fiber.Handler <span class="cov0" title="0">{
+        if tm.nrApp == nil </span><span class="cov0" title="0">{
+                return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                        return c.Next()
+                }</span>
+        }
+        <span class="cov0" title="0">return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                routeName := c.Path()
+                if c.Route() != nil &amp;&amp; c.Route().Path != "" </span><span class="cov0" title="0">{
+                        routeName = c.Route().Path
+                }</span>
+
+                <span class="cov0" title="0">txn := tm.nrApp.StartTransaction(fmt.Sprintf("%s %s", c.Method(), routeName))
+                defer txn.End()
+
+                ctx := newrelic.NewContext(c.UserContext(), txn)
+                c.SetUserContext(ctx)
+
+                err := c.Next()
+
+                txn.AddAttribute("http.method", c.Method())
+                txn.AddAttribute("http.route", routeName)
+                txn.AddAttribute("http.url", c.OriginalURL())
+                txn.AddAttribute("http.real_ip", c.IP())
+                txn.AddAttribute("http.status_code", c.Response().StatusCode())
+
+                if err != nil </span><span class="cov0" title="0">{
+                        txn.NoticeError(nrpkgerrors.Wrap(err))
+                }</span>
+
+                <span class="cov0" title="0">return err</span>
+        }
+}
+
+// EnhanceTracing adds custom attributes to New Relic transactions
+func (tm *TracingMiddleware) EnhanceTracing() fiber.Handler <span class="cov0" title="0">{
+        return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                txn := newrelic.FromContext(c.UserContext())
+                if txn == nil </span><span class="cov0" title="0">{
+                        return c.Next()
+                }</span>
+
+                <span class="cov0" title="0">txn.AddAttribute("http.real_ip", c.IP())
+                txn.AddAttribute("http.user_agent", c.Get(fiber.HeaderUserAgent))
+
+                if requestID := GetRequestID(c); requestID != "" </span><span class="cov0" title="0">{
+                        txn.AddAttribute("request.id", requestID)
+                }</span>
+
+                <span class="cov0" title="0">if userID := c.Locals(UserIDKey); userID != nil </span><span class="cov0" title="0">{
+                        if userIDStr, ok := userID.(string); ok </span><span class="cov0" title="0">{
+                                txn.AddAttribute("user.id", userIDStr)
+                        }</span>
+                }
+
+                <span class="cov0" title="0">err := c.Next()
+                if err != nil </span><span class="cov0" title="0">{
+                        txn.NoticeError(nrpkgerrors.Wrap(err))
+                }</span>
+
+                <span class="cov0" title="0">txn.AddAttribute("http.status_code", c.Response().StatusCode())
+
+                return err</span>
+        }
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
