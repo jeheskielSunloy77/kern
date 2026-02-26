@@ -40,6 +40,42 @@ func registerRoutes(
 	protected := api.Group("", middlewares.Auth.RequireAuth())
 
 	resource(protected, "/users", h.User.ResourceHandler)
+
+	library := protected.Group("/library")
+	library.Post("/catalog/books", h.Library.CreateCatalogBook())
+	library.Get("/catalog/books", h.Library.ListCatalogBooks())
+	library.Post("/assets/upload", h.Library.UploadBookAsset())
+	library.Post("/books", h.Library.UpsertLibraryBook())
+	library.Get("/books", h.Library.ListLibraryBooks())
+	library.Patch("/books/:id", h.Library.UpdateLibraryBook())
+	library.Delete("/books/:id", h.Library.DeleteLibraryBook())
+	library.Get("/books/:id/reading-states/:mode", h.Library.GetReadingState())
+	library.Put("/books/:id/reading-states/:mode", h.Library.UpsertReadingState())
+	library.Get("/books/:id/highlights", h.Library.ListHighlights())
+	library.Post("/books/:id/highlights", h.Library.CreateHighlight())
+	library.Patch("/highlights/:highlightId", h.Library.UpdateHighlight())
+	library.Delete("/highlights/:highlightId", h.Library.DeleteHighlight())
+
+	sharing := protected.Group("/sharing")
+	sharing.Post("/lists", h.Sharing.CreateShareList())
+	sharing.Get("/lists", h.Sharing.ListShareLists())
+	sharing.Patch("/lists/:id", h.Sharing.UpdateShareList())
+	sharing.Post("/lists/:id/items", h.Sharing.CreateShareListItem())
+	sharing.Get("/lists/:id/items", h.Sharing.ListShareListItems())
+	sharing.Put("/book-share-policies", h.Sharing.UpsertBookSharePolicy())
+	sharing.Post("/links", h.Sharing.CreateShareLink())
+	sharing.Post("/links/:id/revoke", h.Sharing.RevokeShareLink())
+	sharing.Get("/resolve/:token", h.Sharing.ResolveShareLink())
+
+	community := protected.Group("/community")
+	community.Get("/profiles/:userId", h.Community.GetProfile())
+	community.Patch("/profile", h.Community.UpdateMyProfile())
+	community.Get("/profiles/:userId/activity", h.Community.ListActivity())
+
+	moderation := protected.Group("/moderation")
+	moderation.Post("/reviews", h.Moderation.CreateReview())
+	moderation.Get("/reviews", h.Moderation.ListReviews())
+	moderation.Patch("/reviews/:id/decision", h.Moderation.DecideReview())
 }
 
 func resource[T domain.BaseModel, S applicationdto.StoreDTO[T], U applicationdto.UpdateDTO[T], TS httpdto.StoreDTO[S], TU httpdto.UpdateDTO[U]](group fiber.Router, path string, h *handler.ResourceHandler[T, S, U, TS, TU], authMiddleware ...fiber.Handler) {
