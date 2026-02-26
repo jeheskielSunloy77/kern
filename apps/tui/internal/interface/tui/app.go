@@ -15,6 +15,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/zeile/tui/internal/application"
 	"github.com/zeile/tui/internal/domain"
+	"github.com/zeile/tui/internal/infrastructure/config"
 	"github.com/zeile/tui/internal/infrastructure/repository"
 	"github.com/zeile/tui/internal/reader"
 )
@@ -25,6 +26,7 @@ const (
 	viewLibrary viewID = iota
 	viewAdd
 	viewReader
+	viewSettings
 )
 
 type addStep int
@@ -117,6 +119,10 @@ const (
 	statusDestructive statusVariant = "destructive"
 )
 
+type settingsSaveMsg struct {
+	sequence int
+}
+
 type model struct {
 	container *application.Container
 
@@ -166,6 +172,11 @@ type model struct {
 	readerZen           bool
 	readerHelp          bool
 	readerFinished      bool
+
+	settingsReturnView viewID
+	settingsSection    settingsSectionID
+	settingsField      int
+	settingsSaveSeq    int
 }
 
 func New(container *application.Container) tea.Model {
@@ -180,6 +191,7 @@ func New(container *application.Container) tea.Model {
 	}
 
 	if container != nil {
+		container.Config = container.Config.Normalized()
 		m.addManagedCopy = container.Config.ManagedCopyDefault
 	}
 
@@ -209,11 +221,17 @@ func (m model) loadStartupCmd() tea.Cmd {
 		}
 
 		resumeBookID := ""
-		book, err := container.Library.MostRecentUnfinishedBook(ctx)
-		if err == nil {
-			resumeBookID = book.ID
-		} else if err != nil && !errors.Is(err, repository.ErrNotFound) {
-			return startupLoadedMsg{books: books, err: err}
+		startupMode := container.Config.StartupMode
+		if startupMode == "" {
+			startupMode = config.StartupModeResume
+		}
+		if startupMode == config.StartupModeResume {
+			book, err := container.Library.MostRecentUnfinishedBook(ctx)
+			if err == nil {
+				resumeBookID = book.ID
+			} else if err != nil && !errors.Is(err, repository.ErrNotFound) {
+				return startupLoadedMsg{books: books, err: err}
+			}
 		}
 
 		return startupLoadedMsg{books: books, resumeBookID: resumeBookID}
@@ -291,6 +309,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 
+	case settingsSaveMsg:
+		if msg.sequence != m.settingsSaveSeq {
+			return m, nil
+		}
+		if err := m.persistSettingsConfig(); err != nil {
+			m.setStatusDestructive(fmt.Sprintf("Failed to save settings: %v", err))
+		}
+		return m, nil
+
 	case tea.QuitMsg:
 		if m.currentView == viewReader {
 			if err := m.saveReaderState(); err != nil {
@@ -324,6 +351,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, cmd
 		case viewReader:
 			m.handleReaderKey(msg)
+		case viewSettings:
+			return m, m.handleSettingsKey(msg)
 		}
 	}
 
@@ -496,6 +525,8 @@ func (m model) View() string {
 		body = m.renderAdd()
 	case viewReader:
 		body = m.renderReader()
+	case viewSettings:
+		body = m.renderSettings()
 	default:
 		body = "Unknown view"
 	}

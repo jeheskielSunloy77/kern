@@ -66,6 +66,9 @@ func (m *model) handleReaderKey(msg tea.KeyMsg) {
 	case "f":
 		m.toggleFinished()
 		return
+	case "s":
+		m.openSettings(viewReader)
+		return
 	}
 }
 
@@ -254,7 +257,10 @@ func (m *model) readerPageSize() (int, int) {
 	if m.readerZen {
 		chromeRows = 1
 	}
+	cfg := m.currentConfig()
 	pageHeight := height - chromeRows
+	pageHeight -= cfg.ParagraphSpacing
+	pageHeight = pageHeight / cfg.LineSpacing
 	if pageHeight < 8 {
 		pageHeight = 8
 	}
@@ -276,10 +282,7 @@ func (m *model) readerPageSize() (int, int) {
 }
 
 func (m *model) isSpreadMode() bool {
-	if m.container == nil {
-		return m.width >= 120
-	}
-	return m.width >= m.container.Config.MinSpreadWidth
+	return m.width >= m.currentConfig().SpreadThreshold
 }
 
 func (m *model) moveReaderPage(delta int) {

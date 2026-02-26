@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/zeile/tui/internal/infrastructure/config"
 	"github.com/zeile/tui/internal/reader"
 )
 
@@ -23,6 +24,7 @@ func (m model) renderLibrary() string {
 
 	headerLines := []string{header, subheader, ""}
 	emptyMessage := "No books yet. Press 'a' to import EPUB/PDF."
+	theme := m.activeTheme()
 
 	rows := make([]string, 0, len(m.libraryBooks)+2)
 	body := ""
@@ -65,7 +67,7 @@ func (m model) renderLibrary() string {
 				formatTime(book.LastOpened),
 			)
 			if idx == m.librarySelected {
-				row = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("205")).Render(row)
+				row = lipgloss.NewStyle().Bold(true).Foreground(theme.Primary).Render(row)
 			}
 			rows = append(rows, row)
 		}
@@ -75,6 +77,7 @@ func (m model) renderLibrary() string {
 	hints := m.renderFooterHints([]footerHint{
 		{key: "/", action: "search"},
 		{key: "a", action: "add"},
+		{key: "s", action: "settings"},
 		{key: "Enter", action: "open"},
 		{key: "r", action: "remove"},
 		{key: "q", action: "quit"},
@@ -90,6 +93,7 @@ func (m model) renderLibrary() string {
 
 func (m model) renderAdd() string {
 	header := lipgloss.NewStyle().Bold(true).Render("Zeile - Add Book")
+	theme := m.activeTheme()
 
 	stepLabel := "Step 1/3 - Choose source"
 	hints := m.renderFooterHints([]footerHint{
@@ -165,7 +169,7 @@ func (m model) renderAdd() string {
 				}
 				line := fmt.Sprintf("%s %s%s", marker, entry.name, suffix)
 				if idx == m.browserSelected {
-					line = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("220")).Render(line)
+					line = lipgloss.NewStyle().Bold(true).Foreground(theme.PrimaryAlt).Render(line)
 				}
 				bodyLines = append(bodyLines, line)
 			}
@@ -294,6 +298,7 @@ func (m model) renderReader() string {
 		{key: "g/G", action: "go-to"},
 		{key: "m", action: "pdf mode"},
 		{key: "f", action: "finished"},
+		{key: "s", action: "settings"},
 		{key: "q", action: "back"},
 	})
 	status := m.renderStatusToast("Reading")
@@ -338,15 +343,6 @@ func (m model) readerPageContent(pageIndex, pageWidth, pageHeight int) (string, 
 
 func (m model) renderPageBox(content string, lineStarts []int, lineRanges []reader.TokenRange, pageNumber, totalPages, pageWidth, pageHeight int) string {
 	lines := strings.Split(content, "\n")
-	if len(lines) > pageHeight-1 {
-		lines = lines[:pageHeight-1]
-		if len(lineStarts) > len(lines) {
-			lineStarts = lineStarts[:len(lines)]
-		}
-		if len(lineRanges) > len(lines) {
-			lineRanges = lineRanges[:len(lines)]
-		}
-	}
 	if len(lineStarts) < len(lines) {
 		padded := make([]int, len(lines))
 		copy(padded, lineStarts)
@@ -363,11 +359,6 @@ func (m model) renderPageBox(content string, lineStarts []int, lineRanges []read
 		}
 		lineRanges = padded
 	}
-	for len(lines) < pageHeight-1 {
-		lines = append(lines, "")
-		lineStarts = append(lineStarts, -1)
-		lineRanges = append(lineRanges, reader.TokenRange{})
-	}
 
 	if m.isReaderTextMode() && len(m.readerChapterStarts) > 0 {
 		for i, start := range lineStarts {
@@ -383,6 +374,18 @@ func (m model) renderPageBox(content string, lineStarts []int, lineRanges []read
 		}
 	}
 
+	lines, lineStarts, lineRanges = m.applyReaderSpacing(lines, lineStarts, lineRanges, pageHeight-1)
+	if len(lines) > pageHeight-1 {
+		lines = lines[:pageHeight-1]
+		lineStarts = lineStarts[:pageHeight-1]
+		lineRanges = lineRanges[:pageHeight-1]
+	}
+	for len(lines) < pageHeight-1 {
+		lines = append(lines, "")
+		lineStarts = append(lineStarts, -1)
+		lineRanges = append(lineRanges, reader.TokenRange{})
+	}
+
 	footer := ""
 	if pageNumber > 0 {
 		footer = fmt.Sprintf("Page %d/%d", pageNumber, totalPages)
@@ -394,6 +397,57 @@ func (m model) renderPageBox(content string, lineStarts []int, lineRanges []read
 		Width(pageWidth).
 		Height(pageHeight).
 		Render(pageText)
+}
+
+func (m model) applyReaderSpacing(lines []string, lineStarts []int, lineRanges []reader.TokenRange, limit int) ([]string, []int, []reader.TokenRange) {
+	if !m.isReaderTextMode() || limit <= 0 {
+		return lines, lineStarts, lineRanges
+	}
+
+	cfg := m.currentConfig()
+	if cfg.LineSpacing <= 1 && cfg.ParagraphSpacing == 0 {
+		return lines, lineStarts, lineRanges
+	}
+
+	outLines := make([]string, 0, len(lines))
+	outStarts := make([]int, 0, len(lines))
+	outRanges := make([]reader.TokenRange, 0, len(lines))
+
+	for i, line := range lines {
+		start := -1
+		if i < len(lineStarts) {
+			start = lineStarts[i]
+		}
+		rangeValue := reader.TokenRange{}
+		if i < len(lineRanges) {
+			rangeValue = lineRanges[i]
+		}
+
+		outLines = append(outLines, line)
+		outStarts = append(outStarts, start)
+		outRanges = append(outRanges, rangeValue)
+		if len(outLines) >= limit {
+			break
+		}
+
+		gap := cfg.LineSpacing - 1
+		if strings.TrimSpace(line) == "" {
+			gap += cfg.ParagraphSpacing
+		}
+		for j := 0; j < gap; j++ {
+			outLines = append(outLines, "")
+			outStarts = append(outStarts, -1)
+			outRanges = append(outRanges, reader.TokenRange{})
+			if len(outLines) >= limit {
+				break
+			}
+		}
+		if len(outLines) >= limit {
+			break
+		}
+	}
+
+	return outLines, outStarts, outRanges
 }
 
 func (m model) renderStyledLine(plainLine string, tokenRange reader.TokenRange, extraStyle reader.TextStyle) string {
@@ -426,7 +480,7 @@ func (m model) renderStyledLine(plainLine string, tokenRange reader.TokenRange, 
 		}
 		segmentText := strings.Join(segmentWords, " ")
 		if segmentStyle != 0 {
-			style := lipglossForTextStyle(segmentStyle)
+			style := m.lipglossForTextStyle(segmentStyle)
 			segmentText = style.Render(segmentText)
 		}
 		if builder.Len() > 0 {
@@ -451,7 +505,7 @@ func (m model) renderStyledLine(plainLine string, tokenRange reader.TokenRange, 
 	return builder.String()
 }
 
-func lipglossForTextStyle(style reader.TextStyle) lipgloss.Style {
+func (m model) lipglossForTextStyle(style reader.TextStyle) lipgloss.Style {
 	s := lipgloss.NewStyle()
 	if style&reader.TextStyleBold != 0 {
 		s = s.Bold(true)
@@ -463,7 +517,15 @@ func lipglossForTextStyle(style reader.TextStyle) lipgloss.Style {
 		s = s.Underline(true)
 	}
 	if style&reader.TextStyleMark != 0 {
-		s = s.Reverse(true)
+		switch m.currentConfig().HighlightStyle {
+		case config.HighlightStyleUnderline:
+			s = s.Underline(true)
+		case config.HighlightStyleBlock:
+			theme := m.activeTheme()
+			s = s.Background(theme.HighlightBlockBG).Foreground(theme.HighlightBlockFG)
+		default:
+			s = s.Reverse(true)
+		}
 	}
 	if style&reader.TextStyleSmall != 0 {
 		s = s.Faint(true)
@@ -475,7 +537,8 @@ func lipglossForTextStyle(style reader.TextStyle) lipgloss.Style {
 		s = s.Faint(true)
 	}
 	if style&reader.TextStyleCode != 0 {
-		s = s.Foreground(lipgloss.Color("252")).Background(lipgloss.Color("236"))
+		theme := m.activeTheme()
+		s = s.Foreground(theme.CodeFG).Background(theme.CodeBG)
 	}
 	return s
 }
@@ -488,8 +551,9 @@ func (m model) renderSpreadDivider(height int) string {
 	for i := range lines {
 		lines[i] = "│"
 	}
+	theme := m.activeTheme()
 	return lipgloss.NewStyle().
-		Foreground(lipgloss.Color("240")).
+		Foreground(theme.Divider).
 		Render(strings.Join(lines, "\n"))
 }
 
@@ -502,6 +566,7 @@ func (m model) renderReaderHelp() string {
 		"- z zen mode toggle",
 		"- m toggle PDF text/layout mode",
 		"- f mark finished",
+		"- s open settings",
 		"- q back to library",
 	}, "\n")
 
@@ -697,21 +762,33 @@ func (m model) bodyLayout() (leftGutter int, contentWidth int) {
 		return 0, 0
 	}
 
-	const maxContentWidth = 200
+	cfg := m.currentConfig()
 	layoutWidth := m.mainLayoutWidth()
-	width := layoutWidth
-	if width > maxContentWidth {
-		width = maxContentWidth
+	margin := cfg.MarginHorizontal
+	if margin < 0 {
+		margin = 0
+	}
+	if margin > 20 {
+		margin = 20
+	}
+	available := layoutWidth - (margin * 2)
+	if available < 24 {
+		available = layoutWidth
+		margin = 0
 	}
 
-	if width == layoutWidth && layoutWidth >= 72 {
-		width = layoutWidth - 4
+	width := cfg.ContentWidth
+	if width < 24 {
+		width = available
+	}
+	if width > available {
+		width = available
 	}
 	if width < 24 {
-		width = layoutWidth
+		width = 24
 	}
 
-	gutter := (layoutWidth - width) / 2
+	gutter := (layoutWidth-width)/2 + margin
 	if gutter < 0 {
 		gutter = 0
 	}
@@ -806,10 +883,19 @@ func truncateRunes(value string, width int) string {
 }
 
 func (m model) renderSelectorMarker() string {
-	return lipgloss.NewStyle().Foreground(lipgloss.Color("205")).Render("▌")
+	return lipgloss.NewStyle().Foreground(m.activeTheme().Primary).Render("▌")
 }
 
 func (m model) renderFooterHints(hints []footerHint) string {
+	cfg := m.currentConfig()
+	if cfg.KeyHintsDensity == config.KeyHintsDensityHidden {
+		return ""
+	}
+	if cfg.KeyHintsDensity == config.KeyHintsDensityCompact && len(hints) > 4 {
+		hints = hints[:4]
+	}
+
+	theme := m.activeTheme()
 	parts := make([]string, 0, len(hints))
 	for _, hint := range hints {
 		if strings.TrimSpace(hint.key) == "" {
@@ -819,7 +905,7 @@ func (m model) renderFooterHints(hints []footerHint) string {
 			parts = append(parts, hint.key)
 			continue
 		}
-		parts = append(parts, hint.key+" "+lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Render(hint.action))
+		parts = append(parts, hint.key+" "+lipgloss.NewStyle().Foreground(theme.Muted).Render(hint.action))
 	}
 	return strings.Join(parts, "  ")
 }
@@ -831,13 +917,14 @@ func (m model) renderStatusToast(fallback string) string {
 	}
 
 	style := lipgloss.NewStyle().Padding(0, 1)
+	theme := m.activeTheme()
 	switch variant {
 	case statusSuccess:
-		style = style.Background(lipgloss.Color("22")).Foreground(lipgloss.Color("255"))
+		style = style.Background(theme.ToastSuccessBG).Foreground(theme.ToastSuccessFG)
 	case statusDestructive:
-		style = style.Background(lipgloss.Color("160")).Foreground(lipgloss.Color("255"))
+		style = style.Background(theme.ToastDestructiveBG).Foreground(theme.ToastDestructiveFG)
 	default:
-		style = style.Background(lipgloss.Color("238")).Foreground(lipgloss.Color("252"))
+		style = style.Background(theme.ToastDefaultBG).Foreground(theme.ToastDefaultFG)
 	}
 	return style.Render(text)
 }

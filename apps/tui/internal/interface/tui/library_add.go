@@ -29,6 +29,8 @@ func (m *model) handleLibraryKey(msg tea.KeyMsg) tea.Cmd {
 	case "a":
 		m.startAddFlow()
 		m.clearStatus()
+	case "s":
+		m.openSettings(viewLibrary)
 	case "enter":
 		book, ok := m.selectedBook()
 		if !ok {
@@ -43,7 +45,7 @@ func (m *model) handleLibraryKey(msg tea.KeyMsg) tea.Cmd {
 			m.openRemoveModal(book)
 		}
 	case "?":
-		m.setStatusDefault("Library: / search  a add  Enter open  r remove  q quit")
+		m.setStatusDefault("Library: / search  a add  s settings  Enter open  r remove  q quit")
 	}
 	return nil
 }
@@ -236,6 +238,16 @@ func (m *model) handleRemoveKey(msg tea.KeyMsg) {
 				m.remove.action = removeActionLibrary
 			}
 		case "enter":
+			if !m.currentConfig().DeleteConfirmation {
+				if m.remove.action == removeActionLibrary {
+					m.remove.value = "REMOVE"
+				} else {
+					m.remove.value = "DELETE"
+				}
+				m.applyRemove()
+				m.closeRemoveModal()
+				return
+			}
 			m.remove.step = removeStepConfirm
 			m.remove.value = ""
 		}
