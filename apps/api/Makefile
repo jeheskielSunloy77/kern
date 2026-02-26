@@ -59,29 +59,29 @@ migrate-new:
 		exit 1; \
 	fi
 	@echo "Creating migration file for $(NAME)..."
-	migrate create -ext sql -dir ./internal/database/migrations -seq $(NAME)
+	migrate create -ext sql -dir ./internal/infrastructure/database/migrations -seq $(NAME)
 	@echo "Migration file created for $(NAME)."
 
 # Roll back last migration
 .PHONY: migrate-down
 migrate-down: confirm
 	@echo "Rolling back last migration..."
-	migrate -database "$(API_DB_DSN)" -path ./internal/database/migrations down 1
+	migrate -database "$(API_DB_DSN)" -path ./internal/infrastructure/database/migrations down 1
 	@echo "Last migration rolled back."
 
 # Apply migrations
 .PHONY: migrate-up
 migrate-up: confirm
 	@echo "Running up migrations..."
-	migrate -database "$(API_DB_DSN)" -path ./internal/database/migrations up
+	migrate -database "$(API_DB_DSN)" -path ./internal/infrastructure/database/migrations up
 	@echo "Migrations applied."
 
 # Drop everything managed by migrate and reapply migrations
 .PHONY: migrate-fresh
 migrate-fresh: confirm
 	@echo "Dropping all database objects (migrate drop) and reapplying migrations..."
-	@migrate -database "$(API_DB_DSN)" -path ./internal/database/migrations drop -f || true
-	@migrate -database "$(API_DB_DSN)" -path ./internal/database/migrations up
+	@migrate -database "$(API_DB_DSN)" -path ./internal/infrastructure/database/migrations drop -f || true
+	@migrate -database "$(API_DB_DSN)" -path ./internal/infrastructure/database/migrations up
 	@echo "Database refreshed."
 
 # Go maintenance
