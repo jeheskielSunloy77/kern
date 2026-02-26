@@ -387,6 +387,85 @@ func TestEffectiveStatusHidesReadyAndReading(t *testing.T) {
 	}
 }
 
+func TestRenderLibraryCentersEmptyStateInBody(t *testing.T) {
+	m := model{
+		currentView: viewLibrary,
+		width:       100,
+		height:      24,
+	}
+
+	rendered := stripANSI(m.renderLibrary())
+	lines := strings.Split(rendered, "\n")
+	message := "No books yet. Press 'a' to import EPUB/PDF."
+
+	headerLine := -1
+	messageLine := -1
+	headerIndent := 0
+	messageIndent := 0
+	for idx, line := range lines {
+		if strings.Contains(line, "Zeile - Library") {
+			headerLine = idx
+			headerIndent = leadingSpaces(line)
+		}
+		if strings.Contains(line, message) {
+			messageLine = idx
+			messageIndent = leadingSpaces(line)
+		}
+	}
+
+	if headerLine == -1 {
+		t.Fatalf("expected library header in rendered output")
+	}
+	if messageLine == -1 {
+		t.Fatalf("expected empty-state message in rendered output")
+	}
+	if messageIndent <= headerIndent+10 {
+		t.Fatalf("expected centered empty state indentation > header indentation + 10, got header=%d message=%d", headerIndent, messageIndent)
+	}
+
+	minCenter := m.height / 3
+	maxCenter := (2 * m.height) / 3
+	if messageLine < minCenter || messageLine > maxCenter {
+		t.Fatalf("expected empty-state line in vertical center band [%d,%d], got %d", minCenter, maxCenter, messageLine)
+	}
+}
+
+func TestRenderLibraryRowsStayLeftAlignedWhenBooksExist(t *testing.T) {
+	m := model{
+		currentView: viewLibrary,
+		width:       100,
+		height:      24,
+		libraryBooks: []domain.Book{
+			{
+				ID:     "book-1",
+				Title:  "Book One",
+				Author: "Author",
+			},
+		},
+		libraryProgress: map[string]float64{},
+		libraryFinished: map[string]bool{},
+	}
+
+	rendered := stripANSI(m.renderLibrary())
+	rowText := "Book One - Author | 0.0% | Last opened: -"
+	rowLine := -1
+	rowIndent := 0
+	for idx, line := range strings.Split(rendered, "\n") {
+		if strings.Contains(line, rowText) {
+			rowLine = idx
+			rowIndent = leadingSpaces(line)
+			break
+		}
+	}
+
+	if rowLine == -1 {
+		t.Fatalf("expected library row in rendered output")
+	}
+	if rowIndent > 12 {
+		t.Fatalf("expected non-empty rows to remain left-aligned, got indentation %d", rowIndent)
+	}
+}
+
 func TestEffectiveStatusAutoDismissesAfterTenSeconds(t *testing.T) {
 	m := model{}
 	m.setStatusSuccess("Imported: Book")
@@ -534,4 +613,15 @@ var ansiPattern = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 func stripANSI(value string) string {
 	return ansiPattern.ReplaceAllString(value, "")
+}
+
+func leadingSpaces(value string) int {
+	count := 0
+	for _, r := range value {
+		if r != ' ' {
+			break
+		}
+		count++
+	}
+	return count
 }

@@ -21,9 +21,29 @@ func (m model) renderLibrary() string {
 		subheader += fmt.Sprintf(" | Search: %s", query)
 	}
 
+	headerLines := []string{header, subheader, ""}
+	emptyMessage := "No books yet. Press 'a' to import EPUB/PDF."
+
 	rows := make([]string, 0, len(m.libraryBooks)+2)
+	body := ""
 	if len(m.libraryBooks) == 0 {
-		rows = append(rows, "No books yet. Press 'a' to import EPUB/PDF.")
+		if m.width > 0 && m.height > 0 {
+			bodyWidth := m.bodyContentWidth()
+			if bodyWidth < 1 {
+				bodyWidth = 1
+			}
+			centered := lipgloss.PlaceHorizontal(bodyWidth, lipgloss.Center, emptyMessage)
+
+			contentHeight := m.mainLayoutHeight() - len(headerLines) - 2
+			if contentHeight < 1 {
+				contentHeight = 1
+			}
+			lines := make([]string, contentHeight)
+			lines[(contentHeight-1)/2] = centered
+			body = strings.Join(lines, "\n")
+		} else {
+			body = emptyMessage
+		}
 	} else {
 		for idx, book := range m.libraryBooks {
 			marker := " "
@@ -49,6 +69,7 @@ func (m model) renderLibrary() string {
 			}
 			rows = append(rows, row)
 		}
+		body = strings.Join(rows, "\n")
 	}
 
 	hints := m.renderFooterHints([]footerHint{
@@ -61,8 +82,8 @@ func (m model) renderLibrary() string {
 	status := m.renderStatusToast("Ready")
 
 	return m.renderPinnedLayout(
-		[]string{header, subheader, ""},
-		strings.Join(rows, "\n"),
+		headerLines,
+		body,
 		[]string{"", m.renderFooterRow(hints, status)},
 	)
 }
