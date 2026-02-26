@@ -503,6 +503,146 @@ func TestRenderStatusToastUsesVariantStyle(t *testing.T) {
 	}
 }
 
+func TestLibrarySettingsKeyOpensSettingsView(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.currentView = viewLibrary
+
+	_ = m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("s")})
+
+	if m.currentView != viewSettings {
+		t.Fatalf("expected settings view, got %v", m.currentView)
+	}
+	if m.settingsReturnView != viewLibrary {
+		t.Fatalf("expected return view library, got %v", m.settingsReturnView)
+	}
+
+	_ = m.handleSettingsKey(tea.KeyMsg{Type: tea.KeyEsc})
+	if m.currentView != viewLibrary {
+		t.Fatalf("expected return to library, got %v", m.currentView)
+	}
+}
+
+func TestReaderSettingsKeyOpensSettingsView(t *testing.T) {
+	container := newTestContainer(t)
+	book := seedBookWithEPUBCache(t, container, "reader-settings", "")
+
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.width = 90
+	m.height = 20
+
+	if err := m.openBook(book.ID, nil); err != nil {
+		t.Fatalf("open seeded book: %v", err)
+	}
+
+	m.handleReaderKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("s")})
+	if m.currentView != viewSettings {
+		t.Fatalf("expected settings view, got %v", m.currentView)
+	}
+	if m.settingsReturnView != viewReader {
+		t.Fatalf("expected return view reader, got %v", m.settingsReturnView)
+	}
+
+	_ = m.handleSettingsKey(tea.KeyMsg{Type: tea.KeyEsc})
+	if m.currentView != viewReader {
+		t.Fatalf("expected return to reader, got %v", m.currentView)
+	}
+}
+
+func TestStartupModeLibrarySkipsAutoResume(t *testing.T) {
+	container := newTestContainer(t)
+	container.Config.StartupMode = config.StartupModeLibrary
+
+	book := seedBookWithEPUBCache(t, container, "startup-library", "")
+	if err := container.Library.UpdateReadingState(context.Background(), domain.ReadingState{
+		BookID:          book.ID,
+		Mode:            domain.ReadingModeEPUB,
+		Locator:         domain.Locator{Offset: 10},
+		ProgressPercent: 20,
+		UpdatedAt:       time.Now().UTC(),
+		IsFinished:      false,
+	}); err != nil {
+		t.Fatalf("seed reading state: %v", err)
+	}
+
+	m := New(container).(model)
+	startupMsg, ok := m.loadStartupCmd()().(startupLoadedMsg)
+	if !ok {
+		t.Fatalf("expected startupLoadedMsg")
+	}
+
+	updated, _ := m.Update(startupMsg)
+	after := updated.(model)
+
+	if after.currentView != viewLibrary {
+		t.Fatalf("expected library view, got %v", after.currentView)
+	}
+	if after.readerBook.ID != "" {
+		t.Fatalf("expected no auto-resumed reader book, got %s", after.readerBook.ID)
+	}
+}
+
+func TestDeleteConfirmationDisabledSkipsConfirmationStep(t *testing.T) {
+	container := newTestContainer(t)
+	seedBookWithEPUBCache(t, container, "no-confirm-remove", "")
+
+	m := New(container).(model)
+	m.startupCompleted = true
+	if err := m.refreshLibrary(); err != nil {
+		t.Fatalf("refresh library: %v", err)
+	}
+
+	cfg := m.currentConfig()
+	cfg.DeleteConfirmation = false
+	m.applyConfig(cfg)
+
+	_ = m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("r")})
+	if m.remove == nil {
+		t.Fatalf("expected remove modal")
+	}
+
+	m.handleRemoveKey(tea.KeyMsg{Type: tea.KeyEnter})
+
+	if m.remove != nil {
+		t.Fatalf("expected remove modal to close after direct apply")
+	}
+	if len(m.libraryBooks) != 0 {
+		t.Fatalf("expected library removal without confirmation, got %d books", len(m.libraryBooks))
+	}
+}
+
+func TestRenderFooterHintsRespectsDensity(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+
+	hints := []footerHint{
+		{key: "1", action: "one"},
+		{key: "2", action: "two"},
+		{key: "3", action: "three"},
+		{key: "4", action: "four"},
+		{key: "5", action: "five"},
+	}
+
+	cfg := m.currentConfig()
+	cfg.KeyHintsDensity = config.KeyHintsDensityHidden
+	m.applyConfig(cfg)
+	if got := stripANSI(m.renderFooterHints(hints)); got != "" {
+		t.Fatalf("expected hidden hints, got %q", got)
+	}
+
+	cfg.KeyHintsDensity = config.KeyHintsDensityCompact
+	m.applyConfig(cfg)
+	got := stripANSI(m.renderFooterHints(hints))
+	if strings.Contains(got, "five") {
+		t.Fatalf("expected compact hints to truncate extra actions, got %q", got)
+	}
+	if !strings.Contains(got, "four") {
+		t.Fatalf("expected compact hints to include first actions, got %q", got)
+	}
+}
+
 func newTestContainer(t *testing.T) *application.Container {
 	t.Helper()
 
@@ -533,13 +673,14 @@ func newTestContainer(t *testing.T) *application.Container {
 	bookRepo := repository.NewBookRepository(db)
 	stateRepo := repository.NewReadingStateRepository(db)
 	registry := preprocessing.NewRegistry()
+	defaultCfg := config.Default()
+	defaultCfg.DataDir = base
+	defaultCfg.ManagedCopyDefault = true
+	defaultCfg.MinSpreadWidth = 120
+	defaultCfg.SpreadThreshold = 120
 
 	return &application.Container{
-		Config: config.Config{
-			DataDir:            base,
-			ManagedCopyDefault: true,
-			MinSpreadWidth:     120,
-		},
+		Config:  defaultCfg.Normalized(),
 		Paths:   paths,
 		DB:      db,
 		Library: application.NewLibraryService(bookRepo, stateRepo, registry, paths),
