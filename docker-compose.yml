@@ -65,20 +65,6 @@ services:
       redis:
         condition: service_healthy
 
-  web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
-        VITE_ENV: ${VITE_ENV:-development}
-        VITE_GOOGLE_AUTH_ENABLED: ${VITE_GOOGLE_AUTH_ENABLED:-false}
-    ports:
-      - "3000:3000"
-    depends_on:
-      api:
-        condition: service_started
-
 volumes:
   db_data:
   redis_data:

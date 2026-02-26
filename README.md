@@ -1,6 +1,6 @@
 # zeile
 
-A monorepo for a Go API and a Vite + React web app with shared TypeScript packages, managed with Turborepo and Bun workspaces. scaffolded with **zeile** visit the
+A monorepo for a Go API and a terminal e-reader app with shared TypeScript packages, managed with Turborepo and Bun workspaces. scaffolded with **zeile** visit the
 [repository](https://github.com/jeheskielSunloy77/zeile) for more details.
 
 ## Repository layout
@@ -9,7 +9,6 @@ A monorepo for a Go API and a Vite + React web app with shared TypeScript packag
 zeile/
 ├── apps/api             # Go API (Fiber)
 ├── apps/tui             # Go terminal e-reader app (MVP)
-├── apps/web             # Vite + React frontend (future)
 ├── packages/zod         # Shared Zod schemas
 ├── packages/openapi     # OpenAPI generation
 ├── packages/emails      # React Email for email templates generation
@@ -63,9 +62,6 @@ cd apps/api && make migrate-down
 # Contracts and emails
 bun run openapi:generate    # Generate OpenAPI spec file from contracts
 bun run emails:generate     # Generate email HTML templates
-
-# UI components
-bun run ui:shadcn:add <component>
 ```
 
 ## API (apps/api)
@@ -117,39 +113,10 @@ bun run ui:shadcn:add <component>
 - EPUB + PDF support (PDF text mode + layout mode with remembered separate positions)
 - Crash-safe reading progress persistence and startup auto-resume of most recent unfinished book
 
-## Web (apps/web)
-
-> `apps/web` is intentionally not used for V1/V2 of the reader roadmap.
-
-### Technologies
-
-- Vite + React + TypeScript
-- React Query + ts-rest for data layer
-- Tailwind CSS + shadcn/ui for UI
-- React Router for routing
-- Cookie-based authentication with refresh
-- React Email for email templates generation
-- React OAuth for Google login
-- Zod for schema validation
-- Vitest + React Testing Library for testing
-- ESLint + Prettier for code quality
-
-### Architecture & Conventions
-
-- Vite + React + TypeScript with routing in `apps/web/src/router.tsx`.
-- Route-based pages live in `apps/web/src/pages`.
-- Data layer uses `@ts-rest/react-query` with the axios fetcher in `apps/web/src/api/index.ts`.
-- UI uses Tailwind + shadcn/ui; shared components live in `packages/ui/src/components`.
-- Auth is cookie-based only. The API client uses `withCredentials: true` and retries once after `/api/v1/auth/refresh`.
-- Protected routes use `apps/web/src/auth/require-auth.tsx` (calls `/api/v1/auth/me`).
-- Auth routes under `/auth`: `/auth/login`, `/auth/register`, `/auth/verify-email`, `/auth/forgot-password`, `/auth/me`.
-- Google login uses `@react-oauth/google` (provider in `apps/web/src/main.tsx`).
-
 ## Packages (packages/\*)
 
 - `@zeile/zod` (`packages/zod`): source of truth for API request/response schemas (exported from `packages/zod/src/index.ts`).
 - `@zeile/openapi` (`packages/openapi`): builds the OpenAPI spec from Zod + ts-rest contracts in `packages/openapi/src/contracts`. Regenerate with `bun run openapi:generate`.
-- `@zeile/ui` (`packages/ui`): shared shadcn/ui component and other reusable components used by web apps.
 - `@zeile/emails` (`packages/emails`): React Email templates in `packages/emails/src/templates`. Export HTML to `apps/api/templates/emails` via `bun run emails:generate`.
 
 ## Testing
@@ -162,6 +129,6 @@ bun run ui:shadcn:add <component>
 
 ## DevOps
 
-- This project is designed to be containerized. it is already dockerized with Dockerfiles in `apps/api/Dockerfile` and `apps/web/Dockerfile`. it also include a nginx configuration file in `apps/web/nginx.conf` for serving the web app and reverse proxying to the API.
+- This project is designed to be containerized and includes the API Dockerfile at `apps/api/Dockerfile`.
 - Use docker compose file on `docker-compose.yml` for local development with containers.
 - CI/CD is set up with GitHub Actions in `.github/workflows/ci.yml`.
