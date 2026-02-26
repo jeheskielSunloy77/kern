@@ -3,6 +3,7 @@ package tui
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -168,19 +169,18 @@ func TestLibraryDeleteShortcutIsDisabled(t *testing.T) {
 	}
 }
 
-func TestManualSyncRequiresConnection(t *testing.T) {
+func TestAccountViewShowsLoginWhenDisconnected(t *testing.T) {
 	container := newTestContainer(t)
-	seedBookWithEPUBCache(t, container, "needs-connect", "")
-
 	m := New(container).(model)
 	m.startupCompleted = true
-	if err := m.refreshLibrary(); err != nil {
-		t.Fatalf("refresh library: %v", err)
-	}
+	m.currentView = viewAccount
 
-	_ = m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("y")})
-	if !strings.Contains(m.statusText, "Connect first to run sync") {
-		t.Fatalf("expected connect warning, got %q", m.statusText)
+	rendered := stripANSI(m.renderAccount())
+	if !strings.Contains(rendered, "Login") {
+		t.Fatalf("expected login label in account view, got %q", rendered)
+	}
+	if strings.Contains(rendered, "Manual sync") || strings.Contains(rendered, "Logout") {
+		t.Fatalf("expected authenticated actions to be hidden when disconnected, got %q", rendered)
 	}
 }
 
@@ -419,7 +419,7 @@ func TestRenderLibraryCentersEmptyStateInBody(t *testing.T) {
 	headerIndent := 0
 	messageIndent := 0
 	for idx, line := range lines {
-		if strings.Contains(line, "Zeile") && strings.Contains(line, "Library") && strings.Contains(line, "Communities") && strings.Contains(line, "Settings") {
+		if strings.Contains(line, "Zeile") && strings.Contains(line, "Library") && strings.Contains(line, "Communities") && strings.Contains(line, "Settings") && strings.Contains(line, "Login") {
 			headerLine = idx
 			headerIndent = leadingSpaces(line)
 		}
@@ -446,7 +446,7 @@ func TestRenderLibraryCentersEmptyStateInBody(t *testing.T) {
 	}
 }
 
-func TestRenderLibraryRowsStayLeftAlignedWhenBooksExist(t *testing.T) {
+func TestRenderLibraryRowsCenterWhenBooksExist(t *testing.T) {
 	m := model{
 		currentView: viewLibrary,
 		width:       100,
@@ -477,8 +477,13 @@ func TestRenderLibraryRowsStayLeftAlignedWhenBooksExist(t *testing.T) {
 	if rowLine == -1 {
 		t.Fatalf("expected library row in rendered output")
 	}
-	if rowIndent > 12 {
-		t.Fatalf("expected non-empty rows to remain left-aligned, got indentation %d", rowIndent)
+	if rowIndent < 20 {
+		t.Fatalf("expected non-empty rows to be centered, got indentation %d", rowIndent)
+	}
+	minCenter := m.height / 3
+	maxCenter := (2 * m.height) / 3
+	if rowLine < minCenter || rowLine > maxCenter {
+		t.Fatalf("expected library row line in vertical center band [%d,%d], got %d", minCenter, maxCenter, rowLine)
 	}
 }
 
@@ -519,7 +524,7 @@ func TestRenderStatusToastUsesVariantStyle(t *testing.T) {
 	}
 }
 
-func TestLibrarySettingsKeyOpensSettingsView(t *testing.T) {
+func TestLibrarySettingsKeyDoesNothing(t *testing.T) {
 	container := newTestContainer(t)
 	m := New(container).(model)
 	m.startupCompleted = true
@@ -527,16 +532,8 @@ func TestLibrarySettingsKeyOpensSettingsView(t *testing.T) {
 
 	_ = m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("s")})
 
-	if m.currentView != viewSettings {
-		t.Fatalf("expected settings view, got %v", m.currentView)
-	}
-	if m.settingsReturnView != viewLibrary {
-		t.Fatalf("expected return view library, got %v", m.settingsReturnView)
-	}
-
-	_ = m.handleSettingsKey(tea.KeyMsg{Type: tea.KeyEsc})
 	if m.currentView != viewLibrary {
-		t.Fatalf("expected return to library, got %v", m.currentView)
+		t.Fatalf("expected to stay in library, got %v", m.currentView)
 	}
 }
 
@@ -560,8 +557,14 @@ func TestMainNavTabCyclesViews(t *testing.T) {
 
 	updated, _ = m.Update(tea.KeyMsg{Type: tea.KeyTab})
 	m = updated.(model)
+	if m.currentView != viewAccount {
+		t.Fatalf("expected account view after third Tab, got %v", m.currentView)
+	}
+
+	updated, _ = m.Update(tea.KeyMsg{Type: tea.KeyTab})
+	m = updated.(model)
 	if m.currentView != viewLibrary {
-		t.Fatalf("expected library view after third Tab, got %v", m.currentView)
+		t.Fatalf("expected library view after fourth Tab, got %v", m.currentView)
 	}
 }
 
@@ -573,14 +576,20 @@ func TestMainNavShiftTabCyclesViewsBackward(t *testing.T) {
 
 	updated, _ := m.Update(tea.KeyMsg{Type: tea.KeyShiftTab})
 	m = updated.(model)
+	if m.currentView != viewAccount {
+		t.Fatalf("expected account view after Shift+Tab from library, got %v", m.currentView)
+	}
+
+	updated, _ = m.Update(tea.KeyMsg{Type: tea.KeyShiftTab})
+	m = updated.(model)
 	if m.currentView != viewSettings {
-		t.Fatalf("expected settings view after Shift+Tab from library, got %v", m.currentView)
+		t.Fatalf("expected settings view after second Shift+Tab, got %v", m.currentView)
 	}
 
 	updated, _ = m.Update(tea.KeyMsg{Type: tea.KeyShiftTab})
 	m = updated.(model)
 	if m.currentView != viewCommunities {
-		t.Fatalf("expected communities view after second Shift+Tab, got %v", m.currentView)
+		t.Fatalf("expected communities view after third Shift+Tab, got %v", m.currentView)
 	}
 }
 
@@ -620,8 +629,190 @@ func TestSettingsTabSwitchesMainView(t *testing.T) {
 
 	updated, _ := m.Update(tea.KeyMsg{Type: tea.KeyTab})
 	m = updated.(model)
-	if m.currentView != viewLibrary {
-		t.Fatalf("expected Tab from settings to switch to library view, got %v", m.currentView)
+	if m.currentView != viewAccount {
+		t.Fatalf("expected Tab from settings to switch to account view, got %v", m.currentView)
+	}
+}
+
+func TestAccountViewShowsAuthenticatedActions(t *testing.T) {
+	m := model{
+		currentView:      viewAccount,
+		connectionLabel:  "Connected: @tester",
+		startupCompleted: true,
+	}
+
+	rendered := stripANSI(m.renderAccount())
+	if !strings.Contains(rendered, "Account") {
+		t.Fatalf("expected account label in account view, got %q", rendered)
+	}
+	if strings.Contains(rendered, "Login") {
+		t.Fatalf("expected login action hidden when connected, got %q", rendered)
+	}
+	if !strings.Contains(rendered, "Edit profile") || !strings.Contains(rendered, "Manual sync") || !strings.Contains(rendered, "Logout") {
+		t.Fatalf("expected edit profile, manual sync, and logout actions, got %q", rendered)
+	}
+}
+
+func TestAccountEnterStartsLoginFlowWhenDisconnected(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.currentView = viewAccount
+
+	cmd := m.handleAccountKey(tea.KeyMsg{Type: tea.KeyEnter})
+	if cmd == nil {
+		t.Fatalf("expected login command")
+	}
+
+	msg := cmd()
+	if _, ok := msg.(deviceAuthStartMsg); !ok {
+		t.Fatalf("expected deviceAuthStartMsg, got %T", msg)
+	}
+}
+
+func TestAccountManualSyncShowsConnectWarningWhenUnavailable(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.currentView = viewAccount
+	m.connectionLabel = "Connected: @tester"
+	m.accountField = 1
+
+	_ = m.handleAccountKey(tea.KeyMsg{Type: tea.KeyEnter})
+	if !strings.Contains(m.statusText, "Connect first to run sync") {
+		t.Fatalf("expected connect warning, got %q", m.statusText)
+	}
+}
+
+func TestAccountEnterOnLogoutRunsDisconnect(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.currentView = viewAccount
+	m.connectionLabel = "Connected: @tester"
+	m.accountField = 2
+
+	cmd := m.handleAccountKey(tea.KeyMsg{Type: tea.KeyEnter})
+	if cmd == nil {
+		t.Fatalf("expected logout command")
+	}
+
+	msg := cmd()
+	if _, ok := msg.(authDisconnectedMsg); !ok {
+		t.Fatalf("expected authDisconnectedMsg, got %T", msg)
+	}
+}
+
+func TestAccountEnterOnEditProfileOpensModal(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.currentView = viewAccount
+	m.connectionLabel = "Connected: @tester"
+	m.accountField = 0
+
+	cmd := m.handleAccountKey(tea.KeyMsg{Type: tea.KeyEnter})
+	if cmd != nil {
+		t.Fatalf("expected no async command for opening profile editor")
+	}
+	if m.profileEditor == nil {
+		t.Fatalf("expected profile editor modal to open")
+	}
+}
+
+func TestProfileEditorEscClosesModal(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.currentView = viewAccount
+	m.profileEditor = &profileEditorState{Username: "tester"}
+
+	updated, _ := m.Update(tea.KeyMsg{Type: tea.KeyEsc})
+	m = updated.(model)
+	if m.profileEditor != nil {
+		t.Fatalf("expected profile editor modal to close")
+	}
+}
+
+func TestProfileEditorRejectsInvalidUsername(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.currentView = viewAccount
+	m.profileEditor = &profileEditorState{Username: "ab"}
+
+	updated, cmd := m.Update(tea.KeyMsg{Type: tea.KeyEnter})
+	m = updated.(model)
+	if cmd != nil {
+		t.Fatalf("expected no save command for invalid username")
+	}
+	if m.profileEditor == nil {
+		t.Fatalf("expected profile editor to remain open")
+	}
+	if !strings.Contains(m.statusText, "Username must be 3-50 characters") {
+		t.Fatalf("expected validation status, got %q", m.statusText)
+	}
+}
+
+func TestProfileUsernameUpdatedSuccessClosesModal(t *testing.T) {
+	m := model{
+		currentView:      viewAccount,
+		connectionLabel:  "Connected: @old",
+		startupCompleted: true,
+		profileEditor: &profileEditorState{
+			Username: "old",
+			Saving:   true,
+		},
+	}
+
+	updated, _ := m.Update(profileUsernameUpdatedMsg{username: "newname"})
+	m = updated.(model)
+
+	if m.profileEditor != nil {
+		t.Fatalf("expected profile editor closed after success")
+	}
+	if !strings.Contains(m.connectionLabel, "@newname") {
+		t.Fatalf("expected connection label to include updated username, got %q", m.connectionLabel)
+	}
+	if !strings.Contains(m.statusText, "Username updated") {
+		t.Fatalf("expected success status, got %q", m.statusText)
+	}
+}
+
+func TestProfileUsernameUpdatedFailureKeepsModalOpen(t *testing.T) {
+	m := model{
+		currentView:      viewAccount,
+		connectionLabel:  "Connected: @old",
+		startupCompleted: true,
+		profileEditor: &profileEditorState{
+			Username: "old",
+			Saving:   true,
+		},
+	}
+
+	updated, _ := m.Update(profileUsernameUpdatedMsg{err: errors.New("boom")})
+	m = updated.(model)
+
+	if m.profileEditor == nil {
+		t.Fatalf("expected profile editor to remain open after failure")
+	}
+	if m.profileEditor.Saving {
+		t.Fatalf("expected saving state cleared after failure")
+	}
+	if !strings.Contains(m.statusText, "Profile update failed") {
+		t.Fatalf("expected failure status, got %q", m.statusText)
+	}
+}
+
+func TestSettingsCloseReturnsToAccount(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.openSettings(viewAccount)
+
+	_ = m.handleSettingsKey(tea.KeyMsg{Type: tea.KeyEsc})
+	if m.currentView != viewAccount {
+		t.Fatalf("expected return to account, got %v", m.currentView)
 	}
 }
 
@@ -659,23 +850,15 @@ func TestRenderCommunitiesShowsPlaceholder(t *testing.T) {
 	}
 }
 
-func TestCommunitiesSettingsReturnToCommunities(t *testing.T) {
+func TestCommunitiesSettingsKeyDoesNothing(t *testing.T) {
 	container := newTestContainer(t)
 	m := New(container).(model)
 	m.startupCompleted = true
 	m.currentView = viewCommunities
 
 	_ = m.handleCommunitiesKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("s")})
-	if m.currentView != viewSettings {
-		t.Fatalf("expected settings view, got %v", m.currentView)
-	}
-	if m.settingsReturnView != viewCommunities {
-		t.Fatalf("expected return view communities, got %v", m.settingsReturnView)
-	}
-
-	_ = m.handleSettingsKey(tea.KeyMsg{Type: tea.KeyEsc})
 	if m.currentView != viewCommunities {
-		t.Fatalf("expected return to communities, got %v", m.currentView)
+		t.Fatalf("expected to stay in communities, got %v", m.currentView)
 	}
 }
 

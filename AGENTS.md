@@ -6,6 +6,7 @@
 - OpenAPI docs are generated from shared Zod schemas in `packages/zod` and written into `apps/api/static/openapi.json`.
 - Email templates are authored in React Email (`packages/emails`) and exported to Go HTML templates consumed by the API.
 - never named any code, or files the prd or app versions, use descriptive names instead.
+- this app is still on the development phase do not care about backward compatibility because theres no users yet only me. i can just migrate the database fresh or rest any other data.
 
 ## Global Testing Guidelines
 
