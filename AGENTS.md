@@ -177,19 +177,19 @@
 
 ## Packages (packages/\*)
 
-### @zeile/zod (packages/zod)
+### @kern/zod (packages/zod)
 
 - Source of truth for API request/response schemas.
 - Update when API models or validation rules change.
 - Exported from `packages/zod/src/index.ts`.
 
-### @zeile/openapi (packages/openapi)
+### @kern/openapi (packages/openapi)
 
 - Builds the OpenAPI spec from Zod + ts-rest contracts. use `bun run openapi:generate` to regenerate.
 - Contracts live in `packages/openapi/src/contracts`; use `createResourceContract` for CRUD resources.
 - Everytime a route is added/changed in the API, update the corresponding contract here.
 
-### @zeile/emails (packages/emails)
+### @kern/emails (packages/emails)
 
 - React Email templates live in `packages/emails/src/templates`.
 - Use Go template placeholders (e.g., `{{.UserFirstName}}`) to match `internal/lib/email` data keys.

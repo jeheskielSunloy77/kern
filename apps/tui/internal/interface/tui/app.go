@@ -13,11 +13,11 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/zeile/tui/internal/application"
-	"github.com/zeile/tui/internal/domain"
-	"github.com/zeile/tui/internal/infrastructure/config"
-	"github.com/zeile/tui/internal/infrastructure/repository"
-	"github.com/zeile/tui/internal/reader"
+	"github.com/jeheskielSunloy77/kern/tui/internal/application"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/repository"
+	"github.com/jeheskielSunloy77/kern/tui/internal/reader"
 )
 
 type viewID int

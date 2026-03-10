@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jeheskielSunloy77/zeile/internal/application"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
-	httpdto "github.com/jeheskielSunloy77/zeile/internal/interface/http/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/response"
-	httputils "github.com/jeheskielSunloy77/zeile/internal/interface/http/utils"
+	"github.com/jeheskielSunloy77/kern/internal/application"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
+	httpdto "github.com/jeheskielSunloy77/kern/internal/interface/http/dto"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/response"
+	httputils "github.com/jeheskielSunloy77/kern/internal/interface/http/utils"
 )
 
 type CommunityHandler struct {

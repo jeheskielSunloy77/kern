@@ -7,7 +7,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/zeile/tui/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/config"
 )
 
 type settingsSectionID int

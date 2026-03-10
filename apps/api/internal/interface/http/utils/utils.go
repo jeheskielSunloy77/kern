@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/app/errs"
+	"github.com/jeheskielSunloy77/kern/internal/app/errs"
 )
 
 func ParseUUIDParam(raw string) (uuid.UUID, error) {

@@ -1,8 +1,8 @@
 package application
 
 import (
-	"github.com/zeile/tui/internal/domain"
-	"github.com/zeile/tui/internal/reader"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/reader"
 	"reflect"
 	"testing"
 )

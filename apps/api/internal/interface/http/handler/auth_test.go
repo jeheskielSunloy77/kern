@@ -12,12 +12,12 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/app/errs"
-	"github.com/jeheskielSunloy77/zeile/internal/application"
-	applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/response"
+	"github.com/jeheskielSunloy77/kern/internal/app/errs"
+	"github.com/jeheskielSunloy77/kern/internal/application"
+	applicationdto "github.com/jeheskielSunloy77/kern/internal/application/dto"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/middleware"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/response"
 
 	"github.com/stretchr/testify/require"
 )

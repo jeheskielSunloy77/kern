@@ -7,15 +7,15 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/jeheskielSunloy77/zeile/internal/application"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/database"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/cache"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/logger"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/repository"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/handler"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/router"
+	"github.com/jeheskielSunloy77/kern/internal/application"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/database"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/lib/cache"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/logger"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/repository"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/server"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/handler"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/router"
 )
 
 const DefaultContextTimeout = 30

@@ -3,7 +3,7 @@ import {
 	ZInternalServerErrorResponse,
 	ZNotFoundResponse,
 	ZUnauthorizedResponse,
-} from '@zeile/zod'
+} from '@kern/zod'
 
 export type SecurityType = 'bearer' | 'cookie' | 'bearerOrCookie'
 

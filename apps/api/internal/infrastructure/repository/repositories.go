@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"github.com/jeheskielSunloy77/zeile/internal/application/port"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/cache"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+	"github.com/jeheskielSunloy77/kern/internal/application/port"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/lib/cache"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/server"
 )
 
 type Repositories = port.Repositories

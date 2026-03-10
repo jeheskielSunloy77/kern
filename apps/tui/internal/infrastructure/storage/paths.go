@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/zeile/tui/internal/domain"
-	"github.com/zeile/tui/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/config"
 )
 
 type Paths struct {
@@ -23,7 +23,7 @@ func Resolve(cfg config.Config, configPath string) Paths {
 		BaseDir:    base,
 		LibraryDir: filepath.Join(base, "library"),
 		CacheDir:   filepath.Join(base, "cache"),
-		DBPath:     filepath.Join(base, "zeile.db"),
+		DBPath:     filepath.Join(base, "kern.db"),
 		ConfigPath: configPath,
 	}
 }

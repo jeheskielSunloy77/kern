@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/response"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/middleware"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/response"
 )
 
 type HealthHandler struct {

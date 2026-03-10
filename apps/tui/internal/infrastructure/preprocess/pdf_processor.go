@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/zeile/tui/internal/domain"
-	pdfparser "github.com/zeile/tui/internal/infrastructure/parser/pdf"
-	"github.com/zeile/tui/internal/preprocessing"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
+	pdfparser "github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/parser/pdf"
+	"github.com/jeheskielSunloy77/kern/tui/internal/preprocessing"
 )
 
 type PDFProcessor struct{}

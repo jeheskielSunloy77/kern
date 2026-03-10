@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/server"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/middleware"
 	"github.com/rs/zerolog"
 
 	"github.com/stretchr/testify/require"

@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/zeile/tui/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/config"
 )
 
 type themeTokens struct {

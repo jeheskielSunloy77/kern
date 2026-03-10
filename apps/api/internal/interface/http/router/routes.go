@@ -2,11 +2,11 @@ package router
 
 import (
 	"github.com/gofiber/fiber/v2"
-	applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
-	httpdto "github.com/jeheskielSunloy77/zeile/internal/interface/http/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/handler"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware"
+	applicationdto "github.com/jeheskielSunloy77/kern/internal/application/dto"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
+	httpdto "github.com/jeheskielSunloy77/kern/internal/interface/http/dto"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/handler"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/middleware"
 )
 
 func registerRoutes(

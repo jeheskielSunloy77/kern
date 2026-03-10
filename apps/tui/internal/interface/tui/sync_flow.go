@@ -6,7 +6,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/zeile/tui/internal/application"
+	"github.com/jeheskielSunloy77/kern/tui/internal/application"
 )
 
 type syncTickMsg struct{}

@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jeheskielSunloy77/zeile/internal/application"
-	applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/application/port"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
-	httpdto "github.com/jeheskielSunloy77/zeile/internal/interface/http/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/response"
-	httputils "github.com/jeheskielSunloy77/zeile/internal/interface/http/utils"
+	"github.com/jeheskielSunloy77/kern/internal/application"
+	applicationdto "github.com/jeheskielSunloy77/kern/internal/application/dto"
+	"github.com/jeheskielSunloy77/kern/internal/application/port"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
+	httpdto "github.com/jeheskielSunloy77/kern/internal/interface/http/dto"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/response"
+	httputils "github.com/jeheskielSunloy77/kern/internal/interface/http/utils"
 )
 
 type ResourceHandler[T domain.BaseModel, S applicationdto.StoreDTO[T], U applicationdto.UpdateDTO[T], TS httpdto.StoreDTO[S], TU httpdto.UpdateDTO[U]] struct {

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/app/errs"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/repository"
+	"github.com/jeheskielSunloy77/kern/internal/app/errs"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/repository"
 
 	"github.com/stretchr/testify/require"
 )

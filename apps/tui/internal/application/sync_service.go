@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zeile/tui/internal/domain"
-	"github.com/zeile/tui/internal/infrastructure/remote"
-	"github.com/zeile/tui/internal/infrastructure/repository"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/remote"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/repository"
 )
 
 type SyncResult struct {

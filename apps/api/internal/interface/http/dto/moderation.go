@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
+	applicationdto "github.com/jeheskielSunloy77/kern/internal/application/dto"
 )
 
 type CreateModerationReviewRequest struct {

@@ -6,9 +6,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	fiberrecover "github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/jeheskielSunloy77/zeile/internal/app/errs"
-	"github.com/jeheskielSunloy77/zeile/internal/app/sqlerr"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+	"github.com/jeheskielSunloy77/kern/internal/app/errs"
+	"github.com/jeheskielSunloy77/kern/internal/app/sqlerr"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/server"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 )

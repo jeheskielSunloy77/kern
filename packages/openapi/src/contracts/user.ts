@@ -1,4 +1,4 @@
-import { ZStoreUserDTO, ZUpdateUserDTO, ZUser } from '@zeile/zod'
+import { ZStoreUserDTO, ZUpdateUserDTO, ZUser } from '@kern/zod'
 
 import { createResourceContract } from './resource.js'
 

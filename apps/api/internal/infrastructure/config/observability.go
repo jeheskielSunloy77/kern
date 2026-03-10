@@ -35,7 +35,7 @@ type HealthChecksConfig struct {
 
 func DefaultObservabilityConfig() *ObservabilityConfig {
 	return &ObservabilityConfig{
-		ServiceName: "zeile",
+		ServiceName: "kern",
 		Env:         EnvDevelopment,
 		Logging: LoggingConfig{
 			Level:              "info",

@@ -12,13 +12,13 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/zeile/tui/internal/application"
-	"github.com/zeile/tui/internal/domain"
-	"github.com/zeile/tui/internal/infrastructure/config"
-	"github.com/zeile/tui/internal/infrastructure/database"
-	"github.com/zeile/tui/internal/infrastructure/repository"
-	"github.com/zeile/tui/internal/infrastructure/storage"
-	"github.com/zeile/tui/internal/preprocessing"
+	"github.com/jeheskielSunloy77/kern/tui/internal/application"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/database"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/repository"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/storage"
+	"github.com/jeheskielSunloy77/kern/tui/internal/preprocessing"
 )
 
 func TestStartupAutoResumeOpensMostRecentUnfinishedBook(t *testing.T) {
@@ -419,7 +419,7 @@ func TestRenderLibraryCentersEmptyStateInBody(t *testing.T) {
 	headerIndent := 0
 	messageIndent := 0
 	for idx, line := range lines {
-		if strings.Contains(line, "Zeile") && strings.Contains(line, "Library") && strings.Contains(line, "Communities") && strings.Contains(line, "Settings") && strings.Contains(line, "Login") {
+		if strings.Contains(line, "Kern") && strings.Contains(line, "Library") && strings.Contains(line, "Communities") && strings.Contains(line, "Settings") && strings.Contains(line, "Login") {
 			headerLine = idx
 			headerIndent = leadingSpaces(line)
 		}
@@ -962,7 +962,7 @@ func newTestContainer(t *testing.T) *application.Container {
 		BaseDir:    base,
 		LibraryDir: filepath.Join(base, "library"),
 		CacheDir:   filepath.Join(base, "cache"),
-		DBPath:     filepath.Join(base, "zeile.db"),
+		DBPath:     filepath.Join(base, "kern.db"),
 		ConfigPath: filepath.Join(base, "config.toml"),
 	}
 	if err := paths.Ensure(); err != nil {

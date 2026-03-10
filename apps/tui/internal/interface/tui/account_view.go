@@ -39,7 +39,7 @@ func (m model) renderAccount() string {
 			lines,
 			lipgloss.NewStyle().Bold(true).Foreground(theme.Primary).Render("Login"),
 			"",
-			"Sign in to connect this app with your Zeile Cloud account.",
+			"Sign in to connect this app with your Kern Cloud account.",
 			"After login, you can run manual sync and manage your session.",
 			"",
 		)

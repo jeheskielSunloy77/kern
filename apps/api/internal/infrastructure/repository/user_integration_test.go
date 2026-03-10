@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/cache"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/utils"
-	internaltesting "github.com/jeheskielSunloy77/zeile/internal/testing"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/lib/cache"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/lib/utils"
+	internaltesting "github.com/jeheskielSunloy77/kern/internal/testing"
 	"gorm.io/gorm"
 
 	"github.com/stretchr/testify/require"

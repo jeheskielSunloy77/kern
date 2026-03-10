@@ -19,7 +19,7 @@ type EmailLayoutProps = {
 const DefaultFooter = () => (
 	<Section className='mt-8 text-center'>
 		<Text className='text-gray-500 text-xs'>
-			Copyright {new Date().getFullYear()} zeile. All rights reserved.
+			Copyright {new Date().getFullYear()} kern. All rights reserved.
 		</Text>
 		<Text className='text-gray-500 text-xs'>
 			123 Project Street, Suite 100, San Francisco, CA 94103

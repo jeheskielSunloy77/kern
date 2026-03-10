@@ -12,12 +12,12 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/app/errs"
-	"github.com/jeheskielSunloy77/zeile/internal/app/sqlerr"
-	applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/application/port"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/storage"
+	"github.com/jeheskielSunloy77/kern/internal/app/errs"
+	"github.com/jeheskielSunloy77/kern/internal/app/sqlerr"
+	applicationdto "github.com/jeheskielSunloy77/kern/internal/application/dto"
+	"github.com/jeheskielSunloy77/kern/internal/application/port"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/lib/storage"
 )
 
 type LibraryService interface {

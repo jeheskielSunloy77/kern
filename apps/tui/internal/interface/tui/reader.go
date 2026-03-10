@@ -10,9 +10,9 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/zeile/tui/internal/domain"
-	"github.com/zeile/tui/internal/infrastructure/repository"
-	"github.com/zeile/tui/internal/reader"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/repository"
+	"github.com/jeheskielSunloy77/kern/tui/internal/reader"
 )
 
 func (m *model) handleReaderKey(msg tea.KeyMsg) {

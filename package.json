@@ -1,5 +1,5 @@
 {
-	"name": "zeile",
+	"name": "kern",
 	"version": "1.0.0",
 	"scripts": {
 		"build": "turbo run build --filter=./apps/*",
@@ -13,7 +13,7 @@
 		"typecheck": "turbo run typecheck",
 		"test": "turbo run test",
 		"clean": "turbo run clean && rimraf node_modules",
-		"api:run": "turbo run dev --filter=@zeile/api",
+		"api:run": "turbo run dev --filter=@kern/api",
 		"tui:run": "cd apps/tui && bun run dev",
 		"api:seed": "cd apps/api && make seed",
 		"api:migrate:new": "cd apps/api && make migrate-new",
@@ -22,8 +22,8 @@
 		"api:migrate:fresh": "cd apps/api && make migrate-fresh",
 		"api:tidy": "cd apps/api && go fmt ./... && go mod tidy && go mod verify",
 		"api:install": "cd apps/api && go mod download",
-		"api:test": "turbo run test --filter=@zeile/api",
-		"tui:test": "turbo run test --filter=@zeile/tui",
+		"api:test": "turbo run test --filter=@kern/api",
+		"tui:test": "turbo run test --filter=@kern/tui",
 		"openapi:generate": "cd packages/openapi && bun generate",
 		"emails:generate": "cd packages/emails && bun run generate",
 		"ci:simulate": "bun install --frozen-lockfile && bun run openapi:generate && bun run emails:generate && git status --porcelain && bun run build && bun run test && echo '✅ CI simulation completed successfully!'",

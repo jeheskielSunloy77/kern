@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/application/port"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/cache"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/lib/utils"
+	"github.com/jeheskielSunloy77/kern/internal/application/port"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/lib/cache"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/lib/utils"
 	"gorm.io/gorm"
 )
 

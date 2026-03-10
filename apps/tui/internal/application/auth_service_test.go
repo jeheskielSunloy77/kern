@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zeile/tui/internal/infrastructure/remote"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/remote"
 )
 
 func TestAuthServiceUpdateUsernameRequiresConnection(t *testing.T) {

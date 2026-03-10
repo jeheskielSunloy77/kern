@@ -3,9 +3,9 @@ package testing
 import (
 	"time"
 
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/database"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/database"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/server"
 	"github.com/rs/zerolog"
 )
 

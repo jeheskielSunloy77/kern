@@ -1,4 +1,4 @@
-module github.com/zeile/tui
+module github.com/jeheskielSunloy77/kern/tui
 
 go 1.24.0
 

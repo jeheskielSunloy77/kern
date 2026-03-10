@@ -6,10 +6,10 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/database"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/database/seeder"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/logger"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/database"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/database/seeder"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/logger"
 )
 
 func main() {

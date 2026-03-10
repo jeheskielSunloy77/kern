@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
-	loggerConfig "github.com/jeheskielSunloy77/zeile/internal/infrastructure/logger"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/config"
+	loggerConfig "github.com/jeheskielSunloy77/kern/internal/infrastructure/logger"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 	"gorm.io/driver/postgres"

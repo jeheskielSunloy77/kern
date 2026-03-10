@@ -2,7 +2,7 @@ package dto
 
 import (
 	"github.com/go-playground/validator/v10"
-	applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
+	applicationdto "github.com/jeheskielSunloy77/kern/internal/application/dto"
 )
 
 type UpdateCommunityProfileRequest struct {

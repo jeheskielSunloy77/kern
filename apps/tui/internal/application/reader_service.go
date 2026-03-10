@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zeile/tui/internal/domain"
-	"github.com/zeile/tui/internal/infrastructure/repository"
-	"github.com/zeile/tui/internal/infrastructure/storage"
-	"github.com/zeile/tui/internal/reader"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/repository"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/storage"
+	"github.com/jeheskielSunloy77/kern/tui/internal/reader"
 )
 
 type TextSession struct {

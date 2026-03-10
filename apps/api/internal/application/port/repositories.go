@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
 )
 
 type AuthRepository interface {

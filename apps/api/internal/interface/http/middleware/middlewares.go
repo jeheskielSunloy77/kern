@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/jeheskielSunloy77/zeile/internal/application"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+	"github.com/jeheskielSunloy77/kern/internal/application"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/server"
 	"github.com/newrelic/go-agent/v3/newrelic"
 )
 

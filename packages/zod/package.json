@@ -1,7 +1,7 @@
 {
-	"name": "@zeile/zod",
+	"name": "@kern/zod",
 	"version": "1.0.0",
-	"description": "Package which exports all zeile zod schemas and types",
+	"description": "Package which exports all kern zod schemas and types",
 	"type": "module",
 	"scripts": {
 		"build": "tsc && tsc-alias",

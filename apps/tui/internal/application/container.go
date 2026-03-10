@@ -5,14 +5,14 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/zeile/tui/internal/domain"
-	"github.com/zeile/tui/internal/infrastructure/config"
-	"github.com/zeile/tui/internal/infrastructure/database"
-	"github.com/zeile/tui/internal/infrastructure/preprocess"
-	"github.com/zeile/tui/internal/infrastructure/remote"
-	"github.com/zeile/tui/internal/infrastructure/repository"
-	"github.com/zeile/tui/internal/infrastructure/storage"
-	"github.com/zeile/tui/internal/preprocessing"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/database"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/preprocess"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/remote"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/repository"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/storage"
+	"github.com/jeheskielSunloy77/kern/tui/internal/preprocessing"
 )
 
 type Container struct {

@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zeile/tui/internal/infrastructure/config"
-	"github.com/zeile/tui/internal/infrastructure/remote"
-	"github.com/zeile/tui/internal/infrastructure/storage"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/remote"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/storage"
 )
 
 type AuthService struct {

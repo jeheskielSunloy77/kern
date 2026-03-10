@@ -1,5 +1,5 @@
 {
-  "name": "@zeile/tui",
+  "name": "@kern/tui",
   "private": true,
   "version": "1.0.0",
   "scripts": {

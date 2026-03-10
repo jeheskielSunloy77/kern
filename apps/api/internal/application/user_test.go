@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/app/errs"
-	applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/repository"
+	"github.com/jeheskielSunloy77/kern/internal/app/errs"
+	applicationdto "github.com/jeheskielSunloy77/kern/internal/application/dto"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/repository"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/stretchr/testify/require"

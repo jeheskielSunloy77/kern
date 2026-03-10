@@ -1,4 +1,4 @@
-import { ZHealthResponse } from '@zeile/zod'
+import { ZHealthResponse } from '@kern/zod'
 import { initContract } from '@ts-rest/core'
 import { failResponses } from '../utils.js'
 

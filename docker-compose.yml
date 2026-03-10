@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: "zeile"
+      POSTGRES_DB: "kern"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
     ports:

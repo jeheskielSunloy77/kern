@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/jeheskielSunloy77/zeile/internal/domain"
+import "github.com/jeheskielSunloy77/kern/internal/domain"
 
 type StoreUserInput struct {
 	Email    string

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/server"
 )
 
 type RateLimitMiddleware struct {

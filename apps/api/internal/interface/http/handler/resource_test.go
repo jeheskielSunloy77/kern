@@ -8,12 +8,12 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/application"
-	applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/application/port"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
-	httpdto "github.com/jeheskielSunloy77/zeile/internal/interface/http/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/response"
+	"github.com/jeheskielSunloy77/kern/internal/application"
+	applicationdto "github.com/jeheskielSunloy77/kern/internal/application/dto"
+	"github.com/jeheskielSunloy77/kern/internal/application/port"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
+	httpdto "github.com/jeheskielSunloy77/kern/internal/interface/http/dto"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/response"
 	"github.com/stretchr/testify/require"
 )
 

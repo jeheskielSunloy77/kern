@@ -1,12 +1,12 @@
-# zeile
+# kern
 
-A monorepo for a Go API and a terminal e-reader app with shared TypeScript packages, managed with Turborepo and Bun workspaces. scaffolded with **zeile** visit the
-[repository](https://github.com/jeheskielSunloy77/zeile) for more details.
+A monorepo for a Go API and a terminal e-reader app with shared TypeScript packages, managed with Turborepo and Bun workspaces. scaffolded with **kern** visit the
+[repository](https://github.com/jeheskielSunloy77/kern) for more details.
 
 ## Repository layout
 
 ```
-zeile/
+kern/
 ├── apps/api             # Go API (Fiber)
 ├── apps/tui             # Go terminal e-reader app (MVP)
 ├── packages/zod         # Shared Zod schemas
@@ -115,9 +115,9 @@ bun run emails:generate     # Generate email HTML templates
 
 ## Packages (packages/\*)
 
-- `@zeile/zod` (`packages/zod`): source of truth for API request/response schemas (exported from `packages/zod/src/index.ts`).
-- `@zeile/openapi` (`packages/openapi`): builds the OpenAPI spec from Zod + ts-rest contracts in `packages/openapi/src/contracts`. Regenerate with `bun run openapi:generate`.
-- `@zeile/emails` (`packages/emails`): React Email templates in `packages/emails/src/templates`. Export HTML to `apps/api/templates/emails` via `bun run emails:generate`.
+- `@kern/zod` (`packages/zod`): source of truth for API request/response schemas (exported from `packages/zod/src/index.ts`).
+- `@kern/openapi` (`packages/openapi`): builds the OpenAPI spec from Zod + ts-rest contracts in `packages/openapi/src/contracts`. Regenerate with `bun run openapi:generate`.
+- `@kern/emails` (`packages/emails`): React Email templates in `packages/emails/src/templates`. Export HTML to `apps/api/templates/emails` via `bun run emails:generate`.
 
 ## Testing
 

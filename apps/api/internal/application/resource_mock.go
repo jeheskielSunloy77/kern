@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	applicationdto "github.com/jeheskielSunloy77/zeile/internal/application/dto"
-	"github.com/jeheskielSunloy77/zeile/internal/application/port"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
+	applicationdto "github.com/jeheskielSunloy77/kern/internal/application/dto"
+	"github.com/jeheskielSunloy77/kern/internal/application/port"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
 )
 
 // MockResourceService is a generic mock for ResourceService interfaces in tests.

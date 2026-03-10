@@ -1,5 +1,5 @@
 {
-	"name": "@zeile/api",
+	"name": "@kern/api",
 	"private": true,
 	"version": "1.0.0",
 	"scripts": {

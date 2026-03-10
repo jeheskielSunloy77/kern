@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/config"
 	"github.com/rs/zerolog"
 	gormlogger "gorm.io/gorm/logger"
 )

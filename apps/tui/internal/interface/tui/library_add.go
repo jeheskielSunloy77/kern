@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/zeile/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
 )
 
 func (m *model) handleLibraryKey(msg tea.KeyMsg) tea.Cmd {

@@ -1,7 +1,7 @@
 package epub
 
 import (
-	"github.com/zeile/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
 	"reflect"
 	"testing"
 )

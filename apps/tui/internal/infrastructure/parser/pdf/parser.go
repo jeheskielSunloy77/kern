@@ -10,7 +10,7 @@ import (
 
 	"rsc.io/pdf"
 
-	"github.com/zeile/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
 )
 
 func Extract(ctx context.Context, pathToPDF string) (domain.PDFCache, error) {

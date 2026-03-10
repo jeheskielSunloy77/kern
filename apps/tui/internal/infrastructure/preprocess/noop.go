@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/zeile/tui/internal/preprocessing"
+	"github.com/jeheskielSunloy77/kern/tui/internal/preprocessing"
 )
 
 type NoopProcessor struct{}

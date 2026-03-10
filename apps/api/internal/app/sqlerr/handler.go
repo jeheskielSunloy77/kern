@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/jeheskielSunloy77/zeile/internal/app/errs"
+	"github.com/jeheskielSunloy77/kern/internal/app/errs"
 	"github.com/lib/pq"
 
 	"golang.org/x/text/cases"

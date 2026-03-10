@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
 )
 
 func PrintJSON(v any) {

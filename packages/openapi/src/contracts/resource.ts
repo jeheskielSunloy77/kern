@@ -4,7 +4,7 @@ import {
 	ZPreloadsQuery,
 	ZResponse,
 	ZResponseWithData,
-} from '@zeile/zod'
+} from '@kern/zod'
 import { initContract } from '@ts-rest/core'
 import { z } from 'zod'
 import {

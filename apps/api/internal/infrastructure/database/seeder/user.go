@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-faker/faker/v4"
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/domain"
+	"github.com/jeheskielSunloy77/kern/internal/domain"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )

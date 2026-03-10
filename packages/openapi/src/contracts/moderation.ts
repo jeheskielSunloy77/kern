@@ -5,7 +5,7 @@ import {
 	ZModerationListResponse,
 	ZModerationReview,
 	ZModerationReviewIDParams,
-} from '@zeile/zod'
+} from '@kern/zod'
 import { initContract } from '@ts-rest/core'
 import { failResponses, getSecurityMetadata } from '../utils.js'
 

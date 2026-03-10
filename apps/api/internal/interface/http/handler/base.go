@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/validation"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/server"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/middleware"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/validation"
 	"github.com/newrelic/go-agent/v3/integrations/nrpkgerrors"
 	"github.com/newrelic/go-agent/v3/newrelic"
 )

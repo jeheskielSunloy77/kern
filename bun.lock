@@ -3,22 +3,22 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "zeile",
+      "name": "kern",
       "devDependencies": {
         "turbo": "^2.5.5",
         "typescript": "^5.8.3",
       },
     },
     "apps/api": {
-      "name": "@zeile/api",
+      "name": "@kern/api",
       "version": "1.0.0",
     },
     "apps/tui": {
-      "name": "@zeile/tui",
+      "name": "@kern/tui",
       "version": "1.0.0",
     },
     "packages/emails": {
-      "name": "@zeile/emails",
+      "name": "@kern/emails",
       "version": "1.0.0",
       "dependencies": {
         "@react-email/components": "0.0.34",
@@ -32,13 +32,13 @@
       },
     },
     "packages/openapi": {
-      "name": "@zeile/openapi",
+      "name": "@kern/openapi",
       "version": "1.0.0",
       "dependencies": {
         "@anatine/zod-openapi": "^2.2.7",
         "@ts-rest/core": "^3.52.1",
         "@ts-rest/open-api": "^3.52.1",
-        "@zeile/zod": "workspace:*",
+        "@kern/zod": "workspace:*",
         "zod": "^3.24.2",
       },
       "devDependencies": {
@@ -51,7 +51,7 @@
       },
     },
     "packages/zod": {
-      "name": "@zeile/zod",
+      "name": "@kern/zod",
       "version": "1.0.0",
       "dependencies": {
         "@anatine/zod-openapi": "^2.2.7",
@@ -287,15 +287,15 @@
 
     "@types/react-dom": ["@types/react-dom@19.2.3", "", { "peerDependencies": { "@types/react": "^19.2.0" } }, "sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ=="],
 
-    "@zeile/api": ["@zeile/api@workspace:apps/api"],
+    "@kern/api": ["@kern/api@workspace:apps/api"],
 
-    "@zeile/emails": ["@zeile/emails@workspace:packages/emails"],
+    "@kern/emails": ["@kern/emails@workspace:packages/emails"],
 
-    "@zeile/openapi": ["@zeile/openapi@workspace:packages/openapi"],
+    "@kern/openapi": ["@kern/openapi@workspace:packages/openapi"],
 
-    "@zeile/tui": ["@zeile/tui@workspace:apps/tui"],
+    "@kern/tui": ["@kern/tui@workspace:apps/tui"],
 
-    "@zeile/zod": ["@zeile/zod@workspace:packages/zod"],
+    "@kern/zod": ["@kern/zod@workspace:packages/zod"],
 
     "accepts": ["accepts@1.3.8", "", { "dependencies": { "mime-types": "~2.1.34", "negotiator": "0.6.3" } }, "sha512-PYAthTa2m2VKxuvSD3DPC/Gy+U+sOA1LAuT8mkmRuvw+NACSaeXEQ+NHcVF7rONl6qcaxV3Uuemwawk+7+SJLw=="],
 

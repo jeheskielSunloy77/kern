@@ -6,7 +6,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/zeile/tui/internal/infrastructure/remote"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/remote"
 )
 
 type deviceAuthState struct {

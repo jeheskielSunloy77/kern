@@ -14,7 +14,7 @@ import (
 
 	xhtml "golang.org/x/net/html"
 
-	"github.com/zeile/tui/internal/domain"
+	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
 )
 
 type containerDoc struct {

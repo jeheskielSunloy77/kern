@@ -38,8 +38,8 @@ export const OpenAPI = Object.assign(
 			openapi: '3.0.2',
 			info: {
 				version: '1.0.0',
-				title: 'zeile REST API - Documentation',
-				description: 'zeile REST API - Documentation',
+				title: 'kern REST API - Documentation',
+				description: 'kern REST API - Documentation',
 			},
 			servers: [
 				{

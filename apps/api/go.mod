@@ -1,4 +1,4 @@
-module github.com/jeheskielSunloy77/zeile
+module github.com/jeheskielSunloy77/kern
 
 go 1.24.5
 

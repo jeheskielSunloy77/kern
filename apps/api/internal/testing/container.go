@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/database"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/database"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
@@ -94,7 +94,7 @@ func SetupTestDB(t *testing.T) (*TestDB, func()) {
 			Username:  "test@gmail.com",
 			Password:  "password",
 			FromEmail: "test@gmail.com",
-			FromName:  "zeile",
+			FromName:  "kern",
 		},
 
 		Cache: config.CacheConfig{

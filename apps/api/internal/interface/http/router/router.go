@@ -9,11 +9,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
-	"github.com/jeheskielSunloy77/zeile/internal/app/errs"
-	"github.com/jeheskielSunloy77/zeile/internal/application"
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/server"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/handler"
-	"github.com/jeheskielSunloy77/zeile/internal/interface/http/middleware"
+	"github.com/jeheskielSunloy77/kern/internal/app/errs"
+	"github.com/jeheskielSunloy77/kern/internal/application"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/server"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/handler"
+	"github.com/jeheskielSunloy77/kern/internal/interface/http/middleware"
 )
 
 func NewRouter(s *server.Server, h *handler.Handlers, services *application.Services) *fiber.App {

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"html/template"
 
-	"github.com/jeheskielSunloy77/zeile/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/internal/infrastructure/config"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"gopkg.in/gomail.v2"

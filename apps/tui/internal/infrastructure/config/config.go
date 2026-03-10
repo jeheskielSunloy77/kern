@@ -199,7 +199,7 @@ func Default() Config {
 	}
 
 	return Config{
-		DataDir:              filepath.Join(homeDir, ".zeile"),
+		DataDir:              filepath.Join(homeDir, ".kern"),
 		APIBaseURL:           "http://localhost:8080",
 		ManagedCopyDefault:   true,
 		MinSpreadWidth:       120,
@@ -222,7 +222,7 @@ func defaultConfigPath() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("resolve user config dir: %w", err)
 	}
-	return filepath.Join(configDir, "zeile", "config.toml"), nil
+	return filepath.Join(configDir, "kern", "config.toml"), nil
 }
 
 func writeDefaults(path string, cfg Config) error {

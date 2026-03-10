@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/zeile/tui/internal/infrastructure/config"
-	"github.com/zeile/tui/internal/reader"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/tui/internal/reader"
 )
 
 type footerHint struct {
@@ -22,7 +22,7 @@ func (m model) renderMainNavHeader(active viewID) string {
 		Foreground(lipgloss.Color("255")).
 		Background(theme.Primary).
 		Padding(0, 1).
-		Render("Zeile")
+		Render("Kern")
 
 	entries := []struct {
 		view  viewID
@@ -195,7 +195,7 @@ func (m model) renderCommunities() string {
 }
 
 func (m model) renderAdd() string {
-	header := lipgloss.NewStyle().Bold(true).Render("Zeile - Add Book")
+	header := lipgloss.NewStyle().Bold(true).Render("Kern - Add Book")
 	theme := m.activeTheme()
 
 	stepLabel := "Step 1/3 - Choose source"
@@ -831,7 +831,7 @@ func (m model) renderDeviceAuthModal() string {
 	}
 
 	content := strings.Join([]string{
-		lipgloss.NewStyle().Bold(true).Render("Connect to Zeile Cloud"),
+		lipgloss.NewStyle().Bold(true).Render("Connect to Kern Cloud"),
 		"",
 		"1. Open this URL in your browser:",
 		m.deviceAuth.VerificationURI,
