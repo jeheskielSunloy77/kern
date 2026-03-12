@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+    <defs>
+        <style>
+            /* Base K Styles */
+            .k-bar {
+            fill: #10b981;
+            }
+            .k-br {
+            stroke: #10b981;
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            }
+
+            /* Path Draw (Typewriter) Animation */
+            .br2 {
+            stroke-dasharray: 90;
+            animation: drawLine 2s ease-in-out infinite alternate;
+            }
+            .bar2 {
+            animation: fadePulse 4s ease-in-out infinite;
+            }
+
+            @keyframes drawLine {
+            0%, 10% { stroke-dashoffset: 90; }
+            90%, 100% { stroke-dashoffset: 0; }
+            }
+
+            @keyframes fadePulse {
+            0%, 10%, 90%, 100% { opacity: 0.2; }
+            40%, 60% { opacity: 1; }
+            }
+        </style>
+    </defs>
+
+    <!-- ================= THE KERN LOADER ================= -->
+    <g>
+        <!-- Pulsing vertical bar -->
+        <rect class="k-bar bar2" x="20" y="20" width="12" height="60" rx="2" />
+
+        <!-- Drawing bracket path -->
+        <path class="k-br br2" d="M 75 20 L 45 50 L 75 80" />
+    </g>
+</svg>

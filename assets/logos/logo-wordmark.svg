@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 410 200" width="100%" height="100%">
+    <defs>
+        <!-- Background styling for the option boxes -->
+        <style>
+            @import
+            url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700;900&amp;display=swap');
+            text {
+            font-family: 'Fira Code', 'JetBrains Mono', Consolas, monospace;
+            user-select: none;
+            }
+
+            .opt-container { cursor: pointer; }
+
+            .text-ern {
+            font-size: 56px;
+            font-weight: 700;
+            fill: #e4e4e7;
+            letter-spacing: -2px;
+            }
+
+            /* OPTION 1: The Prompt */
+            .opt1 .bracket {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: 60px 85px;
+            }
+            .opt1 .cursor { opacity: 0; }
+            /* Flipped the translate direction and the default state so it becomes '>' on hover */
+            .opt1:hover .bracket { transform: translateX(8px) scaleX(-1); }
+            .opt1:hover .cursor { animation: blink 1s step-end infinite; }
+
+            @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+            }
+        </style>
+    </defs>
+
+    <!-- ================= THE KERN LOGO ================= -->
+
+    <g class="opt-container opt1" transform="translate(20, 20)">
+
+        <!-- Logo Content -->
+        <g transform="translate(40, 0)">
+            <!-- Vertical bar of the 'K' -->
+            <rect x="20" y="55" width="12" height="60" fill="#10b981" rx="2" />
+
+            <!-- Unanimated state is the '<' shape forming the 'K' -->
+            <path class="bracket" d="M 75 55 L 45 85 L 75 115" stroke="#10b981" stroke-width="12"
+                fill="none" stroke-linecap="round" stroke-linejoin="round" />
+
+            <!-- The rest of the word -->
+            <text class="text-ern" x="95" y="112">ern</text>
+
+            <!-- Blinking block cursor (visible on hover) -->
+            <rect class="cursor" x="210" y="65" width="16" height="48" fill="#10b981" rx="2" />
+        </g>
+    </g>
+
+</svg>

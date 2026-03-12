@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+    <defs>
+        <style>
+            .opt-container {
+            cursor: pointer;
+            }
+
+            /* The Prompt Icon */
+            .bracket {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: 60px 50px;
+            }
+
+            /* Flipped the translate direction and the default state so it becomes '>' on hover */
+            .opt-container:hover .bracket {
+            transform: translateX(8px) scaleX(-1);
+            }
+        </style>
+    </defs>
+
+    <!-- ================= THE KERN ICON ================= -->
+
+    <g class="opt-container">
+        <!-- Vertical bar of the 'K' -->
+        <rect x="20" y="20" width="12" height="60" fill="#10b981" rx="2" />
+
+        <!-- Unanimated state is the '<' shape forming the 'K' -->
+        <path class="bracket" d="M 75 20 L 45 50 L 75 80" stroke="#10b981" stroke-width="12"
+            fill="none" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+</svg>
