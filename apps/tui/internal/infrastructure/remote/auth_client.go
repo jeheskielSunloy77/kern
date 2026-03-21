@@ -32,9 +32,10 @@ func (e *APIError) Error() string {
 }
 
 type User struct {
-	ID       string `json:"id"`
-	Email    string `json:"email"`
-	Username string `json:"username"`
+	ID        string  `json:"id"`
+	Email     string  `json:"email"`
+	Username  string  `json:"username"`
+	AvatarURL *string `json:"avatarUrl,omitempty"`
 }
 
 type AuthToken struct {

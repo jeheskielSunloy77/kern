@@ -81,6 +81,41 @@ func (r *SyncRepository) GetByLocalBookID(ctx context.Context, localBookID strin
 	return link, nil
 }
 
+func (r *SyncRepository) ListBookLinks(ctx context.Context) ([]domain.SyncBookLink, error) {
+	query := `SELECT local_book_id, local_fingerprint, remote_catalog_book_id, remote_library_book_id, updated_at
+		FROM sync_book_links
+		ORDER BY updated_at DESC`
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("list sync book links: %w", err)
+	}
+	defer rows.Close()
+
+	links := make([]domain.SyncBookLink, 0)
+	for rows.Next() {
+		var (
+			link      domain.SyncBookLink
+			updatedAt int64
+		)
+		if err := rows.Scan(
+			&link.LocalBookID,
+			&link.LocalFingerprint,
+			&link.RemoteCatalogBookID,
+			&link.RemoteLibraryBookID,
+			&updatedAt,
+		); err != nil {
+			return nil, fmt.Errorf("scan sync book link: %w", err)
+		}
+		link.UpdatedAt = time.Unix(updatedAt, 0).UTC()
+		links = append(links, link)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate sync book links: %w", err)
+	}
+	return links, nil
+}
+
 func (r *SyncRepository) UpsertBookLink(ctx context.Context, link domain.SyncBookLink) error {
 	query := `INSERT INTO sync_book_links (
 		local_book_id, local_fingerprint, remote_catalog_book_id, remote_library_book_id, updated_at

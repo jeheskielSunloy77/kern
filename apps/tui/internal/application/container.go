@@ -16,13 +16,14 @@ import (
 )
 
 type Container struct {
-	Config  config.Config
-	Paths   storage.Paths
-	DB      *sql.DB
-	Auth    *AuthService
-	Sync    *SyncService
-	Library *LibraryService
-	Reader  *ReaderService
+	Config    config.Config
+	Paths     storage.Paths
+	DB        *sql.DB
+	Auth      *AuthService
+	Sync      *SyncService
+	Community *CommunityService
+	Library   *LibraryService
+	Reader    *ReaderService
 }
 
 func NewContainer(ctx context.Context) (*Container, error) {
@@ -68,15 +69,17 @@ func NewContainer(ctx context.Context) (*Container, error) {
 		syncRepo,
 		remote.NewClient(loadedConfig.Config.APIBaseURL),
 	)
+	communityService := NewCommunityService(authService, syncRepo, remote.NewClient(loadedConfig.Config.APIBaseURL))
 
 	return &Container{
-		Config:  loadedConfig.Config,
-		Paths:   paths,
-		DB:      db,
-		Auth:    authService,
-		Sync:    syncService,
-		Library: library,
-		Reader:  readerService,
+		Config:    loadedConfig.Config,
+		Paths:     paths,
+		DB:        db,
+		Auth:      authService,
+		Sync:      syncService,
+		Community: communityService,
+		Library:   library,
+		Reader:    readerService,
 	}, nil
 }
 

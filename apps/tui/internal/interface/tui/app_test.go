@@ -463,7 +463,7 @@ func TestRenderLibraryRowsCenterWhenBooksExist(t *testing.T) {
 	}
 
 	rendered := stripANSI(m.renderLibrary())
-	rowText := "Book One - Author | 0.0% | Last opened: -"
+	rowText := "Book One - Author | 0.0% | Cloud: Local only | Last opened: -"
 	rowLine := -1
 	rowIndent := 0
 	for idx, line := range strings.Split(rendered, "\n") {
@@ -837,7 +837,7 @@ func TestSettingsSectionSwitchUsesBrackets(t *testing.T) {
 	}
 }
 
-func TestRenderCommunitiesShowsPlaceholder(t *testing.T) {
+func TestRenderCommunitiesShowsDisconnectedState(t *testing.T) {
 	m := model{
 		currentView: viewCommunities,
 		width:       100,
@@ -845,20 +845,42 @@ func TestRenderCommunitiesShowsPlaceholder(t *testing.T) {
 	}
 
 	rendered := stripANSI(m.renderCommunities())
-	if !strings.Contains(rendered, "Communities - Coming soon.") {
-		t.Fatalf("expected communities placeholder, got %q", rendered)
+	if !strings.Contains(rendered, "Connect your account to browse community books.") {
+		t.Fatalf("expected disconnected communities state, got %q", rendered)
 	}
 }
 
-func TestCommunitiesSettingsKeyDoesNothing(t *testing.T) {
+func TestCommunitiesSearchOpensPrompt(t *testing.T) {
 	container := newTestContainer(t)
 	m := New(container).(model)
 	m.startupCompleted = true
 	m.currentView = viewCommunities
 
-	_ = m.handleCommunitiesKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("s")})
-	if m.currentView != viewCommunities {
-		t.Fatalf("expected to stay in communities, got %v", m.currentView)
+	_ = m.handleCommunitiesKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("/")})
+	if m.prompt == nil {
+		t.Fatalf("expected community search prompt")
+	}
+	if m.prompt.kind != promptCommunitySearch {
+		t.Fatalf("expected community search prompt kind, got %v", m.prompt.kind)
+	}
+}
+
+func TestLibraryVisibilityKeyShowsDisconnectedStatus(t *testing.T) {
+	container := newTestContainer(t)
+	seedBookWithEPUBCache(t, container, "visibility-disconnected", "")
+
+	m := New(container).(model)
+	m.startupCompleted = true
+	if err := m.refreshLibrary(); err != nil {
+		t.Fatalf("refresh library: %v", err)
+	}
+
+	_ = m.handleLibraryKey(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("p")})
+	if !strings.Contains(m.statusText, "Connect first") {
+		t.Fatalf("expected connect-first status, got %q", m.statusText)
+	}
+	if m.visibilityConfirm != nil {
+		t.Fatalf("expected no visibility confirm while disconnected")
 	}
 }
 

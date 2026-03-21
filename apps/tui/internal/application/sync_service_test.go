@@ -2,6 +2,9 @@ package application
 
 import (
 	"context"
+	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -44,6 +47,14 @@ func (m *mockSyncLinkRepo) GetByLocalBookID(ctx context.Context, localBookID str
 	return domain.SyncBookLink{}, repository.ErrNotFound
 }
 
+func (m *mockSyncLinkRepo) ListBookLinks(ctx context.Context) ([]domain.SyncBookLink, error) {
+	links := make([]domain.SyncBookLink, 0, len(m.links))
+	for _, link := range m.links {
+		links = append(links, link)
+	}
+	return links, nil
+}
+
 func (m *mockSyncLinkRepo) UpsertBookLink(ctx context.Context, link domain.SyncBookLink) error {
 	if m.links == nil {
 		m.links = make(map[string]domain.SyncBookLink)
@@ -57,9 +68,15 @@ type mockSyncRemote struct {
 	createCatalogCalls int
 	upsertLibraryCalls int
 	upsertStateCalls   int
+	uploadAssetCalls   int
+	updateAssetCalls   int
 
 	catalogID string
 	libraryID string
+	assetID   string
+
+	preferredAssetID *string
+	uploadErr        error
 }
 
 func (m *mockSyncRemote) CreateCatalogBook(ctx context.Context, accessToken, title, authors string) (remote.BookCatalog, error) {
@@ -69,7 +86,43 @@ func (m *mockSyncRemote) CreateCatalogBook(ctx context.Context, accessToken, tit
 
 func (m *mockSyncRemote) UpsertLibraryBook(ctx context.Context, accessToken, catalogBookID string) (remote.UserLibraryBook, error) {
 	m.upsertLibraryCalls++
-	return remote.UserLibraryBook{ID: m.libraryID}, nil
+	return remote.UserLibraryBook{
+		ID:               m.libraryID,
+		CatalogBookID:    catalogBookID,
+		PreferredAssetID: m.preferredAssetID,
+	}, nil
+}
+
+func (m *mockSyncRemote) ListLibraryBooks(ctx context.Context, accessToken string) ([]remote.UserLibraryBook, error) {
+	book := remote.UserLibraryBook{
+		ID:               m.libraryID,
+		CatalogBookID:    m.catalogID,
+		PreferredAssetID: m.preferredAssetID,
+	}
+	if book.ID == "" {
+		return nil, nil
+	}
+	return []remote.UserLibraryBook{book}, nil
+}
+
+func (m *mockSyncRemote) UploadBookAsset(ctx context.Context, accessToken, catalogBookID, filePath string) (remote.BookAsset, error) {
+	m.uploadAssetCalls++
+	if m.uploadErr != nil {
+		return remote.BookAsset{}, m.uploadErr
+	}
+	return remote.BookAsset{
+		ID:            m.assetID,
+		CatalogBookID: catalogBookID,
+	}, nil
+}
+
+func (m *mockSyncRemote) UpdateLibraryBookPreferredAsset(ctx context.Context, accessToken, libraryBookID, preferredAssetID string) (remote.UserLibraryBook, error) {
+	m.updateAssetCalls++
+	m.preferredAssetID = &preferredAssetID
+	return remote.UserLibraryBook{
+		ID:               libraryBookID,
+		PreferredAssetID: &preferredAssetID,
+	}, nil
 }
 
 func (m *mockSyncRemote) UpsertReadingState(ctx context.Context, accessToken, libraryBookID, mode string, locator map[string]any, progressPercent float64) error {
@@ -96,6 +149,8 @@ func TestSyncServiceReconcileNow_FirstLinkCreation(t *testing.T) {
 		Title:       "Local Book",
 		Author:      "Author",
 	}
+	filePath := seedSyncFile(t, "book-1.epub")
+	book.ManagedPath = filePath
 	library := &mockSyncLibrary{
 		books: []domain.Book{book},
 		states: map[string][]domain.ReadingState{
@@ -113,6 +168,7 @@ func TestSyncServiceReconcileNow_FirstLinkCreation(t *testing.T) {
 	remoteClient := &mockSyncRemote{
 		catalogID: "catalog-1",
 		libraryID: "library-1",
+		assetID:   "asset-1",
 	}
 
 	service := NewSyncService(auth, library, accountRepo, linkRepo, remoteClient)
@@ -130,6 +186,12 @@ func TestSyncServiceReconcileNow_FirstLinkCreation(t *testing.T) {
 	if result.SkippedBooks != 0 {
 		t.Fatalf("expected 0 skipped books, got %d", result.SkippedBooks)
 	}
+	if result.UploadedFiles != 1 {
+		t.Fatalf("expected 1 uploaded file, got %d", result.UploadedFiles)
+	}
+	if result.UploadFailures != 0 {
+		t.Fatalf("expected 0 upload failures, got %d", result.UploadFailures)
+	}
 	if remoteClient.createCatalogCalls != 1 {
 		t.Fatalf("expected 1 catalog call, got %d", remoteClient.createCatalogCalls)
 	}
@@ -138,6 +200,12 @@ func TestSyncServiceReconcileNow_FirstLinkCreation(t *testing.T) {
 	}
 	if remoteClient.upsertStateCalls != 2 {
 		t.Fatalf("expected 2 upsert state calls, got %d", remoteClient.upsertStateCalls)
+	}
+	if remoteClient.uploadAssetCalls != 1 {
+		t.Fatalf("expected 1 upload asset call, got %d", remoteClient.uploadAssetCalls)
+	}
+	if remoteClient.updateAssetCalls != 1 {
+		t.Fatalf("expected 1 preferred asset update call, got %d", remoteClient.updateAssetCalls)
 	}
 	if len(linkRepo.upserted) != 1 {
 		t.Fatalf("expected one persisted link, got %d", len(linkRepo.upserted))
@@ -166,6 +234,8 @@ func TestSyncServiceReconcileNow_ExistingLinkSkipsCatalogCreation(t *testing.T) 
 		Title:       "Local Book",
 		Author:      "Author",
 	}
+	filePath := seedSyncFile(t, "book-1.epub")
+	book.ManagedPath = filePath
 	library := &mockSyncLibrary{
 		books: []domain.Book{book},
 		states: map[string][]domain.ReadingState{
@@ -187,8 +257,9 @@ func TestSyncServiceReconcileNow_ExistingLinkSkipsCatalogCreation(t *testing.T) 
 	}
 	accountRepo := &mockSyncAccountRepo{}
 	remoteClient := &mockSyncRemote{
-		catalogID: "catalog-ignored",
-		libraryID: "library-ignored",
+		catalogID:        "catalog-1",
+		libraryID:        "library-1",
+		preferredAssetID: ptr("asset-existing"),
 	}
 
 	service := NewSyncService(auth, library, accountRepo, linkRepo, remoteClient)
@@ -215,4 +286,80 @@ func TestSyncServiceReconcileNow_ExistingLinkSkipsCatalogCreation(t *testing.T) 
 	if remoteClient.upsertStateCalls != 1 {
 		t.Fatalf("expected one upsert state call, got %d", remoteClient.upsertStateCalls)
 	}
+	if remoteClient.uploadAssetCalls != 0 {
+		t.Fatalf("expected no upload asset calls, got %d", remoteClient.uploadAssetCalls)
+	}
+}
+
+func TestSyncServiceReconcileNow_UploadFailureDoesNotAbortSync(t *testing.T) {
+	auth := &AuthService{
+		session: &remote.Session{
+			User: remote.User{
+				ID:       "user-1",
+				Email:    "reader@example.com",
+				Username: "reader",
+			},
+			AccessToken:     "access-token",
+			AccessExpiresAt: time.Now().UTC().Add(30 * time.Minute),
+		},
+	}
+
+	book := domain.Book{
+		ID:          "book-1",
+		Fingerprint: "fp-book-1",
+		Title:       "Local Book",
+		Author:      "Author",
+		ManagedPath: seedSyncFile(t, "book-1.epub"),
+	}
+	library := &mockSyncLibrary{
+		books: []domain.Book{book},
+		states: map[string][]domain.ReadingState{
+			"book-1": {
+				{BookID: "book-1", Mode: domain.ReadingModeEPUB, Locator: domain.Locator{Offset: 10}, ProgressPercent: 10},
+			},
+		},
+	}
+
+	accountRepo := &mockSyncAccountRepo{}
+	linkRepo := &mockSyncLinkRepo{
+		links: map[string]domain.SyncBookLink{},
+	}
+	remoteClient := &mockSyncRemote{
+		catalogID: "catalog-1",
+		libraryID: "library-1",
+		uploadErr: errors.New("upload failed"),
+	}
+
+	service := NewSyncService(auth, library, accountRepo, linkRepo, remoteClient)
+	result, err := service.ReconcileNow(context.Background())
+	if err != nil {
+		t.Fatalf("reconcile now: %v", err)
+	}
+
+	if result.UploadFailures != 1 {
+		t.Fatalf("expected 1 upload failure, got %d", result.UploadFailures)
+	}
+	if result.SyncedStates != 1 {
+		t.Fatalf("expected reading states to keep syncing, got %d", result.SyncedStates)
+	}
+	if result.LastUploadError == "" {
+		t.Fatalf("expected upload error summary")
+	}
+	if remoteClient.upsertStateCalls != 1 {
+		t.Fatalf("expected one upsert state call, got %d", remoteClient.upsertStateCalls)
+	}
+}
+
+func seedSyncFile(t *testing.T, name string) string {
+	t.Helper()
+	dir := t.TempDir()
+	path := filepath.Join(dir, name)
+	if err := os.WriteFile(path, []byte("book-bytes"), 0o644); err != nil {
+		t.Fatalf("write sync file: %v", err)
+	}
+	return path
+}
+
+func ptr(value string) *string {
+	return &value
 }

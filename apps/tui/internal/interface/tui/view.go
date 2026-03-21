@@ -96,13 +96,15 @@ func (m model) renderLibrary() string {
 			if m.libraryFinished[book.ID] {
 				status = "Finished"
 			}
+			visibility := m.libraryVisibilityLabel(book.ID)
 
 			row := fmt.Sprintf(
-				"%s %s - %s | %s | Last opened: %s",
+				"%s %s - %s | %s | %s | Last opened: %s",
 				marker,
 				book.Title,
 				book.Author,
 				status,
+				visibility,
 				formatTime(book.LastOpened),
 			)
 			if idx == m.librarySelected {
@@ -148,6 +150,7 @@ func (m model) renderLibrary() string {
 		{key: "/", action: "search"},
 		{key: "a", action: "add"},
 		{key: "Enter", action: "open"},
+		{key: "p", action: "public/private"},
 		{key: "r", action: "remove"},
 	})
 	status := m.renderStatusToast("Ready")
@@ -160,30 +163,20 @@ func (m model) renderLibrary() string {
 }
 
 func (m model) renderCommunities() string {
-	headerLines := []string{
-		m.renderMainNavHeader(viewCommunities),
-		"",
+	headerLines := []string{m.renderMainNavHeader(viewCommunities)}
+	if query := strings.TrimSpace(m.communityQuery); query != "" {
+		headerLines = append(headerLines, fmt.Sprintf("Search: %s", query))
 	}
+	headerLines = append(headerLines, "")
 
-	body := "Communities - Coming soon."
-	if m.width > 0 && m.height > 0 {
-		bodyWidth := m.bodyContentWidth()
-		if bodyWidth < 1 {
-			bodyWidth = 1
-		}
-		centered := lipgloss.PlaceHorizontal(bodyWidth, lipgloss.Center, body)
-		contentHeight := m.mainLayoutHeight() - len(headerLines) - 2
-		if contentHeight < 1 {
-			contentHeight = 1
-		}
-		lines := make([]string, contentHeight)
-		lines[(contentHeight-1)/2] = centered
-		body = strings.Join(lines, "\n")
-	}
-
+	body := m.renderCommunitiesBody()
 	hints := m.renderFooterHints([]footerHint{
 		{key: "Tab", action: "next view"},
 		{key: "Shift+Tab", action: "prev view"},
+		{key: "/", action: "search"},
+		{key: "Enter", action: "details"},
+		{key: "s", action: "save"},
+		{key: "r", action: "reload"},
 	})
 	status := m.renderStatusToast("Ready")
 
@@ -192,6 +185,95 @@ func (m model) renderCommunities() string {
 		body,
 		[]string{"", m.renderFooterRow(hints, status)},
 	)
+}
+
+func (m model) renderCommunitiesBody() string {
+	if !m.shouldRunSync() {
+		return m.renderCommunitiesCentered("Connect your account to browse community books.")
+	}
+	if m.communityLoading && len(m.communityBooks) == 0 {
+		return m.renderCommunitiesCentered("Loading public books...")
+	}
+	if len(m.communityBooks) == 0 {
+		message := "No public books found."
+		if strings.TrimSpace(m.communityQuery) != "" {
+			message = "No matches for the current search."
+		}
+		return m.renderCommunitiesCentered(message)
+	}
+
+	listRows := make([]string, 0, len(m.communityBooks))
+	theme := m.activeTheme()
+	for idx, book := range m.communityBooks {
+		marker := " "
+		if idx == m.communitySelected {
+			marker = m.renderSelectorMarker()
+		}
+		row := fmt.Sprintf("%s %s - %s | @%s", marker, book.Title, book.Authors, book.Owner.Username)
+		if idx == m.communitySelected {
+			row = lipgloss.NewStyle().Bold(true).Foreground(theme.Primary).Render(row)
+		}
+		listRows = append(listRows, row)
+	}
+	listPane := strings.Join(listRows, "\n")
+
+	detailBook := m.communityDetail
+	if detailBook == nil && len(m.communityBooks) > 0 && m.communitySelected < len(m.communityBooks) {
+		book := m.communityBooks[m.communitySelected]
+		detailBook = &book
+	}
+	detailPane := "Select a public book to inspect it."
+	if detailBook != nil {
+		detailLines := []string{
+			lipgloss.NewStyle().Bold(true).Render(detailBook.Title),
+			fmt.Sprintf("Author: %s", detailBook.Authors),
+			fmt.Sprintf("Shared by: @%s", detailBook.Owner.Username),
+			fmt.Sprintf("Format: %s", communityBookFormat(detailBook.PreferredAsset.MimeType)),
+			fmt.Sprintf("Size: %s", humanSize(detailBook.PreferredAsset.SizeBytes)),
+		}
+		if m.communitySaving {
+			detailLines = append(detailLines, "", "Saving to your cloud library...")
+		} else {
+			detailLines = append(detailLines, "", "Press s to save this book to your cloud library.")
+		}
+		detailPane = strings.Join(detailLines, "\n")
+	}
+
+	if m.width <= 0 {
+		return listPane + "\n\n" + detailPane
+	}
+
+	_, bodyWidth := m.bodyLayout()
+	if bodyWidth < 20 {
+		return listPane + "\n\n" + detailPane
+	}
+	leftWidth := bodyWidth / 2
+	rightWidth := bodyWidth - leftWidth - 3
+	if rightWidth < 20 {
+		rightWidth = 20
+		leftWidth = bodyWidth - rightWidth - 3
+	}
+	left := lipgloss.NewStyle().Width(leftWidth).Render(listPane)
+	right := lipgloss.NewStyle().Width(rightWidth).Render(detailPane)
+	return lipgloss.JoinHorizontal(lipgloss.Top, left, " | ", right)
+}
+
+func (m model) renderCommunitiesCentered(message string) string {
+	if m.width <= 0 || m.height <= 0 {
+		return message
+	}
+	bodyWidth := m.bodyContentWidth()
+	if bodyWidth < 1 {
+		bodyWidth = 1
+	}
+	centered := lipgloss.PlaceHorizontal(bodyWidth, lipgloss.Center, message)
+	contentHeight := m.mainLayoutHeight() - 3
+	if contentHeight < 1 {
+		contentHeight = 1
+	}
+	lines := make([]string, contentHeight)
+	lines[(contentHeight-1)/2] = centered
+	return strings.Join(lines, "\n")
 }
 
 func (m model) renderAdd() string {
@@ -820,6 +902,39 @@ func (m model) renderRemoveModal() string {
 	return m.renderCenteredContent(style.Render(content))
 }
 
+func (m model) renderVisibilityConfirmModal() string {
+	if m.visibilityConfirm == nil {
+		return ""
+	}
+
+	action := "make this book public"
+	details := "This book will appear in Communities and other connected users can save it."
+	if !m.visibilityConfirm.nextPublic {
+		action = "make this book private"
+		details = "This book will no longer appear in Communities."
+	}
+
+	contentLines := []string{
+		lipgloss.NewStyle().Bold(true).Render("Change Visibility"),
+		"",
+		fmt.Sprintf("Book: %s", m.visibilityConfirm.bookTitle),
+		"",
+		fmt.Sprintf("Confirm %s?", action),
+		details,
+		"",
+		m.renderFooterHints([]footerHint{
+			{key: "Enter", action: "confirm"},
+			{key: "Esc", action: "cancel"},
+		}),
+	}
+	if status := m.renderStatusToast("Ready"); status != "" {
+		contentLines = append(contentLines, status)
+	}
+
+	style := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Padding(1, 2)
+	return m.renderCenteredContent(style.Render(strings.Join(contentLines, "\n")))
+}
+
 func (m model) renderDeviceAuthModal() string {
 	if m.deviceAuth == nil {
 		return ""
@@ -855,6 +970,53 @@ func finishedLabel(done bool) string {
 		return "Finished"
 	}
 	return "Unfinished"
+}
+
+func (m model) libraryVisibilityLabel(bookID string) string {
+	if !m.shouldRunSync() {
+		return "Cloud: Local only"
+	}
+	if !m.libraryVisLoaded {
+		if m.libraryVisLoading {
+			return "Cloud: Loading..."
+		}
+		return "Cloud: Unknown"
+	}
+	if isPublic, ok := m.libraryVisibility[bookID]; ok {
+		if isPublic {
+			return "Cloud: Public"
+		}
+		if !m.libraryPublishable[bookID] {
+			return "Cloud: Synced, no file"
+		}
+		return "Cloud: Private"
+	}
+	return "Cloud: Not synced"
+}
+
+func communityBookFormat(mimeType string) string {
+	mimeType = strings.TrimSpace(strings.ToLower(mimeType))
+	switch mimeType {
+	case "application/epub+zip":
+		return "EPUB"
+	case "application/pdf":
+		return "PDF"
+	default:
+		if mimeType == "" {
+			return "Unknown"
+		}
+		return mimeType
+	}
+}
+
+func humanSize(sizeBytes int64) string {
+	if sizeBytes < 1024 {
+		return fmt.Sprintf("%d B", sizeBytes)
+	}
+	if sizeBytes < 1024*1024 {
+		return fmt.Sprintf("%.1f KB", float64(sizeBytes)/1024)
+	}
+	return fmt.Sprintf("%.1f MB", float64(sizeBytes)/(1024*1024))
 }
 
 func (m model) renderPinnedLayout(headerLines []string, body string, footerLines []string) string {

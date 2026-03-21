@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -15,14 +17,20 @@ import (
 )
 
 type SyncResult struct {
-	SyncedBooks  int
-	SyncedStates int
-	SkippedBooks int
+	SyncedBooks     int
+	SyncedStates    int
+	SkippedBooks    int
+	UploadedFiles   int
+	UploadFailures  int
+	LastUploadError string
 }
 
 type SyncRemoteClient interface {
 	CreateCatalogBook(ctx context.Context, accessToken, title, authors string) (remote.BookCatalog, error)
 	UpsertLibraryBook(ctx context.Context, accessToken, catalogBookID string) (remote.UserLibraryBook, error)
+	ListLibraryBooks(ctx context.Context, accessToken string) ([]remote.UserLibraryBook, error)
+	UploadBookAsset(ctx context.Context, accessToken, catalogBookID, filePath string) (remote.BookAsset, error)
+	UpdateLibraryBookPreferredAsset(ctx context.Context, accessToken, libraryBookID, preferredAssetID string) (remote.UserLibraryBook, error)
 	UpsertReadingState(ctx context.Context, accessToken, libraryBookID, mode string, locator map[string]any, progressPercent float64) error
 }
 
@@ -80,10 +88,32 @@ func (s *SyncService) ReconcileNow(ctx context.Context) (SyncResult, error) {
 
 	result := SyncResult{}
 	accessToken := session.AccessToken
+	remoteLibraryBooks, err := s.remote.ListLibraryBooks(ctx, accessToken)
+	if err != nil {
+		return result, fmt.Errorf("list remote library books: %w", err)
+	}
+	remoteLibraryBooksByID := make(map[string]remote.UserLibraryBook, len(remoteLibraryBooks))
+	for _, remoteBook := range remoteLibraryBooks {
+		remoteLibraryBooksByID[remoteBook.ID] = remoteBook
+	}
+
 	for _, book := range books {
 		link, err := s.links.GetByLocalBookID(ctx, book.ID)
 		switch {
 		case err == nil:
+			remoteBook, ok := remoteLibraryBooksByID[link.RemoteLibraryBookID]
+			if !ok {
+				remoteBook, err = s.remote.UpsertLibraryBook(ctx, accessToken, link.RemoteCatalogBookID)
+				if err != nil {
+					return result, fmt.Errorf("restore remote library book for %q: %w", book.Title, err)
+				}
+			}
+			if uploaded, uploadErr := s.ensureRemoteAsset(ctx, accessToken, book, remoteBook); uploadErr != nil {
+				result.UploadFailures++
+				result.LastUploadError = uploadErr.Error()
+			} else if uploaded {
+				result.UploadedFiles++
+			}
 			pushedStates, pushErr := s.pushReadingStates(ctx, accessToken, book.ID, link.RemoteLibraryBookID)
 			if pushErr != nil {
 				return result, pushErr
@@ -118,6 +148,13 @@ func (s *SyncService) ReconcileNow(ctx context.Context) (SyncResult, error) {
 			return result, fmt.Errorf("persist sync link for %q: %w", book.Title, err)
 		}
 
+		if uploaded, uploadErr := s.ensureRemoteAsset(ctx, accessToken, book, libraryBook); uploadErr != nil {
+			result.UploadFailures++
+			result.LastUploadError = uploadErr.Error()
+		} else if uploaded {
+			result.UploadedFiles++
+		}
+
 		pushedStates, pushErr := s.pushReadingStates(ctx, accessToken, book.ID, libraryBook.ID)
 		if pushErr != nil {
 			return result, pushErr
@@ -141,6 +178,52 @@ func (s *SyncService) ReconcileNow(ctx context.Context) (SyncResult, error) {
 	}
 
 	return result, nil
+}
+
+func (s *SyncService) ensureRemoteAsset(ctx context.Context, accessToken string, book domain.Book, libraryBook remote.UserLibraryBook) (bool, error) {
+	if libraryBook.PreferredAssetID != nil && strings.TrimSpace(*libraryBook.PreferredAssetID) != "" {
+		return false, nil
+	}
+
+	filePath, err := localSyncFilePath(book)
+	if err != nil {
+		return false, fmt.Errorf("prepare upload for %q: %w", book.Title, err)
+	}
+
+	asset, err := s.remote.UploadBookAsset(ctx, accessToken, libraryBook.CatalogBookID, filePath)
+	if err != nil {
+		return false, fmt.Errorf("upload file for %q: %w", book.Title, err)
+	}
+
+	targetLibraryBookID := libraryBook.ID
+	if strings.TrimSpace(libraryBook.ID) != "" {
+		targetLibraryBookID = libraryBook.ID
+	}
+	if _, err := s.remote.UpdateLibraryBookPreferredAsset(ctx, accessToken, targetLibraryBookID, asset.ID); err != nil {
+		return false, fmt.Errorf("attach uploaded file for %q: %w", book.Title, err)
+	}
+	return true, nil
+}
+
+func localSyncFilePath(book domain.Book) (string, error) {
+	candidates := []string{
+		strings.TrimSpace(book.ManagedPath),
+		strings.TrimSpace(book.SourcePath),
+	}
+	for _, candidate := range candidates {
+		if candidate == "" {
+			continue
+		}
+		info, err := os.Stat(candidate)
+		if err != nil {
+			continue
+		}
+		if info.IsDir() {
+			continue
+		}
+		return filepath.Clean(candidate), nil
+	}
+	return "", fmt.Errorf("local file not found")
 }
 
 func (s *SyncService) pushReadingStates(ctx context.Context, accessToken, localBookID, remoteLibraryBookID string) (int, error) {

@@ -42,8 +42,35 @@ func (m *model) handleLibraryKey(msg tea.KeyMsg) tea.Cmd {
 		if ok {
 			m.openRemoveModal(book)
 		}
+	case "p":
+		if !m.shouldRunSync() {
+			m.setStatusDefault("Connect first to change book visibility")
+			return nil
+		}
+		book, ok := m.selectedBook()
+		if !ok {
+			return nil
+		}
+		if !m.libraryVisLoaded {
+			if m.libraryVisLoading {
+				m.setStatusDefault("Loading cloud visibility...")
+				return nil
+			}
+			m.setStatusDefault("Loading cloud visibility...")
+			return m.loadLibraryVisibilityCmd()
+		}
+		isPublic, ok := m.libraryVisibility[book.ID]
+		if !ok {
+			m.setStatusDefault("Book must be synced before changing visibility")
+			return nil
+		}
+		if !isPublic && !m.libraryPublishable[book.ID] {
+			m.setStatusDefault("This book cannot be public yet because it has no cloud file")
+			return nil
+		}
+		m.openVisibilityConfirm(book, !isPublic)
 	case "?":
-		m.setStatusDefault("Library: Tab/Shift+Tab switch views  / search  a add  Enter open  r remove")
+		m.setStatusDefault("Library: Tab/Shift+Tab switch views  / search  a add  Enter open  p public/private  r remove")
 	}
 	return nil
 }
@@ -217,6 +244,35 @@ func (m *model) openRemoveModal(book domain.Book) {
 
 func (m *model) closeRemoveModal() {
 	m.remove = nil
+}
+
+func (m *model) openVisibilityConfirm(book domain.Book, nextPublic bool) {
+	m.visibilityConfirm = &visibilityConfirmState{
+		bookID:     book.ID,
+		bookTitle:  book.Title,
+		nextPublic: nextPublic,
+	}
+}
+
+func (m *model) closeVisibilityConfirm() {
+	m.visibilityConfirm = nil
+}
+
+func (m *model) handleVisibilityConfirmKey(msg tea.KeyMsg) tea.Cmd {
+	if m.visibilityConfirm == nil {
+		return nil
+	}
+
+	switch msg.String() {
+	case "esc", "q":
+		m.closeVisibilityConfirm()
+		return nil
+	case "enter":
+		m.setStatusDefault("Updating cloud visibility...")
+		return m.toggleLibraryVisibilityCmd(m.visibilityConfirm.bookID, m.visibilityConfirm.nextPublic)
+	}
+
+	return nil
 }
 
 func (m *model) handleRemoveKey(msg tea.KeyMsg) {

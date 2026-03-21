@@ -30,5 +30,6 @@ type SyncAccountRepository interface {
 
 type SyncBookLinkRepository interface {
 	GetByLocalBookID(ctx context.Context, localBookID string) (domain.SyncBookLink, error)
+	ListBookLinks(ctx context.Context) ([]domain.SyncBookLink, error)
 	UpsertBookLink(ctx context.Context, link domain.SyncBookLink) error
 }

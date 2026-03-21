@@ -16,6 +16,7 @@ import (
 	"github.com/jeheskielSunloy77/kern/tui/internal/application"
 	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
 	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/config"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/remote"
 	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/repository"
 	"github.com/jeheskielSunloy77/kern/tui/internal/reader"
 )
@@ -53,6 +54,7 @@ type promptKind int
 const (
 	promptNone promptKind = iota
 	promptLibrarySearch
+	promptCommunitySearch
 	promptReaderSearch
 	promptGotoPage
 	promptGotoPercent
@@ -89,6 +91,12 @@ type removeState struct {
 	value       string
 }
 
+type visibilityConfirmState struct {
+	bookID     string
+	bookTitle  string
+	nextPublic bool
+}
+
 type browserEntry struct {
 	name  string
 	path  string
@@ -123,6 +131,35 @@ const (
 
 type settingsSaveMsg struct {
 	sequence int
+}
+
+type communityBooksLoadedMsg struct {
+	books  []remote.CommunityBook
+	total  int
+	offset int
+	query  string
+	err    error
+}
+
+type communityBookLoadedMsg struct {
+	book remote.CommunityBook
+	err  error
+}
+
+type communityBookSavedMsg struct {
+	book remote.UserLibraryBook
+	err  error
+}
+
+type libraryVisibilityLoadedMsg struct {
+	visibility map[string]application.LibrarySharingSummary
+	err        error
+}
+
+type libraryVisibilityToggledMsg struct {
+	localBookID string
+	isPublic    bool
+	err         error
 }
 
 type model struct {
@@ -164,7 +201,22 @@ type model struct {
 	importCancel    context.CancelFunc
 	importEvents    <-chan tea.Msg
 
-	remove *removeState
+	remove            *removeState
+	visibilityConfirm *visibilityConfirmState
+
+	libraryVisibility  map[string]bool
+	libraryPublishable map[string]bool
+	libraryVisLoaded   bool
+	libraryVisLoading  bool
+
+	communityBooks    []remote.CommunityBook
+	communitySelected int
+	communityQuery    string
+	communityTotal    int
+	communityOffset   int
+	communityLoading  bool
+	communityDetail   *remote.CommunityBook
+	communitySaving   bool
 
 	readerBook          domain.Book
 	readerMode          domain.ReadingMode
@@ -191,15 +243,17 @@ type model struct {
 
 func New(container *application.Container) tea.Model {
 	m := model{
-		container:       container,
-		currentView:     viewLibrary,
-		addManagedCopy:  true,
-		addStep:         addStepChooseSource,
-		addSourceMethod: addSourcePath,
-		libraryProgress: map[string]float64{},
-		libraryFinished: map[string]bool{},
-		connectionLabel: "Local-only",
-		syncInterval:    2 * time.Minute,
+		container:          container,
+		currentView:        viewLibrary,
+		addManagedCopy:     true,
+		addStep:            addStepChooseSource,
+		addSourceMethod:    addSourcePath,
+		libraryProgress:    map[string]float64{},
+		libraryFinished:    map[string]bool{},
+		libraryVisibility:  map[string]bool{},
+		libraryPublishable: map[string]bool{},
+		connectionLabel:    "Local-only",
+		syncInterval:       2 * time.Minute,
 	}
 
 	if container != nil {
@@ -280,7 +334,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 		if m.shouldRunSync() {
-			return m, waitSyncTick(m.syncInterval)
+			return m, tea.Batch(
+				waitSyncTick(m.syncInterval),
+				m.loadLibraryVisibilityCmd(),
+			)
 		}
 		return m, nil
 
@@ -359,14 +416,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		if msg.triggeredByUser {
-			m.setStatusSuccess(fmt.Sprintf(
-				"Synced %d books, %d states (%d already linked)",
+			status := fmt.Sprintf(
+				"Synced %d books, %d states, uploaded %d files (%d already linked)",
 				msg.result.SyncedBooks,
 				msg.result.SyncedStates,
+				msg.result.UploadedFiles,
 				msg.result.SkippedBooks,
-			))
+			)
+			if msg.result.UploadFailures > 0 {
+				status = fmt.Sprintf("%s, %d uploads failed", status, msg.result.UploadFailures)
+				if msg.result.LastUploadError != "" {
+					status = fmt.Sprintf("%s: %s", status, msg.result.LastUploadError)
+				}
+				m.setStatusDefault(status)
+			} else {
+				m.setStatusSuccess(status)
+			}
 		}
-		return m, nil
+		return m, m.loadLibraryVisibilityCmd()
 
 	case deviceAuthStartMsg:
 		if msg.err != nil {
@@ -416,9 +483,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Batch(
 					m.syncNowCmd(true),
 					waitSyncTick(m.syncInterval),
+					m.loadLibraryVisibilityCmd(),
+					m.loadCommunityBooksCmd(true),
 				)
 			}
-			return m, nil
+			return m, tea.Batch(
+				m.loadLibraryVisibilityCmd(),
+				m.loadCommunityBooksCmd(true),
+			)
 		}
 
 		if time.Now().UTC().After(m.deviceAuth.ExpiresAt) {
@@ -436,6 +508,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.connectionLabel = "Local-only"
 		m.deviceAuth = nil
 		m.syncing = false
+		m.libraryVisibility = map[string]bool{}
+		m.libraryPublishable = map[string]bool{}
+		m.libraryVisLoaded = false
+		m.libraryVisLoading = false
+		m.communityBooks = nil
+		m.communitySelected = 0
+		m.communityTotal = 0
+		m.communityOffset = 0
+		m.communityDetail = nil
+		m.communityLoading = false
+		m.communitySaving = false
 		m.setStatusSuccess("Disconnected")
 		return m, nil
 
@@ -460,6 +543,79 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.closeProfileEditor()
 		m.setStatusSuccess("Username updated")
+		return m, nil
+
+	case communityBooksLoadedMsg:
+		m.communityLoading = false
+		if msg.err != nil {
+			m.communityBooks = nil
+			m.communityDetail = nil
+			m.communityTotal = 0
+			m.setStatusDestructive(fmt.Sprintf("Community load failed: %v", msg.err))
+			return m, nil
+		}
+		m.communityBooks = msg.books
+		m.communityQuery = msg.query
+		m.communityTotal = msg.total
+		m.communityOffset = msg.offset
+		if len(m.communityBooks) == 0 {
+			m.communitySelected = 0
+			m.communityDetail = nil
+			return m, nil
+		}
+		if m.communitySelected >= len(m.communityBooks) {
+			m.communitySelected = len(m.communityBooks) - 1
+		}
+		detail := m.communityBooks[m.communitySelected]
+		m.communityDetail = &detail
+		return m, nil
+
+	case communityBookLoadedMsg:
+		if msg.err != nil {
+			m.setStatusDestructive(fmt.Sprintf("Community detail failed: %v", msg.err))
+			return m, nil
+		}
+		book := msg.book
+		m.communityDetail = &book
+		return m, nil
+
+	case communityBookSavedMsg:
+		m.communitySaving = false
+		if msg.err != nil {
+			m.setStatusDestructive(fmt.Sprintf("Save failed: %v", msg.err))
+			return m, nil
+		}
+		m.setStatusSuccess("Saved to your cloud library")
+		return m, m.loadLibraryVisibilityCmd()
+
+	case libraryVisibilityLoadedMsg:
+		m.libraryVisLoading = false
+		if msg.err != nil {
+			m.libraryVisLoaded = false
+			m.setStatusDestructive(fmt.Sprintf("Failed to load cloud visibility: %v", msg.err))
+			return m, nil
+		}
+		m.libraryVisibility = make(map[string]bool, len(msg.visibility))
+		m.libraryPublishable = make(map[string]bool, len(msg.visibility))
+		for localBookID, summary := range msg.visibility {
+			m.libraryVisibility[localBookID] = summary.IsPublic
+			m.libraryPublishable[localBookID] = summary.CanPublish
+		}
+		m.libraryVisLoaded = true
+		return m, nil
+
+	case libraryVisibilityToggledMsg:
+		m.visibilityConfirm = nil
+		if msg.err != nil {
+			m.setStatusDestructive(fmt.Sprintf("Visibility update failed: %v", msg.err))
+			return m, nil
+		}
+		m.libraryVisibility[msg.localBookID] = msg.isPublic
+		if msg.isPublic {
+			m.setStatusSuccess("Book is now public")
+		} else {
+			m.setStatusSuccess("Book is now private")
+		}
 		return m, nil
 
 	case tea.QuitMsg:
@@ -494,19 +650,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
+		if m.visibilityConfirm != nil {
+			return m, m.handleVisibilityConfirmKey(msg)
+		}
+
 		if m.prompt != nil {
-			m.handlePromptKey(msg)
-			return m, nil
+			return m, m.handlePromptKey(msg)
 		}
 
 		if m.isMainNavView(m.currentView) {
 			switch msg.String() {
 			case "tab":
 				m.stepMainView(1)
-				return m, nil
+				return m, m.onMainViewChangedCmd()
 			case "shift+tab", "backtab":
 				m.stepMainView(-1)
-				return m, nil
+				return m, m.onMainViewChangedCmd()
 			}
 		}
 
@@ -628,35 +787,37 @@ func (m *model) closePrompt() {
 	m.prompt = nil
 }
 
-func (m *model) handlePromptKey(msg tea.KeyMsg) {
+func (m *model) handlePromptKey(msg tea.KeyMsg) tea.Cmd {
 	if m.prompt == nil {
-		return
+		return nil
 	}
 
 	switch msg.String() {
 	case "esc":
 		m.closePrompt()
-		return
+		return nil
 	case "enter":
-		m.applyPrompt()
+		cmd := m.applyPrompt()
 		m.closePrompt()
-		return
+		return cmd
 	case "backspace":
 		if len(m.prompt.value) > 0 {
 			runes := []rune(m.prompt.value)
 			m.prompt.value = string(runes[:len(runes)-1])
 		}
-		return
+		return nil
 	}
 
 	if len(msg.Runes) > 0 {
 		m.prompt.value += string(msg.Runes)
 	}
+
+	return nil
 }
 
-func (m *model) applyPrompt() {
+func (m *model) applyPrompt() tea.Cmd {
 	if m.prompt == nil {
-		return
+		return nil
 	}
 
 	value := strings.TrimSpace(m.prompt.value)
@@ -666,6 +827,9 @@ func (m *model) applyPrompt() {
 		if err := m.refreshLibrary(); err != nil {
 			m.setStatusDestructive(fmt.Sprintf("Search failed: %v", err))
 		}
+	case promptCommunitySearch:
+		m.communityQuery = value
+		return m.loadCommunityBooksCmd(true)
 	case promptReaderSearch:
 		m.applyReaderSearch(value)
 	case promptGotoPage:
@@ -673,6 +837,8 @@ func (m *model) applyPrompt() {
 	case promptGotoPercent:
 		m.applyGoToPercent(value)
 	}
+
+	return nil
 }
 
 func (m *model) requestQuitCmd() tea.Cmd {
@@ -714,6 +880,10 @@ func (m model) View() string {
 
 	if m.remove != nil {
 		return m.renderRemoveModal()
+	}
+
+	if m.visibilityConfirm != nil {
+		return m.renderVisibilityConfirmModal()
 	}
 
 	if m.deviceAuth != nil {
@@ -817,4 +987,118 @@ func (m model) shouldRunSync() bool {
 		return false
 	}
 	return m.container.Auth.IsConnected()
+}
+
+func (m *model) onMainViewChangedCmd() tea.Cmd {
+	if m.currentView != viewLibrary && m.currentView != viewCommunities {
+		return nil
+	}
+	if !m.shouldRunSync() {
+		return nil
+	}
+
+	cmds := make([]tea.Cmd, 0, 2)
+	if !m.libraryVisLoaded && !m.libraryVisLoading {
+		cmds = append(cmds, m.loadLibraryVisibilityCmd())
+	}
+	if m.currentView == viewCommunities && !m.communityLoading && len(m.communityBooks) == 0 {
+		cmds = append(cmds, m.loadCommunityBooksCmd(false))
+	}
+	if len(cmds) == 0 {
+		return nil
+	}
+	return tea.Batch(cmds...)
+}
+
+func (m *model) loadCommunityBooksCmd(force bool) tea.Cmd {
+	if m.communityLoading {
+		return nil
+	}
+	if !force && len(m.communityBooks) > 0 {
+		return nil
+	}
+	if m.container == nil || m.container.Community == nil || !m.container.Community.Enabled() {
+		return nil
+	}
+
+	m.communityLoading = true
+	query := strings.TrimSpace(m.communityQuery)
+	return func() tea.Msg {
+		books, total, err := m.container.Community.ListBooks(context.Background(), query, 20, 0)
+		return communityBooksLoadedMsg{
+			books:  books,
+			total:  total,
+			offset: 0,
+			query:  query,
+			err:    err,
+		}
+	}
+}
+
+func (m *model) loadCommunityDetailCmd(bookID string) tea.Cmd {
+	if m.container == nil || m.container.Community == nil || !m.container.Community.Enabled() {
+		return nil
+	}
+	bookID = strings.TrimSpace(bookID)
+	if bookID == "" {
+		return nil
+	}
+
+	return func() tea.Msg {
+		book, err := m.container.Community.GetBook(context.Background(), bookID)
+		return communityBookLoadedMsg{book: book, err: err}
+	}
+}
+
+func (m *model) saveCommunityBookCmd(bookID string) tea.Cmd {
+	if m.communitySaving {
+		return nil
+	}
+	if m.container == nil || m.container.Community == nil || !m.container.Community.Enabled() {
+		return nil
+	}
+	bookID = strings.TrimSpace(bookID)
+	if bookID == "" {
+		return nil
+	}
+
+	m.communitySaving = true
+	return func() tea.Msg {
+		book, err := m.container.Community.SaveBook(context.Background(), bookID)
+		return communityBookSavedMsg{book: book, err: err}
+	}
+}
+
+func (m *model) loadLibraryVisibilityCmd() tea.Cmd {
+	if m.libraryVisLoading {
+		return nil
+	}
+	if m.container == nil || m.container.Community == nil || !m.container.Community.Enabled() {
+		return nil
+	}
+
+	m.libraryVisLoading = true
+	return func() tea.Msg {
+		visibility, err := m.container.Community.LoadLibraryVisibility(context.Background())
+		return libraryVisibilityLoadedMsg{visibility: visibility, err: err}
+	}
+}
+
+func (m *model) toggleLibraryVisibilityCmd(localBookID string, nextPublic bool) tea.Cmd {
+	if m.container == nil || m.container.Community == nil || !m.container.Community.Enabled() {
+		return nil
+	}
+	localBookID = strings.TrimSpace(localBookID)
+	if localBookID == "" {
+		return nil
+	}
+
+	return func() tea.Msg {
+		isPublic, err := m.container.Community.ToggleLibraryBookVisibility(context.Background(), localBookID, nextPublic)
+		return libraryVisibilityToggledMsg{
+			localBookID: localBookID,
+			isPublic:    isPublic,
+			err:         err,
+		}
+	}
 }
