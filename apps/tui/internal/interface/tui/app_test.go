@@ -16,6 +16,7 @@ import (
 	"github.com/jeheskielSunloy77/kern/tui/internal/domain"
 	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/config"
 	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/database"
+	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/remote"
 	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/repository"
 	"github.com/jeheskielSunloy77/kern/tui/internal/infrastructure/storage"
 	"github.com/jeheskielSunloy77/kern/tui/internal/preprocessing"
@@ -720,6 +721,55 @@ func TestAccountEnterOnEditProfileOpensModal(t *testing.T) {
 	}
 }
 
+func TestImportDoneTriggersSyncWhenConnectedAndIdle(t *testing.T) {
+	container := newConnectedSyncTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+
+	updated, cmd := m.Update(importDoneMsg{book: domain.Book{Title: "Auto Sync"}})
+	after := updated.(model)
+
+	if !after.syncing {
+		t.Fatalf("expected syncing state true after successful import while connected")
+	}
+	if cmd == nil {
+		t.Fatalf("expected sync command after successful import while connected")
+	}
+}
+
+func TestImportDoneDoesNotTriggerSyncWhenDisconnected(t *testing.T) {
+	container := newTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+
+	updated, cmd := m.Update(importDoneMsg{book: domain.Book{Title: "No Sync"}})
+	after := updated.(model)
+
+	if after.syncing {
+		t.Fatalf("expected syncing state false while disconnected")
+	}
+	if cmd != nil {
+		t.Fatalf("expected no sync command while disconnected")
+	}
+}
+
+func TestImportDoneDoesNotEnqueueSyncWhenAlreadySyncing(t *testing.T) {
+	container := newConnectedSyncTestContainer(t)
+	m := New(container).(model)
+	m.startupCompleted = true
+	m.syncing = true
+
+	updated, cmd := m.Update(importDoneMsg{book: domain.Book{Title: "Already Syncing"}})
+	after := updated.(model)
+
+	if !after.syncing {
+		t.Fatalf("expected syncing state to remain true")
+	}
+	if cmd != nil {
+		t.Fatalf("expected no new sync command when sync is already in progress")
+	}
+}
+
 func TestProfileEditorEscClosesModal(t *testing.T) {
 	container := newTestContainer(t)
 	m := New(container).(model)
@@ -1019,6 +1069,74 @@ func newTestContainer(t *testing.T) *application.Container {
 		Library: application.NewLibraryService(bookRepo, stateRepo, registry, paths),
 		Reader:  application.NewReaderService(bookRepo, stateRepo, paths),
 	}
+}
+
+func newConnectedSyncTestContainer(t *testing.T) *application.Container {
+	t.Helper()
+
+	container := newTestContainer(t)
+	session := remote.Session{
+		User: remote.User{
+			ID:       "user-1",
+			Email:    "tester@example.com",
+			Username: "tester",
+		},
+		AccessToken:      "access-token",
+		AccessExpiresAt:  time.Now().UTC().Add(1 * time.Hour),
+		RefreshToken:     "refresh-token",
+		RefreshExpiresAt: time.Now().UTC().Add(24 * time.Hour),
+	}
+	payload, err := json.Marshal(session)
+	if err != nil {
+		t.Fatalf("marshal test session: %v", err)
+	}
+	sessionPath := filepath.Join(container.Paths.BaseDir, "auth-session.json")
+	if err := os.WriteFile(sessionPath, payload, 0o600); err != nil {
+		t.Fatalf("write test session: %v", err)
+	}
+
+	auth, err := application.NewAuthService(container.Config, container.Paths)
+	if err != nil {
+		t.Fatalf("create auth service: %v", err)
+	}
+	syncRepo := repository.NewSyncRepository(container.DB)
+	syncService := application.NewSyncService(
+		auth,
+		container.Library,
+		syncRepo,
+		syncRepo,
+		noopSyncRemoteClient{},
+	)
+
+	container.Auth = auth
+	container.Sync = syncService
+	return container
+}
+
+type noopSyncRemoteClient struct{}
+
+func (noopSyncRemoteClient) CreateCatalogBook(_ context.Context, _, _, _ string) (remote.BookCatalog, error) {
+	return remote.BookCatalog{ID: "catalog-book"}, nil
+}
+
+func (noopSyncRemoteClient) UpsertLibraryBook(_ context.Context, _, catalogBookID string) (remote.UserLibraryBook, error) {
+	return remote.UserLibraryBook{ID: "library-book", CatalogBookID: catalogBookID}, nil
+}
+
+func (noopSyncRemoteClient) ListLibraryBooks(_ context.Context, _ string) ([]remote.UserLibraryBook, error) {
+	return []remote.UserLibraryBook{}, nil
+}
+
+func (noopSyncRemoteClient) UploadBookAsset(_ context.Context, _, catalogBookID, _ string) (remote.BookAsset, error) {
+	return remote.BookAsset{ID: "asset", CatalogBookID: catalogBookID}, nil
+}
+
+func (noopSyncRemoteClient) UpdateLibraryBookPreferredAsset(_ context.Context, _, libraryBookID, _ string) (remote.UserLibraryBook, error) {
+	return remote.UserLibraryBook{ID: libraryBookID, CatalogBookID: "catalog-book"}, nil
+}
+
+func (noopSyncRemoteClient) UpsertReadingState(_ context.Context, _, _, _ string, _ map[string]any, _ float64) error {
+	return nil
 }
 
 func seedBookWithEPUBCache(t *testing.T, container *application.Container, id string, sourcePath string) domain.Book {

@@ -373,6 +373,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			m.currentView = viewLibrary
 		}
+
+		if m.shouldRunSync() && !m.syncing {
+			m.syncing = true
+			return m, tea.Batch(
+				m.syncNowCmd(true),
+				waitSyncTick(m.syncInterval),
+			)
+		}
 		return m, nil
 
 	case importChannelClosedMsg:
