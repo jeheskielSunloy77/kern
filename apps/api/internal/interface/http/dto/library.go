@@ -143,3 +143,89 @@ func (d *UpdateHighlightRequest) ToUsecase() applicationdto.UpdateHighlightInput
 		Visibility:  d.Visibility,
 	}
 }
+
+type CreateBookmarkRequest struct {
+	Mode        string         `json:"mode" validate:"required,oneof=epub"`
+	LocatorJSON map[string]any `json:"locatorJson"`
+	Label       *string        `json:"label" validate:"omitempty,max=255"`
+}
+
+func (d *CreateBookmarkRequest) Validate() error {
+	return validator.New().Struct(d)
+}
+
+func (d *CreateBookmarkRequest) ToUsecase() applicationdto.CreateBookmarkInput {
+	encoded, _ := json.Marshal(d.LocatorJSON)
+	return applicationdto.CreateBookmarkInput{
+		Mode:        d.Mode,
+		LocatorJSON: encoded,
+		Label:       d.Label,
+	}
+}
+
+type UpdateBookmarkRequest struct {
+	LocatorJSON *map[string]any `json:"locatorJson"`
+	Label       *string         `json:"label" validate:"omitempty,max=255"`
+}
+
+func (d *UpdateBookmarkRequest) Validate() error {
+	return validator.New().Struct(d)
+}
+
+func (d *UpdateBookmarkRequest) ToUsecase() applicationdto.UpdateBookmarkInput {
+	var locator *json.RawMessage
+	if d.LocatorJSON != nil {
+		encoded, _ := json.Marshal(d.LocatorJSON)
+		raw := json.RawMessage(encoded)
+		locator = &raw
+	}
+	return applicationdto.UpdateBookmarkInput{
+		LocatorJSON: locator,
+		Label:       d.Label,
+	}
+}
+
+type CreateNoteRequest struct {
+	Mode        string         `json:"mode" validate:"required,oneof=epub"`
+	LocatorJSON map[string]any `json:"locatorJson"`
+	Excerpt     *string        `json:"excerpt" validate:"omitempty,max=2000"`
+	Content     string         `json:"content" validate:"required,min=1,max=10000"`
+}
+
+func (d *CreateNoteRequest) Validate() error {
+	return validator.New().Struct(d)
+}
+
+func (d *CreateNoteRequest) ToUsecase() applicationdto.CreateNoteInput {
+	encoded, _ := json.Marshal(d.LocatorJSON)
+	return applicationdto.CreateNoteInput{
+		Mode:        d.Mode,
+		LocatorJSON: encoded,
+		Excerpt:     d.Excerpt,
+		Content:     d.Content,
+	}
+}
+
+type UpdateNoteRequest struct {
+	LocatorJSON *map[string]any `json:"locatorJson"`
+	Excerpt     *string         `json:"excerpt" validate:"omitempty,max=2000"`
+	Content     *string         `json:"content" validate:"omitempty,min=1,max=10000"`
+}
+
+func (d *UpdateNoteRequest) Validate() error {
+	return validator.New().Struct(d)
+}
+
+func (d *UpdateNoteRequest) ToUsecase() applicationdto.UpdateNoteInput {
+	var locator *json.RawMessage
+	if d.LocatorJSON != nil {
+		encoded, _ := json.Marshal(d.LocatorJSON)
+		raw := json.RawMessage(encoded)
+		locator = &raw
+	}
+	return applicationdto.UpdateNoteInput{
+		LocatorJSON: locator,
+		Excerpt:     d.Excerpt,
+		Content:     d.Content,
+	}
+}

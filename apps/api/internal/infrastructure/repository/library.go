@@ -57,6 +57,16 @@ func (r *libraryRepository) CreateCatalogBook(ctx context.Context, book *domain.
 	return r.db.WithContext(ctx).Create(book).Error
 }
 
+func (r *libraryRepository) FindCatalogBookByChecksum(ctx context.Context, checksum string) (*domain.BookCatalog, error) {
+	var book domain.BookCatalog
+	if err := r.db.WithContext(ctx).
+		Where("identifiers ->> 'checksum' = ?", strings.TrimSpace(checksum)).
+		First(&book).Error; err != nil {
+		return nil, err
+	}
+	return &book, nil
+}
+
 func (r *libraryRepository) ListCatalogBooks(ctx context.Context, limit, offset int) ([]domain.BookCatalog, int64, error) {
 	var (
 		books []domain.BookCatalog
@@ -319,12 +329,17 @@ func (r *libraryRepository) CreateHighlight(ctx context.Context, highlight *doma
 	return r.db.WithContext(ctx).Create(highlight).Error
 }
 
-func (r *libraryRepository) ListHighlights(ctx context.Context, userID, userLibraryBookID uuid.UUID) ([]domain.Highlight, error) {
+func (r *libraryRepository) ListHighlights(ctx context.Context, userID, userLibraryBookID uuid.UUID, includeDeleted bool) ([]domain.Highlight, error) {
 	var highlights []domain.Highlight
-	err := r.db.WithContext(ctx).
-		Where("user_id = ? AND user_library_book_id = ? AND is_deleted = ?", userID, userLibraryBookID, false).
-		Order("created_at DESC").
-		Find(&highlights).Error
+	query := r.db.WithContext(ctx)
+	if includeDeleted {
+		query = query.Unscoped()
+	}
+	query = query.Where("user_id = ? AND user_library_book_id = ?", userID, userLibraryBookID)
+	if !includeDeleted {
+		query = query.Where("is_deleted = ?", false)
+	}
+	err := query.Order("created_at DESC").Find(&highlights).Error
 	if err != nil {
 		return nil, err
 	}
@@ -358,6 +373,132 @@ func (r *libraryRepository) DeleteHighlight(ctx context.Context, userID, id uuid
 		"updated_at": time.Now().UTC(),
 	}
 	result := r.db.WithContext(ctx).Model(&domain.Highlight{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (r *libraryRepository) CreateBookmark(ctx context.Context, bookmark *domain.Bookmark) error {
+	if bookmark.ID == uuid.Nil {
+		bookmark.ID = uuid.New()
+	}
+	if len(bookmark.LocatorJSON) == 0 {
+		bookmark.LocatorJSON = []byte("{}")
+	}
+	return r.db.WithContext(ctx).Create(bookmark).Error
+}
+
+func (r *libraryRepository) ListBookmarks(ctx context.Context, userID, userLibraryBookID uuid.UUID, includeDeleted bool) ([]domain.Bookmark, error) {
+	var bookmarks []domain.Bookmark
+	query := r.db.WithContext(ctx)
+	if includeDeleted {
+		query = query.Unscoped()
+	}
+	query = query.Where("user_id = ? AND user_library_book_id = ?", userID, userLibraryBookID)
+	if !includeDeleted {
+		query = query.Where("is_deleted = ?", false)
+	}
+	err := query.Order("created_at DESC").Find(&bookmarks).Error
+	if err != nil {
+		return nil, err
+	}
+	return bookmarks, nil
+}
+
+func (r *libraryRepository) GetBookmarkByID(ctx context.Context, userID, id uuid.UUID) (*domain.Bookmark, error) {
+	var bookmark domain.Bookmark
+	if err := r.db.WithContext(ctx).First(&bookmark, "id = ? AND user_id = ?", id, userID).Error; err != nil {
+		return nil, err
+	}
+	return &bookmark, nil
+}
+
+func (r *libraryRepository) UpdateBookmark(ctx context.Context, userID, id uuid.UUID, updates map[string]any) (*domain.Bookmark, error) {
+	updates["updated_at"] = time.Now().UTC()
+	result := r.db.WithContext(ctx).Model(&domain.Bookmark{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return r.GetBookmarkByID(ctx, userID, id)
+}
+
+func (r *libraryRepository) DeleteBookmark(ctx context.Context, userID, id uuid.UUID) error {
+	updates := map[string]any{
+		"is_deleted": true,
+		"deleted_at": time.Now().UTC(),
+		"updated_at": time.Now().UTC(),
+	}
+	result := r.db.WithContext(ctx).Model(&domain.Bookmark{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (r *libraryRepository) CreateNote(ctx context.Context, note *domain.Note) error {
+	if note.ID == uuid.Nil {
+		note.ID = uuid.New()
+	}
+	if len(note.LocatorJSON) == 0 {
+		note.LocatorJSON = []byte("{}")
+	}
+	return r.db.WithContext(ctx).Create(note).Error
+}
+
+func (r *libraryRepository) ListNotes(ctx context.Context, userID, userLibraryBookID uuid.UUID, includeDeleted bool) ([]domain.Note, error) {
+	var notes []domain.Note
+	query := r.db.WithContext(ctx)
+	if includeDeleted {
+		query = query.Unscoped()
+	}
+	query = query.Where("user_id = ? AND user_library_book_id = ?", userID, userLibraryBookID)
+	if !includeDeleted {
+		query = query.Where("is_deleted = ?", false)
+	}
+	err := query.Order("created_at DESC").Find(&notes).Error
+	if err != nil {
+		return nil, err
+	}
+	return notes, nil
+}
+
+func (r *libraryRepository) GetNoteByID(ctx context.Context, userID, id uuid.UUID) (*domain.Note, error) {
+	var note domain.Note
+	if err := r.db.WithContext(ctx).First(&note, "id = ? AND user_id = ?", id, userID).Error; err != nil {
+		return nil, err
+	}
+	return &note, nil
+}
+
+func (r *libraryRepository) UpdateNote(ctx context.Context, userID, id uuid.UUID, updates map[string]any) (*domain.Note, error) {
+	updates["updated_at"] = time.Now().UTC()
+	result := r.db.WithContext(ctx).Model(&domain.Note{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return r.GetNoteByID(ctx, userID, id)
+}
+
+func (r *libraryRepository) DeleteNote(ctx context.Context, userID, id uuid.UUID) error {
+	updates := map[string]any{
+		"is_deleted": true,
+		"deleted_at": time.Now().UTC(),
+		"updated_at": time.Now().UTC(),
+	}
+	result := r.db.WithContext(ctx).Model(&domain.Note{}).Where("id = ? AND user_id = ?", id, userID).Updates(updates)
 	if result.Error != nil {
 		return result.Error
 	}

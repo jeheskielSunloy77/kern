@@ -27,6 +27,7 @@ type stubAuthService struct {
 	loginFn              func(ctx context.Context, input applicationdto.LoginInput, userAgent, ipAddress string) (*application.AuthResult, error)
 	startGoogleAuthFn    func(ctx context.Context) (*application.GoogleAuthStart, error)
 	completeGoogleAuthFn func(ctx context.Context, code, state, stateCookie, userAgent, ipAddress string) (*application.AuthResult, error)
+	googleMobileLoginFn  func(ctx context.Context, input applicationdto.GoogleMobileLoginInput, userAgent, ipAddress string) (*application.AuthResult, error)
 	verifyEmailFn        func(ctx context.Context, input applicationdto.VerifyEmailInput) (*domain.User, error)
 	startDeviceAuthFn    func(ctx context.Context) (*application.DeviceAuthStartResult, error)
 	pollDeviceAuthFn     func(ctx context.Context, input applicationdto.DeviceAuthPollInput, userAgent, ipAddress string) (*application.DeviceAuthPollResult, error)
@@ -62,6 +63,13 @@ func (s *stubAuthService) StartGoogleAuth(ctx context.Context) (*application.Goo
 func (s *stubAuthService) CompleteGoogleAuth(ctx context.Context, code, state, stateCookie, userAgent, ipAddress string) (*application.AuthResult, error) {
 	if s.completeGoogleAuthFn != nil {
 		return s.completeGoogleAuthFn(ctx, code, state, stateCookie, userAgent, ipAddress)
+	}
+	return nil, nil
+}
+
+func (s *stubAuthService) LoginWithGoogleIDToken(ctx context.Context, input applicationdto.GoogleMobileLoginInput, userAgent, ipAddress string) (*application.AuthResult, error) {
+	if s.googleMobileLoginFn != nil {
+		return s.googleMobileLoginFn(ctx, input, userAgent, ipAddress)
 	}
 	return nil, nil
 }
@@ -188,10 +196,13 @@ func TestAuthHandlerRegister_Success(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, http.StatusCreated, resp.StatusCode)
 
-	var got domain.User
+	var got application.AuthResult
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&got))
-	require.Equal(t, userID, got.ID)
-	require.Equal(t, "user@example.com", got.Email)
+	require.NotNil(t, got.User)
+	require.Equal(t, userID, got.User.ID)
+	require.Equal(t, "user@example.com", got.User.Email)
+	require.Equal(t, "token", got.Token.Token)
+	require.Equal(t, "refresh", got.RefreshToken.Token)
 }
 
 // Ensures Login normalizes email identifiers and maps auth errors to HTTP responses.
@@ -297,6 +308,44 @@ func TestAuthHandlerGoogleCallback_RedirectsToSuccess(t *testing.T) {
 	cookieHeaders := strings.Join(resp.Header["Set-Cookie"], "; ")
 	require.Contains(t, cookieHeaders, "access_token=")
 	require.Contains(t, cookieHeaders, "refresh_token=")
+}
+
+// Ensures native Google login returns the auth payload without relying on cookies.
+func TestAuthHandlerGoogleMobile_Success(t *testing.T) {
+	srv := newTestServer()
+	app := newTestApp(srv)
+
+	userID := uuid.New()
+	authService := &stubAuthService{
+		googleMobileLoginFn: func(ctx context.Context, input applicationdto.GoogleMobileLoginInput, userAgent, ipAddress string) (*application.AuthResult, error) {
+			require.Equal(t, "google-id-token", input.IDToken)
+			return &application.AuthResult{
+				User:         &domain.User{ID: userID, Email: "reader@example.com"},
+				Token:        application.AuthToken{Token: "access", ExpiresAt: time.Now().Add(time.Hour)},
+				RefreshToken: application.AuthToken{Token: "refresh", ExpiresAt: time.Now().Add(24 * time.Hour)},
+			}, nil
+		},
+	}
+
+	h := NewAuthHandler(NewHandler(srv), authService)
+	app.Post("/google/mobile", h.GoogleMobile())
+
+	req, err := http.NewRequest(http.MethodPost, "/google/mobile", bytes.NewReader(mustJSON(t, map[string]any{
+		"idToken": "google-id-token",
+	})))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := app.Test(req)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var got application.AuthResult
+	require.NoError(t, json.NewDecoder(resp.Body).Decode(&got))
+	require.NotNil(t, got.User)
+	require.Equal(t, userID, got.User.ID)
+	require.Equal(t, "access", got.Token.Token)
+	require.Equal(t, "refresh", got.RefreshToken.Token)
 }
 
 // Ensures VerifyEmail validates required fields.
@@ -521,9 +570,10 @@ func TestAuthHandlerRefresh_Success(t *testing.T) {
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 	require.Equal(t, refreshToken, gotToken)
 
-	var got domain.User
+	var got application.AuthResult
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&got))
-	require.Equal(t, userID, got.ID)
+	require.NotNil(t, got.User)
+	require.Equal(t, userID, got.User.ID)
 
 	require.NotNil(t, cookieByName(resp.Cookies(), "access_token"))
 	require.NotNil(t, cookieByName(resp.Cookies(), "refresh_token"))

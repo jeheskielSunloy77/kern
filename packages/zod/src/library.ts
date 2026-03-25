@@ -71,6 +71,29 @@ export const ZHighlight = z
 	})
 	.extend(ZModel.shape)
 
+export const ZBookmark = z
+	.object({
+		userId: z.string().uuid(),
+		userLibraryBookId: z.string().uuid(),
+		mode: ZReadingMode,
+		locatorJson: z.record(z.string(), z.any()).default({}),
+		label: z.string().optional(),
+		isDeleted: z.boolean(),
+	})
+	.extend(ZModel.shape)
+
+export const ZNote = z
+	.object({
+		userId: z.string().uuid(),
+		userLibraryBookId: z.string().uuid(),
+		mode: ZReadingMode,
+		locatorJson: z.record(z.string(), z.any()).default({}),
+		excerpt: z.string().optional(),
+		content: z.string().min(1).max(10000),
+		isDeleted: z.boolean(),
+	})
+	.extend(ZModel.shape)
+
 export const ZCreateCatalogBookDTO = z.object({
 	title: z.string().min(1).max(255),
 	authors: z.string().max(1024).default(''),
@@ -116,9 +139,35 @@ export const ZUpdateHighlightDTO = z.object({
 	visibility: ZVisibility.optional(),
 })
 
+export const ZCreateBookmarkDTO = z.object({
+	mode: ZReadingMode,
+	locatorJson: z.record(z.string(), z.any()).default({}),
+	label: z.string().max(255).optional(),
+})
+
+export const ZUpdateBookmarkDTO = z.object({
+	locatorJson: z.record(z.string(), z.any()).optional(),
+	label: z.string().max(255).optional(),
+})
+
+export const ZCreateNoteDTO = z.object({
+	mode: ZReadingMode,
+	locatorJson: z.record(z.string(), z.any()).default({}),
+	excerpt: z.string().max(2000).optional(),
+	content: z.string().min(1).max(10000),
+})
+
+export const ZUpdateNoteDTO = z.object({
+	locatorJson: z.record(z.string(), z.any()).optional(),
+	excerpt: z.string().max(2000).optional(),
+	content: z.string().min(1).max(10000).optional(),
+})
+
 export const ZLibraryCatalogListResponse = ZPaginatedResponse(ZBookCatalog)
 export const ZLibraryBooksListResponse = ZPaginatedResponse(ZUserLibraryBook)
 export const ZLibraryHighlightsResponse = z.array(ZHighlight)
+export const ZLibraryBookmarksResponse = ZPaginatedResponse(ZBookmark)
+export const ZLibraryNotesResponse = ZPaginatedResponse(ZNote)
 
 export const ZLibraryDeleteResponse = ZResponse
 export const ZLibraryCatalogCreateResponse = ZResponseWithData(ZBookCatalog)
@@ -131,9 +180,21 @@ export const ZLibraryHighlightIDParams = z.object({
 	highlightId: z.string().uuid(),
 })
 
+export const ZLibraryBookmarkIDParams = z.object({
+	bookmarkId: z.string().uuid(),
+})
+
+export const ZLibraryNoteIDParams = z.object({
+	noteId: z.string().uuid(),
+})
+
 export const ZReadingStatePathParams = z.object({
 	id: z.string().uuid(),
 	mode: ZReadingMode,
 })
 
 export const ZLibraryListQuery = ZGetManyQuery
+
+export const ZAnnotationListQuery = z.object({
+	includeDeleted: z.coerce.boolean().optional(),
+})

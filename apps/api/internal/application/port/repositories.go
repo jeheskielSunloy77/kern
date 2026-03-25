@@ -39,6 +39,7 @@ type UserRepository interface {
 
 type LibraryRepository interface {
 	CreateCatalogBook(ctx context.Context, book *domain.BookCatalog) error
+	FindCatalogBookByChecksum(ctx context.Context, checksum string) (*domain.BookCatalog, error)
 	ListCatalogBooks(ctx context.Context, limit, offset int) ([]domain.BookCatalog, int64, error)
 	GetCatalogBookByID(ctx context.Context, id uuid.UUID) (*domain.BookCatalog, error)
 
@@ -58,10 +59,22 @@ type LibraryRepository interface {
 	GetReadingState(ctx context.Context, userID, userLibraryBookID uuid.UUID, mode string) (*domain.ReadingState, error)
 
 	CreateHighlight(ctx context.Context, highlight *domain.Highlight) error
-	ListHighlights(ctx context.Context, userID, userLibraryBookID uuid.UUID) ([]domain.Highlight, error)
+	ListHighlights(ctx context.Context, userID, userLibraryBookID uuid.UUID, includeDeleted bool) ([]domain.Highlight, error)
 	GetHighlightByID(ctx context.Context, userID, id uuid.UUID) (*domain.Highlight, error)
 	UpdateHighlight(ctx context.Context, userID, id uuid.UUID, updates map[string]any) (*domain.Highlight, error)
 	DeleteHighlight(ctx context.Context, userID, id uuid.UUID) error
+
+	CreateBookmark(ctx context.Context, bookmark *domain.Bookmark) error
+	ListBookmarks(ctx context.Context, userID, userLibraryBookID uuid.UUID, includeDeleted bool) ([]domain.Bookmark, error)
+	GetBookmarkByID(ctx context.Context, userID, id uuid.UUID) (*domain.Bookmark, error)
+	UpdateBookmark(ctx context.Context, userID, id uuid.UUID, updates map[string]any) (*domain.Bookmark, error)
+	DeleteBookmark(ctx context.Context, userID, id uuid.UUID) error
+
+	CreateNote(ctx context.Context, note *domain.Note) error
+	ListNotes(ctx context.Context, userID, userLibraryBookID uuid.UUID, includeDeleted bool) ([]domain.Note, error)
+	GetNoteByID(ctx context.Context, userID, id uuid.UUID) (*domain.Note, error)
+	UpdateNote(ctx context.Context, userID, id uuid.UUID, updates map[string]any) (*domain.Note, error)
+	DeleteNote(ctx context.Context, userID, id uuid.UUID) error
 
 	GetIdempotencyKey(ctx context.Context, userID uuid.UUID, operation, key string) (*domain.IdempotencyKey, error)
 	CreateIdempotencyKey(ctx context.Context, idempotency *domain.IdempotencyKey) error

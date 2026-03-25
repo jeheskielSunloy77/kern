@@ -215,7 +215,7 @@ func (h *LibraryHandler) ListHighlights() fiber.Handler {
 		if parseErr != nil {
 			return nil, parseErr
 		}
-		highlights, serviceErr := h.service.ListHighlights(c.UserContext(), userID, libraryBookID)
+		highlights, serviceErr := h.service.ListHighlights(c.UserContext(), userID, libraryBookID, shouldIncludeDeleted(c))
 		if serviceErr != nil {
 			return nil, serviceErr
 		}
@@ -279,4 +279,160 @@ func (h *LibraryHandler) DeleteHighlight() fiber.Handler {
 		}
 		return &resp, nil
 	}, http.StatusOK, &httpdto.Empty{})
+}
+
+func (h *LibraryHandler) ListBookmarks() fiber.Handler {
+	return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) ([]domain.Bookmark, error) {
+		userID, err := parseUserIDFromContext(c)
+		if err != nil {
+			return nil, err
+		}
+		libraryBookID, parseErr := httputils.ParseUUIDParam(c.Params("id"))
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		bookmarks, serviceErr := h.service.ListBookmarks(c.UserContext(), userID, libraryBookID, shouldIncludeDeleted(c))
+		if serviceErr != nil {
+			return nil, serviceErr
+		}
+		return bookmarks, nil
+	}, http.StatusOK, &httpdto.Empty{})
+}
+
+func (h *LibraryHandler) CreateBookmark() fiber.Handler {
+	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.CreateBookmarkRequest) (*domain.Bookmark, error) {
+		userID, err := parseUserIDFromContext(c)
+		if err != nil {
+			return nil, err
+		}
+		libraryBookID, parseErr := httputils.ParseUUIDParam(c.Params("id"))
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		bookmark, serviceErr := h.service.CreateBookmark(c.UserContext(), userID, libraryBookID, req.ToUsecase())
+		if serviceErr != nil {
+			return nil, serviceErr
+		}
+		return bookmark, nil
+	}, http.StatusCreated, &httpdto.CreateBookmarkRequest{})
+}
+
+func (h *LibraryHandler) UpdateBookmark() fiber.Handler {
+	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.UpdateBookmarkRequest) (*domain.Bookmark, error) {
+		userID, err := parseUserIDFromContext(c)
+		if err != nil {
+			return nil, err
+		}
+		bookmarkID, parseErr := httputils.ParseUUIDParam(c.Params("bookmarkId"))
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		bookmark, serviceErr := h.service.UpdateBookmark(c.UserContext(), userID, bookmarkID, req.ToUsecase())
+		if serviceErr != nil {
+			return nil, serviceErr
+		}
+		return bookmark, nil
+	}, http.StatusOK, &httpdto.UpdateBookmarkRequest{})
+}
+
+func (h *LibraryHandler) DeleteBookmark() fiber.Handler {
+	return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*response.Response[any], error) {
+		userID, err := parseUserIDFromContext(c)
+		if err != nil {
+			return nil, err
+		}
+		bookmarkID, parseErr := httputils.ParseUUIDParam(c.Params("bookmarkId"))
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		if serviceErr := h.service.DeleteBookmark(c.UserContext(), userID, bookmarkID); serviceErr != nil {
+			return nil, serviceErr
+		}
+		resp := response.Response[any]{
+			Message: "Bookmark deleted successfully.",
+			Status:  http.StatusOK,
+			Success: true,
+		}
+		return &resp, nil
+	}, http.StatusOK, &httpdto.Empty{})
+}
+
+func (h *LibraryHandler) ListNotes() fiber.Handler {
+	return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) ([]domain.Note, error) {
+		userID, err := parseUserIDFromContext(c)
+		if err != nil {
+			return nil, err
+		}
+		libraryBookID, parseErr := httputils.ParseUUIDParam(c.Params("id"))
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		notes, serviceErr := h.service.ListNotes(c.UserContext(), userID, libraryBookID, shouldIncludeDeleted(c))
+		if serviceErr != nil {
+			return nil, serviceErr
+		}
+		return notes, nil
+	}, http.StatusOK, &httpdto.Empty{})
+}
+
+func (h *LibraryHandler) CreateNote() fiber.Handler {
+	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.CreateNoteRequest) (*domain.Note, error) {
+		userID, err := parseUserIDFromContext(c)
+		if err != nil {
+			return nil, err
+		}
+		libraryBookID, parseErr := httputils.ParseUUIDParam(c.Params("id"))
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		note, serviceErr := h.service.CreateNote(c.UserContext(), userID, libraryBookID, req.ToUsecase())
+		if serviceErr != nil {
+			return nil, serviceErr
+		}
+		return note, nil
+	}, http.StatusCreated, &httpdto.CreateNoteRequest{})
+}
+
+func (h *LibraryHandler) UpdateNote() fiber.Handler {
+	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.UpdateNoteRequest) (*domain.Note, error) {
+		userID, err := parseUserIDFromContext(c)
+		if err != nil {
+			return nil, err
+		}
+		noteID, parseErr := httputils.ParseUUIDParam(c.Params("noteId"))
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		note, serviceErr := h.service.UpdateNote(c.UserContext(), userID, noteID, req.ToUsecase())
+		if serviceErr != nil {
+			return nil, serviceErr
+		}
+		return note, nil
+	}, http.StatusOK, &httpdto.UpdateNoteRequest{})
+}
+
+func (h *LibraryHandler) DeleteNote() fiber.Handler {
+	return Handle(h.Handler, func(c *fiber.Ctx, _ *httpdto.Empty) (*response.Response[any], error) {
+		userID, err := parseUserIDFromContext(c)
+		if err != nil {
+			return nil, err
+		}
+		noteID, parseErr := httputils.ParseUUIDParam(c.Params("noteId"))
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		if serviceErr := h.service.DeleteNote(c.UserContext(), userID, noteID); serviceErr != nil {
+			return nil, serviceErr
+		}
+		resp := response.Response[any]{
+			Message: "Note deleted successfully.",
+			Status:  http.StatusOK,
+			Success: true,
+		}
+		return &resp, nil
+	}, http.StatusOK, &httpdto.Empty{})
+}
+
+func shouldIncludeDeleted(c *fiber.Ctx) bool {
+	return strings.EqualFold(strings.TrimSpace(c.Query("includeDeleted")), "true")
 }

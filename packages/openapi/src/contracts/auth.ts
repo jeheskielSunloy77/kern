@@ -2,6 +2,7 @@ import {
 	ZAuthDeviceApproveDTO,
 	ZAuthDevicePollDTO,
 	ZAuthDevicePollResponse,
+	ZAuthGoogleMobileDTO,
 	ZAuthDeviceStartResponse,
 	ZAuthGoogleCallbackQuery,
 	ZAuthLoginDTO,
@@ -59,6 +60,17 @@ export const authContract = c.router({
 		query: ZAuthGoogleCallbackQuery,
 		responses: {
 			302: ZEmpty,
+		},
+	},
+	googleMobile: {
+		summary: 'Google mobile login',
+		description: 'Complete native mobile Google sign-in using an ID token.',
+		path: '/api/v1/auth/google/mobile',
+		method: 'POST',
+		body: ZAuthGoogleMobileDTO,
+		responses: {
+			200: ZAuthResult,
+			...failResponses,
 		},
 	},
 	deviceStart: {

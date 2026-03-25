@@ -53,3 +53,27 @@ type UpdateHighlightInput struct {
 	Excerpt     *string
 	Visibility  *string
 }
+
+type CreateBookmarkInput struct {
+	Mode        string
+	LocatorJSON json.RawMessage
+	Label       *string
+}
+
+type UpdateBookmarkInput struct {
+	LocatorJSON *json.RawMessage
+	Label       *string
+}
+
+type CreateNoteInput struct {
+	Mode        string
+	LocatorJSON json.RawMessage
+	Excerpt     *string
+	Content     string
+}
+
+type UpdateNoteInput struct {
+	LocatorJSON *json.RawMessage
+	Excerpt     *string
+	Content     *string
+}
