@@ -1,8 +1,7 @@
 import { PropsWithChildren } from 'react'
 
-import { Modal, Pressable } from 'react-native'
+import { Modal, Pressable, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Text, YStack } from 'tamagui'
 
 export function SheetModal({
 	visible,
@@ -21,16 +20,16 @@ export function SheetModal({
 			presentationStyle="pageSheet"
 			onRequestClose={onClose}
 		>
-			<SafeAreaView style={{ flex: 1, backgroundColor: '#f5eddc' }}>
-				<YStack flex={1} padding="$5" gap="$4">
+			<SafeAreaView style={{ flex: 1 }} className="bg-kern-surface">
+				<View className="flex-1 p-5 gap-4">
 					<Pressable onPress={onClose}>
-						<Text color="$accentSolid">Close</Text>
+						<Text className="text-kern-primary font-ui">Close</Text>
 					</Pressable>
-					<Text fontFamily="$heading" fontSize="$7" color="$ink">
+					<Text className="font-heading text-[28px] text-kern-ink">
 						{title}
 					</Text>
 					{children}
-				</YStack>
+				</View>
 			</SafeAreaView>
 		</Modal>
 	)

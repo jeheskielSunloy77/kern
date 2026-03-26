@@ -5,7 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Linking, Modal, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSQLiteContext } from 'expo-sqlite'
-import { Input, ScrollView, Spinner, Text, XStack, YStack } from 'tamagui'
+import { TextInput, ScrollView, ActivityIndicator, Text, View } from 'react-native'
 
 import { Reader, useReader } from '@epubjs-react-native/core'
 import { useFileSystem } from '@epubjs-react-native/expo-file-system'
@@ -290,10 +290,10 @@ export function ReaderScreen() {
 	if (bookQuery.isLoading || prefsQuery.isLoading) {
 		return (
 			<ScreenShell>
-				<XStack alignItems="center" gap="$3">
-					<Spinner color="$accentSolid" />
-					<Text color="$muted">Opening your book...</Text>
-				</XStack>
+				<View className="flex-row" style={{ alignItems: "center" }} style={{ gap: 12 }}>
+					<ActivityIndicator color="#496360" />
+					<Text className="text-kern-muted">Opening your book...</Text>
+				</View>
 			</ScreenShell>
 		)
 	}
@@ -302,10 +302,10 @@ export function ReaderScreen() {
 		return (
 			<ScreenShell>
 				<PanelCard>
-					<Text color="$danger">This book could not be loaded.</Text>
+					<Text textClassName="text-kern-danger">This book could not be loaded.</Text>
 					<ActionButton
-						backgroundColor="$accentSoft"
-						color="$accent"
+						className="bg-kern-surface-container"
+						textClassName="text-kern-primary"
 						onPress={() => {
 							router.back()
 						}}
@@ -318,33 +318,33 @@ export function ReaderScreen() {
 	}
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#f5eddc' }}>
-			<YStack flex={1}>
-				<XStack
-					paddingHorizontal="$4"
-					paddingVertical="$3"
-					alignItems="center"
-					justifyContent="space-between"
-					backgroundColor="$background"
+		<SafeAreaView style={{ flex: 1, backgroundColor: '#faf9f5' }}>
+			<View className="flex-col" style={{ flex: 1 }}>
+				<View className="flex-row"
+					style={{ paddingHorizontal: 16 }}
+					style={{ paddingVertical: 12 }}
+					style={{ alignItems: "center" }}
+					style={{ justifyContent: "space-between" }}
+					className="bg-kern-surface"
 				>
-					<YStack flex={1} paddingRight="$3">
-						<Text fontFamily="$heading" fontSize="$6" color="$ink" numberOfLines={1}>
+					<View className="flex-col" style={{ flex: 1 }} style={{ paddingRight: 12 }}>
+						<Text className="font-heading" style={{ fontSize: 20 }} className="text-kern-ink" numberOfLines={1}>
 							{bookQuery.data.title}
 						</Text>
-						<Text color="$muted" numberOfLines={1}>
+						<Text className="text-kern-muted" numberOfLines={1}>
 							{section?.label || bookQuery.data.authors}
 						</Text>
-					</YStack>
+					</View>
 					<ActionButton
-						backgroundColor="$accentSoft"
-						color="$accent"
+						className="bg-kern-surface-container"
+						textClassName="text-kern-primary"
 						onPress={() => {
 							router.back()
 						}}
 					>
 						Close
 					</ActionButton>
-				</XStack>
+				</View>
 
 				<Reader
 					src={bookQuery.data.fileUri}
@@ -394,64 +394,64 @@ export function ReaderScreen() {
 						}, 900)
 					}}
 					renderOpeningBookComponent={() => (
-						<YStack flex={1} alignItems="center" justifyContent="center" gap="$3">
-							<Spinner color="$accentSolid" />
-							<Text color="$muted">Rendering your offline reader...</Text>
-						</YStack>
+						<View className="flex-col" style={{ flex: 1 }} style={{ alignItems: "center" }} style={{ justifyContent: "center" }} style={{ gap: 12 }}>
+							<ActivityIndicator color="#496360" />
+							<Text className="text-kern-muted">Rendering your offline reader...</Text>
+						</View>
 					)}
 				/>
 
-				<XStack
-					padding="$3"
-					backgroundColor="$background"
-					gap="$2"
-					flexWrap="wrap"
+				<View className="flex-row"
+					style={{ padding: 12 }}
+					className="bg-kern-surface"
+					style={{ gap: 8 }}
+					style={{ flexWrap: "wrap" }}
 				>
-					<ActionButton backgroundColor="$accentSoft" color="$accent" onPress={() => goPrevious()}>
+					<ActionButton className="bg-kern-surface-container" textClassName="text-kern-primary" onPress={() => goPrevious()}>
 						Prev
 					</ActionButton>
-					<ActionButton backgroundColor="$accentSoft" color="$accent" onPress={() => goNext()}>
+					<ActionButton className="bg-kern-surface-container" textClassName="text-kern-primary" onPress={() => goNext()}>
 						Next
 					</ActionButton>
-					<ActionButton backgroundColor="$accentSoft" color="$accent" onPress={() => setSearchSheetOpen(true)}>
+					<ActionButton className="bg-kern-surface-container" textClassName="text-kern-primary" onPress={() => setSearchSheetOpen(true)}>
 						Search
 					</ActionButton>
-					<ActionButton backgroundColor="$accentSoft" color="$accent" onPress={() => setNotesSheetOpen(true)}>
+					<ActionButton className="bg-kern-surface-container" textClassName="text-kern-primary" onPress={() => setNotesSheetOpen(true)}>
 						Notes
 					</ActionButton>
-					<ActionButton backgroundColor="$accentSoft" color="$accent" onPress={() => setPrefsSheetOpen(true)}>
+					<ActionButton className="bg-kern-surface-container" textClassName="text-kern-primary" onPress={() => setPrefsSheetOpen(true)}>
 						Aa
 					</ActionButton>
 					<ActionButton
-						backgroundColor={currentBookmarked ? '$accentSolid' : '$accentSoft'}
-						color={currentBookmarked ? 'white' : '$accent'}
+						className={currentBookmarked ? "bg-kern-primary" : "bg-kern-surface-container"}
+						textClassName={currentBookmarked ? "text-[#e0fef9]" : "text-kern-primary"}
 						onPress={() => {
 							void handleToggleBookmark()
 						}}
 					>
 						Bookmark
 					</ActionButton>
-				</XStack>
-			</YStack>
+				</View>
+			</View>
 
 			<SheetModal
 				visible={searchSheetOpen}
 				title="Search this book"
 				onClose={() => setSearchSheetOpen(false)}
 			>
-				<YStack gap="$3" flex={1}>
-					<Input
+				<View className="flex-col" style={{ gap: 12 }} style={{ flex: 1 }}>
+					<TextInput
 						value={searchTerm}
 						onChangeText={setSearchTerm}
 						placeholder="Find text inside the EPUB"
-						backgroundColor="$backgroundSoft"
-						borderColor="$borderColor"
-						color="$ink"
+						className="bg-kern-surface-container"
+						style={{ borderColor: "#cbe8e3", borderWidth: 1 }}
+						className="text-kern-ink"
 					/>
-					<XStack gap="$3">
+					<View className="flex-row" style={{ gap: 12 }}>
 						<ActionButton
-							backgroundColor="$accentSolid"
-							color="white"
+							className="bg-kern-primary"
+							textClassName="text-[#e0fef9]"
 							onPress={() => {
 								search(searchTerm)
 							}}
@@ -459,8 +459,8 @@ export function ReaderScreen() {
 							Run Search
 						</ActionButton>
 						<ActionButton
-							backgroundColor="$accentSoft"
-							color="$accent"
+							className="bg-kern-surface-container"
+							textClassName="text-kern-primary"
 							onPress={() => {
 								clearSearchResults()
 								setSearchTerm('')
@@ -468,9 +468,9 @@ export function ReaderScreen() {
 						>
 							Clear
 						</ActionButton>
-					</XStack>
+					</View>
 					<ScrollView>
-						<YStack gap="$3">
+						<View className="flex-col" style={{ gap: 12 }}>
 							{searchResults.results.map((result) => (
 								<Pressable
 									key={`${result.cfi}-${result.section.href}`}
@@ -480,16 +480,16 @@ export function ReaderScreen() {
 									}}
 								>
 									<PanelCard>
-										<Text fontFamily="$heading" color="$ink">
+										<Text className="font-heading" className="text-kern-ink">
 											{result.section.label}
 										</Text>
-										<Text color="$muted">{result.excerpt}</Text>
+										<Text className="text-kern-muted">{result.excerpt}</Text>
 									</PanelCard>
 								</Pressable>
 							))}
-						</YStack>
+						</View>
 					</ScrollView>
-				</YStack>
+				</View>
 			</SheetModal>
 
 			<SheetModal
@@ -498,35 +498,35 @@ export function ReaderScreen() {
 				onClose={() => setNotesSheetOpen(false)}
 			>
 				<ScrollView>
-					<YStack gap="$4">
+					<View className="flex-col" style={{ gap: 16 }}>
 						<PanelCard>
-							<Text fontFamily="$heading" fontSize="$6" color="$ink">
+							<Text className="font-heading" style={{ fontSize: 20 }} className="text-kern-ink">
 								Bookmarks
 							</Text>
 							{(bookmarksQuery.data ?? [])
 								.filter((bookmark) => !bookmark.isDeleted)
 								.map((bookmark) => (
 									<PanelCard key={bookmark.id}>
-										<Text color="$ink">{bookmark.label || 'Saved place'}</Text>
-										<Text color="$muted">
+										<Text className="text-kern-ink">{bookmark.label || 'Saved place'}</Text>
+										<Text className="text-kern-muted">
 											{String(bookmark.locator.href ?? bookmark.locator.cfi ?? '')}
 										</Text>
 									</PanelCard>
 								))}
 						</PanelCard>
 						<PanelCard>
-							<Text fontFamily="$heading" fontSize="$6" color="$ink">
+							<Text className="font-heading" style={{ fontSize: 20 }} className="text-kern-ink">
 								Highlights
 							</Text>
 							{(highlightsQuery.data ?? [])
 								.filter((highlight) => !highlight.isDeleted)
 								.map((highlight) => (
 									<PanelCard key={highlight.id}>
-										<Text color="$ink">{highlight.excerpt || 'Highlight'}</Text>
-										<XStack gap="$3">
+										<Text className="text-kern-ink">{highlight.excerpt || 'Highlight'}</Text>
+										<View className="flex-row" style={{ gap: 12 }}>
 											<ActionButton
-												backgroundColor="$accentSoft"
-												color="$accent"
+												className="bg-kern-surface-container"
+												textClassName="text-kern-primary"
 												onPress={() => {
 													const cfi = String(highlight.locator.cfiRange ?? highlight.locator.cfi ?? '')
 													if (cfi) {
@@ -538,32 +538,32 @@ export function ReaderScreen() {
 												Jump
 											</ActionButton>
 											<ActionButton
-												backgroundColor="$backgroundSoft"
-												color="$danger"
+												className="bg-kern-surface-container"
+												textClassName="text-kern-danger"
 												onPress={() => {
 													void removeHighlight(highlight)
 												}}
 											>
 												Delete
 											</ActionButton>
-										</XStack>
+										</View>
 									</PanelCard>
 								))}
 						</PanelCard>
 						<PanelCard>
-							<Text fontFamily="$heading" fontSize="$6" color="$ink">
+							<Text className="font-heading" style={{ fontSize: 20 }} className="text-kern-ink">
 								Notes
 							</Text>
 							{(notesQuery.data ?? [])
 								.filter((note) => !note.isDeleted)
 								.map((note) => (
 									<PanelCard key={note.id}>
-										<Text color="$ink">{note.content}</Text>
-										{note.excerpt ? <Text color="$muted">{note.excerpt}</Text> : null}
-										<XStack gap="$3" flexWrap="wrap">
+										<Text className="text-kern-ink">{note.content}</Text>
+										{note.excerpt ? <Text className="text-kern-muted">{note.excerpt}</Text> : null}
+										<View className="flex-row" style={{ gap: 12 }} style={{ flexWrap: "wrap" }}>
 											<ActionButton
-												backgroundColor="$accentSoft"
-												color="$accent"
+												className="bg-kern-surface-container"
+												textClassName="text-kern-primary"
 												onPress={() => {
 													const cfi = String(note.locator.cfiRange ?? note.locator.cfi ?? '')
 													if (cfi) {
@@ -575,8 +575,8 @@ export function ReaderScreen() {
 												Jump
 											</ActionButton>
 											<ActionButton
-												backgroundColor="$accentSoft"
-												color="$accent"
+												className="bg-kern-surface-container"
+												textClassName="text-kern-primary"
 												onPress={() => {
 													setNoteDraft({
 														mode: 'edit',
@@ -590,19 +590,19 @@ export function ReaderScreen() {
 												Edit
 											</ActionButton>
 											<ActionButton
-												backgroundColor="$backgroundSoft"
-												color="$danger"
+												className="bg-kern-surface-container"
+												textClassName="text-kern-danger"
 												onPress={() => {
 													void removeNote(note)
 												}}
 											>
 												Delete
 											</ActionButton>
-										</XStack>
+										</View>
 									</PanelCard>
 								))}
 						</PanelCard>
-					</YStack>
+					</View>
 				</ScrollView>
 			</SheetModal>
 
@@ -626,13 +626,13 @@ export function ReaderScreen() {
 				presentationStyle="formSheet"
 				onRequestClose={() => setNoteDraft(null)}
 			>
-				<SafeAreaView style={{ flex: 1, backgroundColor: '#f5eddc' }}>
-					<YStack flex={1} padding="$5" gap="$4">
-						<Text fontFamily="$heading" fontSize="$7" color="$ink">
+				<SafeAreaView style={{ flex: 1, backgroundColor: '#faf9f5' }}>
+					<View className="flex-col" style={{ flex: 1 }} style={{ padding: 20 }} style={{ gap: 16 }}>
+						<Text className="font-heading" style={{ fontSize: 24 }} className="text-kern-ink">
 							{noteDraft?.mode === 'edit' ? 'Edit note' : 'New note'}
 						</Text>
-						<Text color="$muted">{noteDraft?.excerpt}</Text>
-						<Input
+						<Text className="text-kern-muted">{noteDraft?.excerpt}</Text>
+						<TextInput
 							value={noteDraft?.content ?? ''}
 							onChangeText={(value) => {
 								setNoteDraft((current) => (current ? { ...current, content: value } : current))
@@ -640,14 +640,14 @@ export function ReaderScreen() {
 							multiline
 							numberOfLines={8}
 							textAlignVertical="top"
-							backgroundColor="$backgroundSoft"
-							borderColor="$borderColor"
-							color="$ink"
+							className="bg-kern-surface-container"
+							style={{ borderColor: "#cbe8e3", borderWidth: 1 }}
+							className="text-kern-ink"
 						/>
-						<XStack gap="$3">
+						<View className="flex-row" style={{ gap: 12 }}>
 							<ActionButton
-								backgroundColor="$accentSolid"
-								color="white"
+								className="bg-kern-primary"
+								textClassName="text-[#e0fef9]"
 								onPress={() => {
 									void saveNoteDraft()
 								}}
@@ -655,14 +655,14 @@ export function ReaderScreen() {
 								Save note
 							</ActionButton>
 							<ActionButton
-								backgroundColor="$accentSoft"
-								color="$accent"
+								className="bg-kern-surface-container"
+								textClassName="text-kern-primary"
 								onPress={() => setNoteDraft(null)}
 							>
 								Cancel
 							</ActionButton>
-						</XStack>
-					</YStack>
+						</View>
+					</View>
 				</SafeAreaView>
 			</Modal>
 		</SafeAreaView>
@@ -755,15 +755,15 @@ function PreferencesEditor({
 		})
 
 	return (
-		<YStack gap="$4">
+		<View className="flex-col" style={{ gap: 16 }}>
 			<PanelCard>
-				<Text color="$ink">Theme</Text>
-				<XStack gap="$3" flexWrap="wrap">
+				<Text className="text-kern-ink">Theme</Text>
+				<View className="flex-row" style={{ gap: 12 }} style={{ flexWrap: "wrap" }}>
 					{(['paper', 'sepia', 'night'] as const).map((theme) => (
 						<ActionButton
 							key={theme}
-							backgroundColor={preferences.theme === theme ? '$accentSolid' : '$accentSoft'}
-							color={preferences.theme === theme ? 'white' : '$accent'}
+							className={preferences.theme === theme ? "bg-kern-primary" : "bg-kern-surface-container"}
+							textClassName={preferences.theme === theme ? "text-[#e0fef9]" : "text-kern-primary"}
 							onPress={() => {
 								void update({ theme })
 							}}
@@ -771,15 +771,15 @@ function PreferencesEditor({
 							{theme}
 						</ActionButton>
 					))}
-				</XStack>
+				</View>
 			</PanelCard>
 
 			<PanelCard>
-				<Text color="$ink">Font size</Text>
-				<XStack gap="$3">
+				<Text className="text-kern-ink">Font size</Text>
+				<View className="flex-row" style={{ gap: 12 }}>
 					<ActionButton
-						backgroundColor="$accentSoft"
-						color="$accent"
+						className="bg-kern-surface-container"
+						textClassName="text-kern-primary"
 						onPress={() => {
 							void update({ fontScale: Math.max(80, preferences.fontScale - 10) })
 						}}
@@ -787,26 +787,26 @@ function PreferencesEditor({
 						Smaller
 					</ActionButton>
 					<ActionButton
-						backgroundColor="$accentSoft"
-						color="$accent"
+						className="bg-kern-surface-container"
+						textClassName="text-kern-primary"
 						onPress={() => {
 							void update({ fontScale: Math.min(160, preferences.fontScale + 10) })
 						}}
 					>
 						Larger
 					</ActionButton>
-				</XStack>
-				<Text color="$muted">{preferences.fontScale}%</Text>
+				</View>
+				<Text className="text-kern-muted">{preferences.fontScale}%</Text>
 			</PanelCard>
 
 			<PanelCard>
-				<Text color="$ink">Flow</Text>
-				<XStack gap="$3">
+				<Text className="text-kern-ink">Flow</Text>
+				<View className="flex-row" style={{ gap: 12 }}>
 					{(['paginated', 'scrolled-doc'] as ReaderFlow[]).map((flow) => (
 						<ActionButton
 							key={flow}
-							backgroundColor={preferences.flow === flow ? '$accentSolid' : '$accentSoft'}
-							color={preferences.flow === flow ? 'white' : '$accent'}
+							className={preferences.flow === flow ? "bg-kern-primary" : "bg-kern-surface-container"}
+							textClassName={preferences.flow === flow ? "text-[#e0fef9]" : "text-kern-primary"}
 							onPress={() => {
 								void update({ flow })
 							}}
@@ -814,8 +814,8 @@ function PreferencesEditor({
 							{flow}
 						</ActionButton>
 					))}
-				</XStack>
+				</View>
 			</PanelCard>
-		</YStack>
+		</View>
 	)
 }

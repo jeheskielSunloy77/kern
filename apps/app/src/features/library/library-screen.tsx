@@ -1,9 +1,8 @@
 import { useState } from 'react'
-
+import { ActivityIndicator, View, Text } from 'react-native'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Href, useRouter } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
-import { Spinner, Text, XStack, YStack } from 'tamagui'
 
 import { ActionButton } from '../../components/action-button'
 import { BookCard } from '../../components/book-card'
@@ -47,21 +46,20 @@ export function LibraryScreen() {
 
 	return (
 		<ScreenShell>
-			<YStack gap="$4">
-				<Text fontFamily="$heading" fontSize="$8" color="$ink">
-					Library
+			<View className="py-4 flex-col gap-1">
+				<Text className="font-heading text-4xl text-kern-ink">
+					My Library
 				</Text>
-				<Text color="$muted" fontSize="$5">
-					Your imported EPUB collection lives here. Open a title, continue where you
-					left off, or add something new.
+				<Text className="font-ui text-kern-muted">
+					{booksQuery.data ? `${booksQuery.data.length} Volumes Collected` : '... Volumes Collected'}
 				</Text>
-			</YStack>
+			</View>
 
 			<PanelCard>
-				<XStack gap="$3" flexWrap="wrap" alignItems="center">
+				<View className="flex-row gap-3 flex-wrap items-center">
 					<ActionButton
-						backgroundColor="$accentSolid"
-						color="white"
+						className="bg-kern-primary"
+						textClassName="text-[#e0fef9]"
 						onPress={() => {
 							void handleImport()
 						}}
@@ -69,26 +67,24 @@ export function LibraryScreen() {
 					>
 						{importing ? 'Importing...' : 'Import EPUB'}
 					</ActionButton>
-				</XStack>
-				<Text color="$muted">
+				</View>
+				<Text className="text-kern-muted font-ui leading-tight mt-1">
 					Books are sorted by your most recent reading activity so the next title is
 					always near the top.
 				</Text>
-				{importError ? <Text color="$danger">{importError}</Text> : null}
+				{importError ? <Text className="text-kern-danger font-ui">{importError}</Text> : null}
 			</PanelCard>
 
-			<PanelCard>
-				<Text fontFamily="$heading" fontSize="$7" color="$ink">
-					All books
-				</Text>
+			<View className="flex-col gap-4 mt-2">
 				{booksQuery.isLoading ? (
-					<XStack alignItems="center" gap="$3">
-						<Spinner color="$accentSolid" />
-						<Text color="$muted">Loading your imported books...</Text>
-					</XStack>
+					<View className="flex-row items-center gap-3">
+						<ActivityIndicator color="#496360" />
+						<Text className="text-kern-muted font-ui">Loading your imported books...</Text>
+					</View>
 				) : null}
+				
 				{booksQuery.data?.length ? (
-					<YStack gap="$3">
+					<View className="flex-col gap-3">
 						{booksQuery.data.map((book) => (
 							<BookWithProgress
 								key={book.id}
@@ -101,20 +97,20 @@ export function LibraryScreen() {
 								}}
 							/>
 						))}
-					</YStack>
+					</View>
 				) : null}
+				
 				{!booksQuery.isLoading && !booksQuery.data?.length ? (
-					<YStack gap="$3">
-						<Text color="$muted">
+					<View className="flex-col gap-3 p-4 bg-kern-surface-container rounded-[24px]">
+						<Text className="text-kern-muted font-ui">
 							Your library is empty. Start by importing an EPUB from your device.
 						</Text>
-						<Text color="$muted">
-							Everything stays available offline after import, with or without an
-							account.
+						<Text className="text-kern-muted font-ui">
+							Everything stays available offline after import.
 						</Text>
-					</YStack>
+					</View>
 				) : null}
-			</PanelCard>
+			</View>
 		</ScreenShell>
 	)
 }

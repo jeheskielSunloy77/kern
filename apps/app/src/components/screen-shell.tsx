@@ -1,21 +1,19 @@
 import { PropsWithChildren } from 'react'
-
-import { ScrollView } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { YStack } from 'tamagui'
 
 export function ScreenShell({
 	children,
 	scroll = true,
 }: PropsWithChildren<{ scroll?: boolean }>) {
 	const content = (
-		<YStack flex={1} padding="$5" gap="$5" backgroundColor="$background">
+		<View className="flex-1 bg-kern-surface px-5 py-5 gap-y-5">
 			{children}
-		</YStack>
+		</View>
 	)
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: '#f5eddc' }}>
+		<SafeAreaView style={{ flex: 1 }} className="bg-kern-surface">
 			{scroll ? (
 				<ScrollView
 					contentContainerStyle={{ flexGrow: 1 }}

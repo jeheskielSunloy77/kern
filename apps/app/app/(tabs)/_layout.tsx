@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router'
-import { Text, YStack } from 'tamagui'
+import { Text, View } from 'react-native'
 
 function TabGlyph({
 	label,
@@ -9,22 +9,16 @@ function TabGlyph({
 	focused: boolean
 }) {
 	return (
-		<YStack alignItems="center" gap="$1">
-			<YStack
-				width={focused ? 28 : 8}
-				height={6}
-				borderRadius="$4"
-				backgroundColor={focused ? '$accentSolid' : '$border'}
+		<View className="items-center gap-1">
+			<View
+				className={`h-1.5 rounded-full ${focused ? 'w-7 bg-kern-primary' : 'w-2 bg-kern-surface-highest'}`}
 			/>
 			<Text
-				fontFamily="$body"
-				fontSize="$2"
-				fontWeight={focused ? '700' : '600'}
-				color={focused ? '$ink' : '$muted'}
+				className={`font-ui text-xs ${focused ? 'font-bold text-kern-ink' : 'font-semibold text-kern-muted'}`}
 			>
 				{label}
 			</Text>
-		</YStack>
+		</View>
 	)
 }
 
@@ -34,13 +28,13 @@ export default function TabsLayout() {
 			screenOptions={{
 				headerShown: false,
 				sceneStyle: {
-					backgroundColor: '#f5eddc',
+					backgroundColor: '#faf9f5', // kern-surface
 				},
 				tabBarShowLabel: false,
 				tabBarStyle: {
-					backgroundColor: '#fcf7eb',
-					borderTopColor: '#d8ccb3',
-					borderTopWidth: 1,
+					backgroundColor: '#f4f4ef', // kern-surface-low
+					borderTopWidth: 0,
+					elevation: 0,
 					height: 82,
 					paddingTop: 10,
 					paddingBottom: 12,
@@ -50,14 +44,6 @@ export default function TabsLayout() {
 				},
 			}}
 		>
-			<Tabs.Screen
-				name="home"
-				options={{
-					tabBarIcon: ({ focused }) => (
-						<TabGlyph label="Home" focused={focused} />
-					),
-				}}
-			/>
 			<Tabs.Screen
 				name="library"
 				options={{
@@ -75,10 +61,10 @@ export default function TabsLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name="account"
+				name="profile"
 				options={{
 					tabBarIcon: ({ focused }) => (
-						<TabGlyph label="Account" focused={focused} />
+						<TabGlyph label="Profile" focused={focused} />
 					),
 				}}
 			/>

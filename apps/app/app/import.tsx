@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { Href, useLocalSearchParams, useRouter } from 'expo-router'
 import { useSQLiteContext } from 'expo-sqlite'
-import { Spinner, Text, YStack } from 'tamagui'
+import { ActivityIndicator, Text, View } from 'react-native'
 
 import { FullScreenCard } from '../src/components/full-screen-card'
 import { importEpubFromUri } from '../src/storage/import-epub'
@@ -56,15 +56,15 @@ export default function ImportRoute() {
 
 	return (
 		<FullScreenCard>
-			<YStack gap="$4" alignItems="center">
-				<Spinner size="large" color="$accentSolid" />
-				<Text fontFamily="$heading" fontSize="$7" color="$ink">
+			<View className="gap-4 items-center flex-col">
+				<ActivityIndicator size="large" color="#496360" />
+				<Text className="font-heading text-3xl text-kern-ink">
 					Importing
 				</Text>
-				<Text textAlign="center" color="$muted">
+				<Text className="text-center text-kern-muted font-ui">
 					{message}
 				</Text>
-			</YStack>
+			</View>
 		</FullScreenCard>
 	)
 }
