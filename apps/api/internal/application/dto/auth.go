@@ -13,6 +13,10 @@ type LoginInput struct {
 	Password   string
 }
 
+type GoogleMobileLoginInput struct {
+	IDToken string
+}
+
 type VerifyEmailInput struct {
 	Email string
 	Code  string

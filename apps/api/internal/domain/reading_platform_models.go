@@ -122,6 +122,41 @@ func (m Highlight) GetID() uuid.UUID {
 	return m.ID
 }
 
+type Bookmark struct {
+	ID                uuid.UUID       `json:"id" gorm:"type:uuid;primaryKey"`
+	UserID            uuid.UUID       `json:"userId" gorm:"type:uuid;not null;index"`
+	UserLibraryBookID uuid.UUID       `json:"userLibraryBookId" gorm:"type:uuid;not null;index"`
+	Mode              string          `json:"mode" gorm:"not null"`
+	LocatorJSON       json.RawMessage `json:"locatorJson" gorm:"type:jsonb;not null"`
+	Label             *string         `json:"label,omitempty"`
+	IsDeleted         bool            `json:"isDeleted"`
+	CreatedAt         time.Time       `json:"createdAt"`
+	UpdatedAt         time.Time       `json:"updatedAt"`
+	DeletedAt         gorm.DeletedAt  `json:"deletedAt"`
+}
+
+func (m Bookmark) GetID() uuid.UUID {
+	return m.ID
+}
+
+type Note struct {
+	ID                uuid.UUID       `json:"id" gorm:"type:uuid;primaryKey"`
+	UserID            uuid.UUID       `json:"userId" gorm:"type:uuid;not null;index"`
+	UserLibraryBookID uuid.UUID       `json:"userLibraryBookId" gorm:"type:uuid;not null;index"`
+	Mode              string          `json:"mode" gorm:"not null"`
+	LocatorJSON       json.RawMessage `json:"locatorJson" gorm:"type:jsonb;not null"`
+	Excerpt           *string         `json:"excerpt,omitempty"`
+	Content           string          `json:"content" gorm:"not null"`
+	IsDeleted         bool            `json:"isDeleted"`
+	CreatedAt         time.Time       `json:"createdAt"`
+	UpdatedAt         time.Time       `json:"updatedAt"`
+	DeletedAt         gorm.DeletedAt  `json:"deletedAt"`
+}
+
+func (m Note) GetID() uuid.UUID {
+	return m.ID
+}
+
 type CommunityBookOwner struct {
 	ID        uuid.UUID `json:"id"`
 	Username  string    `json:"username"`

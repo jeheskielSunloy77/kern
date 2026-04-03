@@ -124,6 +124,7 @@ type AuthService interface {
 	Login(ctx context.Context, input applicationdto.LoginInput, userAgent, ipAddress string) (*AuthResult, error)
 	StartGoogleAuth(ctx context.Context) (*GoogleAuthStart, error)
 	CompleteGoogleAuth(ctx context.Context, code, state, stateCookie, userAgent, ipAddress string) (*AuthResult, error)
+	LoginWithGoogleIDToken(ctx context.Context, input applicationdto.GoogleMobileLoginInput, userAgent, ipAddress string) (*AuthResult, error)
 	VerifyEmail(ctx context.Context, input applicationdto.VerifyEmailInput) (*domain.User, error)
 	StartDeviceAuth(ctx context.Context) (*DeviceAuthStartResult, error)
 	PollDeviceAuth(ctx context.Context, input applicationdto.DeviceAuthPollInput, userAgent, ipAddress string) (*DeviceAuthPollResult, error)
@@ -320,6 +321,28 @@ func (s *authService) CompleteGoogleAuth(ctx context.Context, code, state, state
 	return s.loginWithGoogleClaims(ctx, subject, emailClaim, emailVerified, userAgent, ipAddress)
 }
 
+func (s *authService) LoginWithGoogleIDToken(ctx context.Context, input applicationdto.GoogleMobileLoginInput, userAgent, ipAddress string) (*AuthResult, error) {
+	if !s.googleIDTokenReady() {
+		return nil, errs.NewBadRequestError("Google login is not configured", false, nil, nil)
+	}
+
+	rawIDToken := strings.TrimSpace(input.IDToken)
+	if rawIDToken == "" {
+		return nil, errs.NewBadRequestError("Invalid Google token", false, nil, nil)
+	}
+
+	claims, err := s.googleTokenValidator(ctx, rawIDToken, s.googleClientID)
+	if err != nil {
+		return nil, errs.NewUnauthorizedError("Invalid Google token", false)
+	}
+
+	subject := claims.Subject
+	emailClaim, _ := claims.Claims["email"].(string)
+	emailVerified, _ := claims.Claims["email_verified"].(bool)
+
+	return s.loginWithGoogleClaims(ctx, subject, emailClaim, emailVerified, userAgent, ipAddress)
+}
+
 func (s *authService) loginWithGoogleClaims(ctx context.Context, subject, emailClaim string, emailVerified bool, userAgent, ipAddress string) (*AuthResult, error) {
 	if subject == "" {
 		return nil, errs.NewUnauthorizedError("Invalid Google token", false)
@@ -383,6 +406,10 @@ func (s *authService) loginWithGoogleClaims(ctx context.Context, subject, emailC
 
 func (s *authService) googleConfigReady() bool {
 	return s.googleClientID != "" && s.googleClientSecret != "" && s.googleRedirectURL != "" && s.googleOAuthConfig != nil
+}
+
+func (s *authService) googleIDTokenReady() bool {
+	return s.googleClientID != "" && s.googleTokenValidator != nil
 }
 
 func (s *authService) buildGoogleStateCookie() (string, string, time.Time, error) {

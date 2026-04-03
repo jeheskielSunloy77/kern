@@ -50,6 +50,118 @@ func TestLibraryServiceUpsertLibraryBook_PublicRequiresPreferredAsset(t *testing
 	require.NoError(t, err)
 }
 
+func TestLibraryServiceBookmarkAndNoteLifecycle(t *testing.T) {
+	testDB, cleanup := internaltesting.SetupTestDB(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	err := internaltesting.WithRollbackTransaction(ctx, testDB, func(tx *gorm.DB) error {
+		require.NoError(t, tx.Create(&domain.User{ID: uuid.New(), Email: "reader@example.com", Username: "reader"}).Error)
+		var reader domain.User
+		require.NoError(t, tx.First(&reader, "email = ?", "reader@example.com").Error)
+
+		libraryRepo := repository.NewLibraryRepository(tx)
+		service := NewLibraryService(libraryRepo, nil)
+
+		catalog := &domain.BookCatalog{
+			Title:      "Book One",
+			Authors:    "Author",
+			SourceType: "user_upload",
+		}
+		require.NoError(t, libraryRepo.CreateCatalogBook(ctx, catalog))
+
+		book, err := service.UpsertLibraryBook(ctx, reader.ID, applicationdto.CreateLibraryBookInput{
+			CatalogBookID: catalog.ID,
+		})
+		require.NoError(t, err)
+
+		bookmark, err := service.CreateBookmark(ctx, reader.ID, book.ID, applicationdto.CreateBookmarkInput{
+			Mode:        domain.ReadingModeEPUB,
+			LocatorJSON: []byte(`{"cfi":"epubcfi(/6/2[chapter-1])"}`),
+		})
+		require.NoError(t, err)
+		require.NotEqual(t, uuid.Nil, bookmark.ID)
+
+		note, err := service.CreateNote(ctx, reader.ID, book.ID, applicationdto.CreateNoteInput{
+			Mode:        domain.ReadingModeEPUB,
+			LocatorJSON: []byte(`{"cfi":"epubcfi(/6/2[chapter-1])"}`),
+			Content:     "Important passage",
+		})
+		require.NoError(t, err)
+		require.NotEqual(t, uuid.Nil, note.ID)
+
+		visibleBookmarks, err := service.ListBookmarks(ctx, reader.ID, book.ID, false)
+		require.NoError(t, err)
+		require.Len(t, visibleBookmarks, 1)
+
+		visibleNotes, err := service.ListNotes(ctx, reader.ID, book.ID, false)
+		require.NoError(t, err)
+		require.Len(t, visibleNotes, 1)
+
+		require.NoError(t, service.DeleteBookmark(ctx, reader.ID, bookmark.ID))
+		require.NoError(t, service.DeleteNote(ctx, reader.ID, note.ID))
+
+		visibleBookmarks, err = service.ListBookmarks(ctx, reader.ID, book.ID, false)
+		require.NoError(t, err)
+		require.Len(t, visibleBookmarks, 0)
+
+		visibleNotes, err = service.ListNotes(ctx, reader.ID, book.ID, false)
+		require.NoError(t, err)
+		require.Len(t, visibleNotes, 0)
+
+		allBookmarks, err := service.ListBookmarks(ctx, reader.ID, book.ID, true)
+		require.NoError(t, err)
+		require.Len(t, allBookmarks, 1)
+		require.True(t, allBookmarks[0].IsDeleted)
+
+		allNotes, err := service.ListNotes(ctx, reader.ID, book.ID, true)
+		require.NoError(t, err)
+		require.Len(t, allNotes, 1)
+		require.True(t, allNotes[0].IsDeleted)
+
+		return nil
+	})
+	require.NoError(t, err)
+}
+
+func TestLibraryServiceCreateCatalogBook_ReusesChecksumMatch(t *testing.T) {
+	testDB, cleanup := internaltesting.SetupTestDB(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	err := internaltesting.WithRollbackTransaction(ctx, testDB, func(tx *gorm.DB) error {
+		libraryRepo := repository.NewLibraryRepository(tx)
+		service := NewLibraryService(libraryRepo, nil)
+
+		first, err := service.CreateCatalogBook(ctx, applicationdto.CreateCatalogBookInput{
+			Title:   "Book One",
+			Authors: "Author",
+			Identifiers: map[string]string{
+				"checksum": "abc123",
+			},
+			SourceType: stringPtr("mobile_import"),
+		})
+		require.NoError(t, err)
+
+		second, err := service.CreateCatalogBook(ctx, applicationdto.CreateCatalogBookInput{
+			Title:   "Book One Duplicate",
+			Authors: "Another Author",
+			Identifiers: map[string]string{
+				"checksum": "abc123",
+			},
+			SourceType: stringPtr("mobile_import"),
+		})
+		require.NoError(t, err)
+		require.Equal(t, first.ID, second.ID)
+
+		var count int64
+		require.NoError(t, tx.Model(&domain.BookCatalog{}).Count(&count).Error)
+		require.EqualValues(t, 1, count)
+		return nil
+	})
+	require.NoError(t, err)
+}
+
 func TestCommunityServiceSaveBook_ClonesOwnedRows(t *testing.T) {
 	testDB, cleanup := internaltesting.SetupTestDB(t)
 	defer cleanup()
@@ -171,5 +283,9 @@ func TestCommunityServiceSaveBook_IsIdempotentPerSourceBook(t *testing.T) {
 }
 
 func boolPtr(v bool) *bool {
+	return &v
+}
+
+func stringPtr(v string) *string {
 	return &v
 }

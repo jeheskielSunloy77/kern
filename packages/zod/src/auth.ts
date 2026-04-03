@@ -7,7 +7,13 @@ export const ZAuthToken = z.object({
 	expiresAt: z.string().datetime(),
 })
 
-export const ZAuthResult = ZUser
+export const ZAuthSession = z.object({
+	user: ZUser,
+	token: ZAuthToken,
+	refreshToken: ZAuthToken,
+})
+
+export const ZAuthResult = ZAuthSession
 
 export const ZAuthRefreshDTO = z.object({
 	refreshToken: z.string().min(32).max(256).optional(),
@@ -27,6 +33,10 @@ export const ZAuthLoginDTO = z.object({
 export const ZAuthGoogleCallbackQuery = z.object({
 	code: z.string(),
 	state: z.string(),
+})
+
+export const ZAuthGoogleMobileDTO = z.object({
+	idToken: z.string().min(1),
 })
 
 export const ZAuthVerifyEmailDTO = z.object({

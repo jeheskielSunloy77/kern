@@ -31,18 +31,18 @@ func NewAuthHandler(h Handler, authService application.AuthService) *AuthHandler
 }
 
 func (h *AuthHandler) Register() fiber.Handler {
-	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.RegisterRequest) (*domain.User, error) {
+	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.RegisterRequest) (*application.AuthResult, error) {
 		result, err := h.authService.Register(c.UserContext(), req.ToUsecase(), c.Get(fiber.HeaderUserAgent), c.IP())
 		if err != nil {
 			return nil, err
 		}
 		h.setAuthCookies(c, result)
-		return result.User, nil
+		return result, nil
 	}, http.StatusCreated, &httpdto.RegisterRequest{})
 }
 
 func (h *AuthHandler) Login() fiber.Handler {
-	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.LoginRequest) (*domain.User, error) {
+	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.LoginRequest) (*application.AuthResult, error) {
 		identifier := req.Identifier
 		if isEmail(identifier) {
 			identifier = normalizeEmail(identifier)
@@ -55,7 +55,7 @@ func (h *AuthHandler) Login() fiber.Handler {
 			return nil, err
 		}
 		h.setAuthCookies(c, result)
-		return result.User, nil
+		return result, nil
 	}, http.StatusOK, &httpdto.LoginRequest{})
 }
 
@@ -96,6 +96,16 @@ func (h *AuthHandler) GoogleCallback() fiber.Handler {
 
 		return c.Redirect(h.server.Config.Auth.GoogleSuccessRedirectURL, http.StatusFound)
 	}
+}
+
+func (h *AuthHandler) GoogleMobile() fiber.Handler {
+	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.GoogleMobileLoginRequest) (*application.AuthResult, error) {
+		result, err := h.authService.LoginWithGoogleIDToken(c.UserContext(), req.ToUsecase(), c.Get(fiber.HeaderUserAgent), c.IP())
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+	}, http.StatusOK, &httpdto.GoogleMobileLoginRequest{})
 }
 
 func (h *AuthHandler) VerifyEmail() fiber.Handler {
@@ -238,7 +248,7 @@ func (h *AuthHandler) DeviceApprove() fiber.Handler {
 }
 
 func (h *AuthHandler) Refresh() fiber.Handler {
-	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.RefreshRequest) (*domain.User, error) {
+	return Handle(h.Handler, func(c *fiber.Ctx, req *httpdto.RefreshRequest) (*application.AuthResult, error) {
 		refreshToken := c.Cookies(h.refreshCookieName())
 		if req != nil && req.RefreshToken != nil && strings.TrimSpace(*req.RefreshToken) != "" {
 			refreshToken = strings.TrimSpace(*req.RefreshToken)
@@ -248,7 +258,7 @@ func (h *AuthHandler) Refresh() fiber.Handler {
 			return nil, err
 		}
 		h.setAuthCookies(c, result)
-		return result.User, nil
+		return result, nil
 	}, http.StatusOK, &httpdto.RefreshRequest{})
 }
 

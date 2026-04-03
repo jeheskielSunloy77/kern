@@ -495,6 +495,67 @@ func TestAuthServiceCompleteGoogleAuth_Success(t *testing.T) {
 	require.NotEmpty(t, result.RefreshToken.Token)
 }
 
+// Ensures native Google login validates an ID token and creates a session.
+func TestAuthServiceLoginWithGoogleIDToken_Success(t *testing.T) {
+	ctx := context.Background()
+	userID := uuid.New()
+
+	repo := &mockAuthRepo{
+		getByGoogleIDFn: func(_ context.Context, googleID string) (*domain.User, error) {
+			return nil, gorm.ErrRecordNotFound
+		},
+		getByEmailFn: func(_ context.Context, email string) (*domain.User, error) {
+			return nil, gorm.ErrRecordNotFound
+		},
+		createUserFn: func(_ context.Context, user *domain.User) error {
+			user.ID = userID
+			return nil
+		},
+	}
+
+	sessionRepo := &mockSessionRepo{
+		createFn: func(_ context.Context, session *domain.AuthSession) error {
+			session.ID = uuid.New()
+			return nil
+		},
+	}
+
+	svc := NewAuthService(
+		&config.AuthConfig{
+			SecretKey:      "secret",
+			AccessTokenTTL: time.Minute,
+			GoogleClientID: "client",
+		},
+		repo,
+		sessionRepo,
+		nil,
+		nil,
+		nil,
+	).(*authService)
+
+	svc.googleTokenValidator = func(_ context.Context, token, audience string) (*idtoken.Payload, error) {
+		require.Equal(t, "mobile-id-token", token)
+		require.Equal(t, "client", audience)
+		return &idtoken.Payload{
+			Subject: "google-mobile-sub",
+			Claims: map[string]interface{}{
+				"email":          "mobile@example.com",
+				"email_verified": true,
+			},
+		}, nil
+	}
+
+	result, err := svc.LoginWithGoogleIDToken(ctx, applicationdto.GoogleMobileLoginInput{
+		IDToken: "mobile-id-token",
+	}, "android-app", "127.0.0.1")
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	require.Equal(t, userID, result.User.ID)
+	require.Equal(t, "mobile@example.com", result.User.Email)
+	require.NotEmpty(t, result.Token.Token)
+	require.NotEmpty(t, result.RefreshToken.Token)
+}
+
 // Ensures VerifyEmail marks the user as verified when the code is valid.
 func TestAuthServiceVerifyEmail_Success(t *testing.T) {
 	ctx := context.Background()

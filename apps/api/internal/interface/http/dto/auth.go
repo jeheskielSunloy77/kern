@@ -39,6 +39,20 @@ func (d *LoginRequest) ToUsecase() dto.LoginInput {
 	}
 }
 
+type GoogleMobileLoginRequest struct {
+	IDToken string `json:"idToken" validate:"required"`
+}
+
+func (d *GoogleMobileLoginRequest) Validate() error {
+	return validator.New().Struct(d)
+}
+
+func (d *GoogleMobileLoginRequest) ToUsecase() dto.GoogleMobileLoginInput {
+	return dto.GoogleMobileLoginInput{
+		IDToken: d.IDToken,
+	}
+}
+
 type VerifyEmailRequest struct {
 	Email string `json:"email" validate:"required,email"`
 	Code  string `json:"code" validate:"required,min=4,max=10"`

@@ -3,8 +3,9 @@ package application
 import (
 	"context"
 	"crypto/sha256"
-	"encoding/json"
 	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"path"
@@ -18,6 +19,7 @@ import (
 	"github.com/jeheskielSunloy77/kern/internal/application/port"
 	"github.com/jeheskielSunloy77/kern/internal/domain"
 	"github.com/jeheskielSunloy77/kern/internal/infrastructure/lib/storage"
+	"gorm.io/gorm"
 )
 
 type LibraryService interface {
@@ -34,9 +36,19 @@ type LibraryService interface {
 	UpsertReadingState(ctx context.Context, userID, libraryBookID uuid.UUID, input applicationdto.UpsertReadingStateInput) (*domain.ReadingState, error)
 
 	CreateHighlight(ctx context.Context, userID, libraryBookID uuid.UUID, input applicationdto.CreateHighlightInput) (*domain.Highlight, error)
-	ListHighlights(ctx context.Context, userID, libraryBookID uuid.UUID) ([]domain.Highlight, error)
+	ListHighlights(ctx context.Context, userID, libraryBookID uuid.UUID, includeDeleted bool) ([]domain.Highlight, error)
 	UpdateHighlight(ctx context.Context, userID, highlightID uuid.UUID, input applicationdto.UpdateHighlightInput) (*domain.Highlight, error)
 	DeleteHighlight(ctx context.Context, userID, highlightID uuid.UUID) error
+
+	CreateBookmark(ctx context.Context, userID, libraryBookID uuid.UUID, input applicationdto.CreateBookmarkInput) (*domain.Bookmark, error)
+	ListBookmarks(ctx context.Context, userID, libraryBookID uuid.UUID, includeDeleted bool) ([]domain.Bookmark, error)
+	UpdateBookmark(ctx context.Context, userID, bookmarkID uuid.UUID, input applicationdto.UpdateBookmarkInput) (*domain.Bookmark, error)
+	DeleteBookmark(ctx context.Context, userID, bookmarkID uuid.UUID) error
+
+	CreateNote(ctx context.Context, userID, libraryBookID uuid.UUID, input applicationdto.CreateNoteInput) (*domain.Note, error)
+	ListNotes(ctx context.Context, userID, libraryBookID uuid.UUID, includeDeleted bool) ([]domain.Note, error)
+	UpdateNote(ctx context.Context, userID, noteID uuid.UUID, input applicationdto.UpdateNoteInput) (*domain.Note, error)
+	DeleteNote(ctx context.Context, userID, noteID uuid.UUID) error
 }
 
 type libraryService struct {
@@ -58,6 +70,17 @@ func (s *libraryService) CreateCatalogBook(ctx context.Context, input applicatio
 
 	identifiers := []byte("{}")
 	if len(input.Identifiers) > 0 {
+		if checksum := strings.TrimSpace(input.Identifiers["checksum"]); checksum != "" {
+			existing, err := s.repo.FindCatalogBookByChecksum(ctx, checksum)
+			switch {
+			case err == nil:
+				return existing, nil
+			case errors.Is(err, gorm.ErrRecordNotFound):
+			default:
+				return nil, sqlerr.HandleError(err)
+			}
+		}
+
 		encoded, err := jsonMarshal(input.Identifiers)
 		if err != nil {
 			return nil, errs.NewBadRequestError("identifiers must be a valid object", true, nil, nil)
@@ -318,11 +341,11 @@ func (s *libraryService) CreateHighlight(ctx context.Context, userID, libraryBoo
 	return highlight, nil
 }
 
-func (s *libraryService) ListHighlights(ctx context.Context, userID, libraryBookID uuid.UUID) ([]domain.Highlight, error) {
+func (s *libraryService) ListHighlights(ctx context.Context, userID, libraryBookID uuid.UUID, includeDeleted bool) ([]domain.Highlight, error) {
 	if _, err := s.repo.GetUserLibraryBookByID(ctx, userID, libraryBookID); err != nil {
 		return nil, sqlerr.HandleError(err)
 	}
-	highlights, err := s.repo.ListHighlights(ctx, userID, libraryBookID)
+	highlights, err := s.repo.ListHighlights(ctx, userID, libraryBookID, includeDeleted)
 	if err != nil {
 		return nil, sqlerr.HandleError(err)
 	}
@@ -356,6 +379,133 @@ func (s *libraryService) UpdateHighlight(ctx context.Context, userID, highlightI
 
 func (s *libraryService) DeleteHighlight(ctx context.Context, userID, highlightID uuid.UUID) error {
 	if err := s.repo.DeleteHighlight(ctx, userID, highlightID); err != nil {
+		return sqlerr.HandleError(err)
+	}
+	return nil
+}
+
+func (s *libraryService) CreateBookmark(ctx context.Context, userID, libraryBookID uuid.UUID, input applicationdto.CreateBookmarkInput) (*domain.Bookmark, error) {
+	if !isValidReadingMode(input.Mode) {
+		return nil, errs.NewBadRequestError("Validation failed", true, []errs.FieldError{{Field: "mode", Error: "unsupported reading mode"}}, nil)
+	}
+	if _, err := s.repo.GetUserLibraryBookByID(ctx, userID, libraryBookID); err != nil {
+		return nil, sqlerr.HandleError(err)
+	}
+
+	bookmark := &domain.Bookmark{
+		UserID:            userID,
+		UserLibraryBookID: libraryBookID,
+		Mode:              input.Mode,
+		LocatorJSON:       emptyJSONIfNil(input.LocatorJSON),
+		Label:             input.Label,
+		IsDeleted:         false,
+	}
+	if err := s.repo.CreateBookmark(ctx, bookmark); err != nil {
+		return nil, sqlerr.HandleError(err)
+	}
+	return bookmark, nil
+}
+
+func (s *libraryService) ListBookmarks(ctx context.Context, userID, libraryBookID uuid.UUID, includeDeleted bool) ([]domain.Bookmark, error) {
+	if _, err := s.repo.GetUserLibraryBookByID(ctx, userID, libraryBookID); err != nil {
+		return nil, sqlerr.HandleError(err)
+	}
+	bookmarks, err := s.repo.ListBookmarks(ctx, userID, libraryBookID, includeDeleted)
+	if err != nil {
+		return nil, sqlerr.HandleError(err)
+	}
+	return bookmarks, nil
+}
+
+func (s *libraryService) UpdateBookmark(ctx context.Context, userID, bookmarkID uuid.UUID, input applicationdto.UpdateBookmarkInput) (*domain.Bookmark, error) {
+	updates := make(map[string]any)
+	if input.LocatorJSON != nil {
+		updates["locator_json"] = emptyJSONIfNil(*input.LocatorJSON)
+	}
+	if input.Label != nil {
+		updates["label"] = input.Label
+	}
+	if len(updates) == 0 {
+		return s.repo.GetBookmarkByID(ctx, userID, bookmarkID)
+	}
+	bookmark, err := s.repo.UpdateBookmark(ctx, userID, bookmarkID, updates)
+	if err != nil {
+		return nil, sqlerr.HandleError(err)
+	}
+	return bookmark, nil
+}
+
+func (s *libraryService) DeleteBookmark(ctx context.Context, userID, bookmarkID uuid.UUID) error {
+	if err := s.repo.DeleteBookmark(ctx, userID, bookmarkID); err != nil {
+		return sqlerr.HandleError(err)
+	}
+	return nil
+}
+
+func (s *libraryService) CreateNote(ctx context.Context, userID, libraryBookID uuid.UUID, input applicationdto.CreateNoteInput) (*domain.Note, error) {
+	if !isValidReadingMode(input.Mode) {
+		return nil, errs.NewBadRequestError("Validation failed", true, []errs.FieldError{{Field: "mode", Error: "unsupported reading mode"}}, nil)
+	}
+	if strings.TrimSpace(input.Content) == "" {
+		return nil, errs.NewBadRequestError("Validation failed", true, []errs.FieldError{{Field: "content", Error: "is required"}}, nil)
+	}
+	if _, err := s.repo.GetUserLibraryBookByID(ctx, userID, libraryBookID); err != nil {
+		return nil, sqlerr.HandleError(err)
+	}
+
+	note := &domain.Note{
+		UserID:            userID,
+		UserLibraryBookID: libraryBookID,
+		Mode:              input.Mode,
+		LocatorJSON:       emptyJSONIfNil(input.LocatorJSON),
+		Excerpt:           input.Excerpt,
+		Content:           strings.TrimSpace(input.Content),
+		IsDeleted:         false,
+	}
+	if err := s.repo.CreateNote(ctx, note); err != nil {
+		return nil, sqlerr.HandleError(err)
+	}
+	return note, nil
+}
+
+func (s *libraryService) ListNotes(ctx context.Context, userID, libraryBookID uuid.UUID, includeDeleted bool) ([]domain.Note, error) {
+	if _, err := s.repo.GetUserLibraryBookByID(ctx, userID, libraryBookID); err != nil {
+		return nil, sqlerr.HandleError(err)
+	}
+	notes, err := s.repo.ListNotes(ctx, userID, libraryBookID, includeDeleted)
+	if err != nil {
+		return nil, sqlerr.HandleError(err)
+	}
+	return notes, nil
+}
+
+func (s *libraryService) UpdateNote(ctx context.Context, userID, noteID uuid.UUID, input applicationdto.UpdateNoteInput) (*domain.Note, error) {
+	updates := make(map[string]any)
+	if input.LocatorJSON != nil {
+		updates["locator_json"] = emptyJSONIfNil(*input.LocatorJSON)
+	}
+	if input.Excerpt != nil {
+		updates["excerpt"] = input.Excerpt
+	}
+	if input.Content != nil {
+		trimmed := strings.TrimSpace(*input.Content)
+		if trimmed == "" {
+			return nil, errs.NewBadRequestError("Validation failed", true, []errs.FieldError{{Field: "content", Error: "is required"}}, nil)
+		}
+		updates["content"] = trimmed
+	}
+	if len(updates) == 0 {
+		return s.repo.GetNoteByID(ctx, userID, noteID)
+	}
+	note, err := s.repo.UpdateNote(ctx, userID, noteID, updates)
+	if err != nil {
+		return nil, sqlerr.HandleError(err)
+	}
+	return note, nil
+}
+
+func (s *libraryService) DeleteNote(ctx context.Context, userID, noteID uuid.UUID) error {
+	if err := s.repo.DeleteNote(ctx, userID, noteID); err != nil {
 		return sqlerr.HandleError(err)
 	}
 	return nil
